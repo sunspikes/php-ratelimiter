@@ -1,0 +1,35 @@
+{
+    "name": "sunspikes/laravel-ratelimit",
+    "description": "Ratelimit Is A Generic Throttler For Laravel 5",
+    "keywords": ["laravel", "framework", "rate limit", "throttle", "throttling", "ratelimit", "Laravel Ratelimit", "Laravel-Ratelimit", "Krishnaprasad MG", "sunspikes"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Krishnaprasad MG",
+            "email": "sunspikes@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5",
+        "desarrolla2/cache": "~1.8"
+    },
+    "require-dev": {
+        "mockery/mockery": "^0.9.4",
+        "phpunit/phpunit": "^4.7.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sunspikes\\Ratelimit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sunspikes\\Tests\\Ratelimit\\": "tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
