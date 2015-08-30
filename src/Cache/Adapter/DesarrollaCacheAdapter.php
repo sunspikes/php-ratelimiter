@@ -2,7 +2,7 @@
 
 namespace Sunspikes\Ratelimit\Cache\Adapter;
 
-class DesarrollaCacheAdapter extends AbstractAdapter
+class DesarrollaCacheAdapter extends AbstractCacheAdapter
 {
     public function __construct($cache, $ttl)
     {

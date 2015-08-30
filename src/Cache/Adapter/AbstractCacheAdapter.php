@@ -4,7 +4,7 @@ namespace Sunspikes\Ratelimit\Cache\Adapter;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
-class AbstractAdapter implements AdapterContract
+class AbstractCacheAdapter implements CacheAdapterContract
 {
     protected $ttl = 600; // 10 mins
 

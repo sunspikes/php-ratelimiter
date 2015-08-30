@@ -2,7 +2,7 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
-interface HydratorContract
+interface DataHydratorContract
 {
     public function hydrate($data, $limit, $ttl);
 }

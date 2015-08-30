@@ -2,7 +2,7 @@
 
 namespace Sunspikes\Ratelimit\Cache\Adapter;
 
-interface AdapterContract
+interface CacheAdapterContract
 {
     public function get($key);
 
