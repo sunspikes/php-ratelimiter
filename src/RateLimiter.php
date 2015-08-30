@@ -5,7 +5,6 @@ namespace Sunspikes;
 use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator;
-use Sunspikes\Ratelimit\Throttle\Hydrator\RequestHydrator;
 use Sunspikes\Ratelimit\Throttle\Hydrator\StringHydrator;
 
 class RateLimiter
