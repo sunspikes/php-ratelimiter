@@ -29,9 +29,6 @@ use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
 class AbstractCacheAdapter implements CacheAdapterContract
 {
-    /* @var int */
-    protected $ttl = 600; // 10 mins
-
     /* @var mixed */
     protected $cache;
 

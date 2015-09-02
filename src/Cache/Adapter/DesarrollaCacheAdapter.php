@@ -32,11 +32,9 @@ class DesarrollaCacheAdapter extends AbstractCacheAdapter
 {
     /**
      * @param \Desarrolla2\Cache\CacheInterface $cache
-     * @param int $ttl
      */
-    public function __construct($cache, $ttl)
+    public function __construct($cache)
     {
         $this->cache = $cache;
-        $this->ttl = $ttl;
     }
 }

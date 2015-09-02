@@ -25,6 +25,7 @@
 
 namespace Sunspikes;
 
+use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
 use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator;
@@ -36,17 +37,28 @@ class RateLimiter
     private $adapter;
     /* @var array */
     private $throttlers;
+    /* @var int */
+    private $limit;
+    /* @var int */
+    private $ttl;
 
     /**
      * @param array $config
+     * @param int $limit
+     * @param int $ttl
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $config)
+    public function __construct(array $config, $limit, $ttl)
     {
+        $this->limit = $limit;
+        $this->ttl = $ttl;
+
         if ('desarrolla' == $config['adapter'])
         {
-            $adapterFactory = new DesarrollaCacheFactory();
-            $this->adapter = $adapterFactory->make($config);
+            $cacheFactory = new DesarrollaCacheFactory();
+            $cache = $cacheFactory->make($config);
+
+            $this->adapter = new DesarrollaCacheAdapter($cache);
         }
 
         throw new \InvalidArgumentException('No adapter found, please check your config.');
@@ -56,29 +68,27 @@ class RateLimiter
      * Build the throttler for given data
      *
      * @param mixed $data
-     * @param int $limit
-     * @param int $ttl
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function get($data, $limit, $ttl)
+    public function get($data)
     {
         if (! empty($data))
         {
             if (is_array($data))
             {
-                $data = new ArrayHydrator($data, $limit, $ttl);
+                $data = new ArrayHydrator($data, $this->limit, $this->ttl);
             }
             elseif (is_string($data))
             {
-                $data = new StringHydrator($data, $limit, $ttl);
+                $data = new StringHydrator($data, $this->limit, $this->ttl);
             }
             else
             {
                 throw new \InvalidArgumentException("Unsupported data, please check the data.");
             }
 
-            if (isset($this->throttlers[$data->getKey()]))
+            if (! isset($this->throttlers[$data->getKey()]))
             {
                 $factory = new ThrottlerFactory();
                 /** @noinspection PhpParamsInspection */
