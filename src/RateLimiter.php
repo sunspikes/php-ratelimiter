@@ -81,6 +81,7 @@ class RateLimiter
             if (isset($this->throttlers[$data->getKey()]))
             {
                 $factory = new ThrottlerFactory();
+                /** @noinspection PhpParamsInspection */
                 $this->throttlers[$data->getKey()] = $factory->make($data, $this->adapter);
             }
         }

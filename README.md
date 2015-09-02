@@ -1,5 +1,5 @@
-PHP Ratelimiter  (*WIP*)
-========================
+PHP Ratelimiter
+===============
 
 A framework independent rate limiter for PHP
 
@@ -30,4 +30,3 @@ TODO
 ----
 - Tests
 - Documentation
-- Lot of cleanup

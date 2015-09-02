@@ -1,4 +1,7 @@
 <?php
+/**
+ * Configure the adapter and cache drivers
+ */
 
 return [
     'adapter' => 'desarrolla',
