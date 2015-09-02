@@ -48,7 +48,7 @@ class CacheThrottler implements ThrottlerContract, \Countable
      * @param int                                                     $limit
      * @param int                                                     $ttl
      */
-    public function __contruct($cache, $key, $limit, $ttl)
+    public function __construct($cache, $key, $limit, $ttl)
     {
         $this->cache = $cache;
         $this->key = $key;

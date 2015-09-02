@@ -55,5 +55,5 @@ print count($throttler); // or $throttler->count()
  
 TODO
 ----
-- Tests
-- Documentation
+- More Tests
+- More Documentation
