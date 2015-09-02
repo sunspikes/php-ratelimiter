@@ -4,8 +4,7 @@ PHP Ratelimiter
 A framework independent rate limiter for PHP
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sunspikes/php-ratelimiter/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/sunspikes/php-ratelimiter/?branch=master)
-
-[![Build Status](https://scrutinizer-ci.com/g/sunspikes/php-ratelimiter/badges/build.png?b=master)](https://scrutinizer-ci.com/g/sunspikes/php-ratelimiter/build-status/master)
+[![Build Status](https://travis-ci.org/sunspikes/php-ratelimiter.svg?branch=master)](https://travis-ci.org/sunspikes/php-ratelimiter)
 
 ## Installation
 
