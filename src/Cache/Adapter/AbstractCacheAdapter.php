@@ -75,5 +75,4 @@ class AbstractCacheAdapter implements CacheAdapterContract
     {
         $this->cache->clear();
     }
-
 }

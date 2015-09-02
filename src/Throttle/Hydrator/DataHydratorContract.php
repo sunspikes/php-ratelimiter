@@ -31,8 +31,8 @@ interface DataHydratorContract
      * Hydrate the given data
      *
      * @param mixed $data
-     * @param int $limit
-     * @param int $ttl
+     * @param int   $limit
+     * @param int   $ttl
      *
      * @return \Sunspikes\Ratelimit\Throttle\Entity\Data
      */

@@ -31,6 +31,7 @@ interface CacheAdapterContract
      * Get value from cache
      *
      * @param string $key
+     *
      * @return mixed
      */
     public function get($key);
@@ -39,8 +40,9 @@ interface CacheAdapterContract
      * Set value in cache
      *
      * @param string $key
-     * @param mixed $value
-     * @param int $ttl
+     * @param mixed  $value
+     * @param int    $ttl
+     *
      * @return mixed
      */
     public function set($key, $value, $ttl = null);
@@ -49,6 +51,7 @@ interface CacheAdapterContract
      * Delete value from cache
      *
      * @param string $key
+     *
      * @return mixed
      */
     public function delete($key);
@@ -57,6 +60,7 @@ interface CacheAdapterContract
      * Check if keyed value exists in cache
      *
      * @param string $key
+     *
      * @return bool
      */
     public function has($key);

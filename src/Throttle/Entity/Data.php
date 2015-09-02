@@ -29,20 +29,17 @@ class Data
 {
     /* @var string */
     protected $data;
-
     /* @var int */
     protected $limit;
-
     /* @var int */
     protected $ttl;
-
     /* @var string */
     protected $key;
 
     /**
      * @param string $data
-     * @param int $limit
-     * @param int $ttl
+     * @param int    $limit
+     * @param int    $ttl
      */
     public function __construct($data, $limit, $ttl)
     {

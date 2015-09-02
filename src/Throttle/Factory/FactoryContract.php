@@ -35,6 +35,7 @@ interface FactoryContract
      *
      * @param Data                 $data
      * @param CacheAdapterContract $cache
+     *
      * @return \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerContract
      */
     public function make(Data $data, CacheAdapterContract $cache);

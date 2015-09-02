@@ -44,8 +44,9 @@ class RateLimiter
 
     /**
      * @param array $config
-     * @param int $limit
-     * @param int $ttl
+     * @param int   $limit
+     * @param int   $ttl
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct(array $config, $limit, $ttl)
@@ -53,8 +54,7 @@ class RateLimiter
         $this->limit = $limit;
         $this->ttl = $ttl;
 
-        if ('desarrolla' == $config['adapter'])
-        {
+        if ('desarrolla' == $config['adapter']) {
             $cacheFactory = new DesarrollaCacheFactory();
             $cache = $cacheFactory->make($config);
 
@@ -68,28 +68,22 @@ class RateLimiter
      * Build the throttler for given data
      *
      * @param mixed $data
+     *
      * @return mixed
      * @throws \InvalidArgumentException
      */
     public function get($data)
     {
-        if (! empty($data))
-        {
-            if (is_array($data))
-            {
+        if (!empty($data)) {
+            if (is_array($data)) {
                 $data = new ArrayHydrator($data, $this->limit, $this->ttl);
-            }
-            elseif (is_string($data))
-            {
+            } elseif (is_string($data)) {
                 $data = new StringHydrator($data, $this->limit, $this->ttl);
-            }
-            else
-            {
+            } else {
                 throw new \InvalidArgumentException("Unsupported data, please check the data.");
             }
 
-            if (! isset($this->throttlers[$data->getKey()]))
-            {
+            if (!isset($this->throttlers[$data->getKey()])) {
                 $factory = new ThrottlerFactory();
                 /** @noinspection PhpParamsInspection */
                 $this->throttlers[$data->getKey()] = $factory->make($data, $this->adapter);

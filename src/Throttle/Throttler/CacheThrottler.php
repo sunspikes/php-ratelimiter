@@ -31,16 +31,12 @@ class CacheThrottler implements ThrottlerContract, \Countable
 {
     /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract */
     protected $cache;
-
     /* @var string */
     protected $key;
-
     /* @var int */
     protected $limit;
-
     /* @var int */
     protected $ttl;
-
     /* @var int */
     protected $counter;
 
@@ -48,9 +44,9 @@ class CacheThrottler implements ThrottlerContract, \Countable
      * Short description for Function
      *
      * @param \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract $cache
-     * @param string $key
-     * @param int $limit
-     * @param int $ttl
+     * @param string                                                  $key
+     * @param int                                                     $limit
+     * @param int                                                     $ttl
      */
     public function __contruct($cache, $key, $limit, $ttl)
     {
@@ -101,14 +97,13 @@ class CacheThrottler implements ThrottlerContract, \Countable
      */
     public function count()
     {
-        if (! is_null($this->counter)) {
+        if (!is_null($this->counter)) {
             return $this->counter;
         }
 
         try {
             $this->counter = $this->cache->get($this->key);
-        }
-        catch (ItemNotFoundException $e) {
+        } catch (ItemNotFoundException $e) {
             $this->counter = 0;
         }
 

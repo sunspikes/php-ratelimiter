@@ -4,35 +4,35 @@
  */
 
 return [
-    'adapter' => 'desarrolla',
+    'adapter'    => 'desarrolla',
     'desarrolla' => [
         'default_ttl' => 3600,
-        'driver' => 'notcache',
-        'notcache' => [
+        'driver'      => 'notcache',
+        'notcache'    => [
             // config for not cache
         ],
-        'file' => [
+        'file'        => [
             'cache_dir' => './data',
         ],
-        'apc' => [
+        'apc'         => [
             // config for apc
         ],
-        'memory' => [
+        'memory'      => [
             'limit' => 1000,
         ],
-        'mongo' => [
+        'mongo'       => [
             'server' => 'mongodb://localhost:27017',
         ],
-        'mysql' => [
-            'host' => '127.0.0.1',
+        'mysql'       => [
+            'host'     => '127.0.0.1',
             'username' => 'root',
             'password' => '',
-            'port' => 3306
+            'port'     => 3306
         ],
-        'redis' => [
+        'redis'       => [
             // config for redis
         ],
-        'memcache' => [
+        'memcache'    => [
             // config for memcache
         ],
     ]
