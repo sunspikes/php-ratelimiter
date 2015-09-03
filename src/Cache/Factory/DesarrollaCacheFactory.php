@@ -45,7 +45,7 @@ class DesarrollaCacheFactory implements FactoryInterface
     const DEFAULT_LIMIT = 1000;
 
     /* @var array */
-    private $config;
+    protected $config;
 
     /**
      * @inheritdoc
@@ -65,7 +65,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      * @throws DriverNotFoundException
      * @throws InvalidConfigException
      */
-    private function getDriver()
+    protected function getDriver()
     {
         $driver = $this->config['driver'];
 
@@ -93,7 +93,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return NotCache
      */
-    private function createNotcacheDriver()
+    protected function createNotcacheDriver()
     {
         return new NotCache();
     }
@@ -103,7 +103,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return File
      */
-    private function createFileDriver()
+    protected function createFileDriver()
     {
         return new File($this->config['cache_dir']);
     }
@@ -113,7 +113,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Apc
      */
-    private function createApcDriver()
+    protected function createApcDriver()
     {
         return new Apc();
     }
@@ -124,7 +124,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      * @return Memory
      * @throws \Desarrolla2\Cache\Adapter\MemoryCacheException
      */
-    private function createMemoryDriver()
+    protected function createMemoryDriver()
     {
         $memory = new Memory();
         $memory->setOption('limit',
@@ -140,7 +140,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Mongo
      */
-    private function createMongoDriver()
+    protected function createMongoDriver()
     {
         return new Mongo($this->config['server']);
     }
@@ -150,7 +150,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return MySQL
      */
-    private function createMysqlDriver()
+    protected function createMysqlDriver()
     {
         return new MySQL(
             $this->config['host'],
@@ -165,7 +165,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Redis
      */
-    private function createRedisDriver()
+    protected function createRedisDriver()
     {
         return new Redis();
     }
@@ -175,7 +175,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return MemCache
      */
-    private function createMemcacheDriver()
+    protected function createMemcacheDriver()
     {
         return new MemCache();
     }
