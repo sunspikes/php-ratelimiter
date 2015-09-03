@@ -27,7 +27,7 @@ compatible autoloader.
 
 ## Usage
 
-```
+```php
 <?php
 
 include 'vendor/autoload.php';
@@ -44,7 +44,11 @@ $throttler = $ratelimiter->get('/login');
 $throttler->access(); // or do $throttler->hit();
 
 // Check if it reached the limit
-$throttler->check();
+if ($throttler->check()) {
+    // access permitted
+} else {
+    // access denied
+}
 
 // Get the number of hits
 print count($throttler); // or $throttler->count()
