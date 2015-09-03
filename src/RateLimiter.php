@@ -76,14 +76,17 @@ class RateLimiter
     {
         if (!empty($data)) {
             if (is_array($data)) {
-                $data = new ArrayHydrator($data, $this->limit, $this->ttl);
+                $hydrator = new ArrayHydrator();
             } elseif (is_string($data)) {
-                $data = new StringHydrator($data, $this->limit, $this->ttl);
+                $hydrator = new StringHydrator();
             } else {
                 throw new \InvalidArgumentException("Unsupported data, please check the data.");
             }
 
             if (!isset($this->throttlers[$data->getKey()])) {
+                // Create the data object
+                $data = $hydrator->hydrate($data, $this->limit, $this->ttl);
+
                 $factory = new ThrottlerFactory();
                 /** @noinspection PhpParamsInspection */
                 $this->throttlers[$data->getKey()] = $factory->make($data, $this->adapter);
