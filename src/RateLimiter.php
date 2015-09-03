@@ -83,16 +83,18 @@ class RateLimiter
                 throw new \InvalidArgumentException("Unsupported data, please check the data.");
             }
 
-            if (!isset($this->throttlers[$data->getKey()])) {
-                // Create the data object
-                $data = $hydrator->hydrate($data, $this->limit, $this->ttl);
+            // Create the data object
+            $data = $hydrator->hydrate($data, $this->limit, $this->ttl);
 
+            if (!isset($this->throttlers[$data->getKey()])) {
                 $factory = new ThrottlerFactory();
                 /** @noinspection PhpParamsInspection */
                 $this->throttlers[$data->getKey()] = $factory->make($data, $this->adapter);
             }
+            
+            return $this->throttlers[$data->getKey()];
         }
 
-        return $this->throttlers[$data->getKey()];
+        throw new \InvalidArgumentException("Invalid data, please check the data.");
     }
 }
