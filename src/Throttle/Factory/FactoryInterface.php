@@ -23,52 +23,20 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Adapter;
+namespace Sunspikes\Ratelimit\Throttle\Factory;
 
-interface CacheAdapterContract
+use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Throttle\Entity\Data;
+
+interface FactoryInterface
 {
     /**
-     * Get value from cache
+     * Create the throttler
      *
-     * @param string $key
+     * @param Data                 $data
+     * @param CacheAdapterInterface $cache
      *
-     * @return mixed
+     * @return \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface
      */
-    public function get($key);
-
-    /**
-     * Set value in cache
-     *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $ttl
-     *
-     * @return mixed
-     */
-    public function set($key, $value, $ttl = null);
-
-    /**
-     * Delete value from cache
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function delete($key);
-
-    /**
-     * Check if keyed value exists in cache
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has($key);
-
-    /**
-     * Clear cache
-     *
-     * @return void
-     */
-    public function clear();
+    public function make(Data $data, CacheAdapterInterface $cache);
 }

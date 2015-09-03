@@ -3,7 +3,7 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
 use Mockery as M;
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract;
+use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
 
 class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
@@ -12,7 +12,7 @@ class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $cacheAdapter = M::mock(CacheAdapterContract::class);
+        $cacheAdapter = M::mock(CacheAdapterInterface::class);
 
         $cacheAdapter->shouldReceive('set')
             ->withAnyArgs()

@@ -33,7 +33,7 @@ use Sunspikes\Ratelimit\Throttle\Hydrator\StringHydrator;
 
 class RateLimiter
 {
-    /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract */
+    /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface */
     private $adapter;
     /* @var array */
     private $throttlers;

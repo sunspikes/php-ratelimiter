@@ -25,16 +25,16 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract;
+use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
 
-class ThrottlerFactory implements FactoryContract
+class ThrottlerFactory implements FactoryInterface
 {
     /**
      * @inheritdoc
      */
-    public function make(Data $data, CacheAdapterContract $cache)
+    public function make(Data $data, CacheAdapterInterface $cache)
     {
         $throttler = new CacheThrottler(
             $cache,

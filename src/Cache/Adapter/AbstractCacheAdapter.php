@@ -27,7 +27,7 @@ namespace Sunspikes\Ratelimit\Cache\Adapter;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
-class AbstractCacheAdapter implements CacheAdapterContract
+class AbstractCacheAdapter implements CacheAdapterInterface
 {
     /* @var mixed */
     protected $cache;

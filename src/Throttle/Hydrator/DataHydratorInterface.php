@@ -23,20 +23,18 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Factory;
+namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract;
-use Sunspikes\Ratelimit\Throttle\Entity\Data;
-
-interface FactoryContract
+interface DataHydratorInterface
 {
     /**
-     * Create the throttler
+     * Hydrate the given data
      *
-     * @param Data                 $data
-     * @param CacheAdapterContract $cache
+     * @param mixed $data
+     * @param int   $limit
+     * @param int   $ttl
      *
-     * @return \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerContract
+     * @return \Sunspikes\Ratelimit\Throttle\Entity\Data
      */
-    public function make(Data $data, CacheAdapterContract $cache);
+    public function hydrate($data, $limit, $ttl);
 }

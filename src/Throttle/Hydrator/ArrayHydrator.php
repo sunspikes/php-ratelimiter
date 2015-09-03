@@ -27,7 +27,7 @@ namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 
-class ArrayHydrator implements DataHydratorContract
+class ArrayHydrator implements DataHydratorInterface
 {
     /**
      * @inheritdoc

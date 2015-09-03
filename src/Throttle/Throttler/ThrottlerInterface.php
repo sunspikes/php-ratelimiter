@@ -23,18 +23,42 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Hydrator;
+namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-interface DataHydratorContract
+interface ThrottlerInterface
 {
     /**
-     * Hydrate the given data
+     * Access the resource and return status
      *
-     * @param mixed $data
-     * @param int   $limit
-     * @param int   $ttl
-     *
-     * @return \Sunspikes\Ratelimit\Throttle\Entity\Data
+     * @return bool
      */
-    public function hydrate($data, $limit, $ttl);
+    public function access();
+
+    /**
+     * Register a hit for the resource
+     *
+     * @return mixed
+     */
+    public function hit();
+
+    /**
+     * Clear the hit counter
+     *
+     * @return mixed
+     */
+    public function clear();
+
+    /**
+     * Get the hit count
+     *
+     * @return int
+     */
+    public function count();
+
+    /**
+     * Check the throttle status
+     *
+     * @return bool
+     */
+    public function check();
 }

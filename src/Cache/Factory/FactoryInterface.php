@@ -25,7 +25,7 @@
 
 namespace Sunspikes\Ratelimit\Cache\Factory;
 
-interface FactoryContract
+interface FactoryInterface
 {
     /**
      * Create a cache driver adapter

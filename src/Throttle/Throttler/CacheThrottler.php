@@ -27,9 +27,9 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
-class CacheThrottler implements ThrottlerContract, \Countable
+class CacheThrottler implements ThrottlerInterface, \Countable
 {
-    /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract */
+    /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface */
     protected $cache;
     /* @var string */
     protected $key;
@@ -43,7 +43,7 @@ class CacheThrottler implements ThrottlerContract, \Countable
     /**
      * Short description for Function
      *
-     * @param \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract $cache
+     * @param \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface $cache
      * @param string                                                  $key
      * @param int                                                     $limit
      * @param int                                                     $ttl
@@ -121,7 +121,7 @@ class CacheThrottler implements ThrottlerContract, \Countable
     /**
      * Get the cache adapter
      *
-     * @return \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterContract
+     * @return \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface
      */
     public function getCache()
     {

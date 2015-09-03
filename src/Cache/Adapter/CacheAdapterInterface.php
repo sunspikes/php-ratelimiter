@@ -23,42 +23,52 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Throttler;
+namespace Sunspikes\Ratelimit\Cache\Adapter;
 
-interface ThrottlerContract
+interface CacheAdapterInterface
 {
     /**
-     * Access the resource and return status
+     * Get value from cache
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function get($key);
+
+    /**
+     * Set value in cache
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $ttl
+     *
+     * @return mixed
+     */
+    public function set($key, $value, $ttl = null);
+
+    /**
+     * Delete value from cache
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function delete($key);
+
+    /**
+     * Check if keyed value exists in cache
+     *
+     * @param string $key
      *
      * @return bool
      */
-    public function access();
+    public function has($key);
 
     /**
-     * Register a hit for the resource
+     * Clear cache
      *
-     * @return mixed
-     */
-    public function hit();
-
-    /**
-     * Clear the hit counter
-     *
-     * @return mixed
+     * @return void
      */
     public function clear();
-
-    /**
-     * Get the hit count
-     *
-     * @return int
-     */
-    public function count();
-
-    /**
-     * Check the throttle status
-     *
-     * @return bool
-     */
-    public function check();
 }
