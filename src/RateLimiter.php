@@ -43,16 +43,21 @@ class RateLimiter
     private $ttl;
 
     /**
-     * @param array $config
      * @param int   $limit
      * @param int   $ttl
+     * @param array $config
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $config, $limit, $ttl)
+    public function __construct($limit, $ttl, array $config = [])
     {
         $this->limit = $limit;
         $this->ttl = $ttl;
+
+        // Load the default config from distribution
+        if (empty($config)) {
+            $config = __DIR__.'/../config/config.php';
+        }
 
         if ('desarrolla' == $config['adapter']) {
             $cacheFactory = new DesarrollaCacheFactory();

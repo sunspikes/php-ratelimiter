@@ -1,7 +1,7 @@
 PHP Ratelimiter
 ===============
 
-A framework independent rate limiter for PHP
+A framework independent highly extensible rate limiter for PHP
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/51be0137-1158-403a-9fc7-ab863f2c0ca9/big.png)](https://insight.sensiolabs.com/projects/51be0137-1158-403a-9fc7-ab863f2c0ca9)
 
@@ -29,36 +29,102 @@ compatible autoloader.
 
 ## Usage
 
+### Overview
+
 ```php
-<?php
+// 1. Configure the adapter and driver (see configuration section)
+$config = './config.php';
 
-include 'vendor/autoload.php';
+// 2. Make a rate limiter with limit 3 attempts in 10 minutes
+$ratelimiter = new RateLimiter(3, 600, $config);
 
-$config = './vendor/sunspikes/php-ratelimiter/config/config.php';
+// 3. Get a throttler for /login 
+$loginThrottler = $ratelimiter->get('/login');
 
-// Make a rate limiter with limit 3 attempts in 10 minutes
-$ratelimiter = new RateLimiter($config, 3, 600);
+// 4. Register a hit
+$loginThrottler->hit()
 
-// Get a throttler for /login 
-$throttler = $ratelimiter->get('/login');
-
-// Access the resource, will increment the hit count
-$throttler->access(); // or do $throttler->hit();
-
-// Check if it reached the limit
-if ($throttler->check()) {
+// 5. Check if it reached the limit
+if ($loginThrottler->check()) {
     // access permitted
 } else {
     // access denied
 }
 
-// Get the number of hits
-print count($throttler); // or $throttler->count()
+// Or combine the steps 4 & 5
+if ($loginThrottler->access()) {
+    // access permitted
+} else {
+    // access denied
+}
 
-
+// To get the number of hits
+print $loginThrottler->count(); // or count($throttler)
 ```
- 
+
+### Configuration
+
+By default PHP Ratelimiter uses the [desarolla2 cache adapter](https://github.com/desarrolla2/Cache), the sample configuration provided in ```config/config.php```
+
+You can configure the drivers in ```config.php```, for example to use memcache change the driver to ```'memcache'```
+
+```php
+return [
+    'adapter'    => 'desarrolla',
+    'desarrolla' => [
+        'default_ttl' => 3600,
+        'driver'      => 'memcache',
+        //....
+    ]
+];
+```
+
+### Extending
+
+The PHP Ratelimiter is highly extensible, you can have custom adapters by implementing ```Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface``` 
+
+For example to use Doctrine cache adapter
+
+```php
+class DoctrineCacheAdapter implements CacheAdapterInterface
+{
+    public function __construct($cache)
+    {
+        $this->cache = $cache;
+    }
+    
+    // Implement the methods
+}
+
+// Build adapter using APC cache driver
+$adapter = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ApcCache());
+```
+
+Also you can have custom hydrators by extending ```Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface```
+
+For example to use a Symfony Request object instead of custom URL for ratelimiting
+
+```php
+class RequestHydrator implements DataHydratorInterface
+{
+    public function hydrate($data, $limit, $ttl)
+    {
+        $key = $data->getClientIp() . $data->getPathInfo();
+
+        return new Data($key, $limit, $ttl);
+    }
+}
+
+// Hydrate the request to Data object
+$hydrator = new RequestHydrator();
+$data = $hydrator->hydrate(new \Symfony\Component\HttpFoundation\Request(), 3, 600);
+
+$factory = new ThrottlerFactory();
+$requestThrottler = $factory->make($data, $adapter);
+
+// Now you have the request throttler
+```
+
 TODO
 ----
 - More Tests
-- More Documentation
