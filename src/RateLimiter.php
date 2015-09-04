@@ -54,8 +54,8 @@ class RateLimiter
         $this->limit = $limit;
         $this->ttl = $ttl;
 
-        // Load the default config from distribution
-        if (! $configFile) {
+        // Default config from distribution
+        if (null === $configFile) {
             $configFile = __DIR__.'/../config/config.php';
         }
 
