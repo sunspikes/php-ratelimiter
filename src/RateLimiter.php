@@ -59,7 +59,7 @@ class RateLimiter
             $configFile = __DIR__.'/../config/config.php';
         }
 
-        $config = file_get_contents($configFile);
+        $config = include $configFile;
 
         if ('desarrolla' == $config['adapter']) {
             $cacheFactory = new DesarrollaCacheFactory();
