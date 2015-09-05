@@ -1,7 +1,7 @@
 PHP Ratelimiter
 ===============
 
-A framework independent highly extensible rate limiter for PHP
+A framework independent, flexible and highly extensible rate limiter for PHP.
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/51be0137-1158-403a-9fc7-ab863f2c0ca9/big.png)](https://insight.sensiolabs.com/projects/51be0137-1158-403a-9fc7-ab863f2c0ca9)
 
@@ -32,26 +32,23 @@ compatible autoloader.
 ### Overview
 
 ```php
-// 1. Configure the adapter and driver (see configuration section)
-$config = './config.php';
+// 1. Make a rate limiter with limit 3 attempts in 10 minutes
+$ratelimiter = new RateLimiter(3, 600);
 
-// 2. Make a rate limiter with limit 3 attempts in 10 minutes
-$ratelimiter = new RateLimiter(3, 600, $config);
-
-// 3. Get a throttler for /login 
+// 2. Get a throttler for path /login 
 $loginThrottler = $ratelimiter->get('/login');
 
-// 4. Register a hit
+// 3. Register a hit
 $loginThrottler->hit()
 
-// 5. Check if it reached the limit
+// 4. Check if it reached the limit
 if ($loginThrottler->check()) {
     // access permitted
 } else {
     // access denied
 }
 
-// Or combine the steps 4 & 5
+// Or combine the steps 3 & 4
 if ($loginThrottler->access()) {
     // access permitted
 } else {
