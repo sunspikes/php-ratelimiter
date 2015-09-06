@@ -11,14 +11,14 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $dataMock = M::mock('\Sunspikes\Ratelimit\Throttle\Entity\Data');
         $dataMock->shouldReceive('getKey')
-                 ->andReturn('getKey')
-                 ->once();
+            ->andReturn('getKey')
+            ->once();
         $dataMock->shouldReceive('getLimit')
-                 ->andReturn(3)
-                 ->once();
+            ->andReturn(3)
+            ->once();
         $dataMock->shouldReceive('getTtl')
-                 ->andReturn(600)
-                 ->once();
+            ->andReturn(600)
+            ->once();
 
         $adapterMock = M::mock('\Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface');
 

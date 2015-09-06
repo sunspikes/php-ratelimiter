@@ -87,7 +87,7 @@ class RateLimiter
             } elseif (is_string($data)) {
                 $hydrator = new StringHydrator();
             } else {
-                throw new \InvalidArgumentException("Unsupported data, please check the data.");
+                throw new \InvalidArgumentException('Unsupported data, please check the data.');
             }
 
             // Create the data object
@@ -98,10 +98,10 @@ class RateLimiter
                 /** @noinspection PhpParamsInspection */
                 $this->throttlers[$data->getKey()] = $factory->make($data, $this->adapter);
             }
-            
+
             return $this->throttlers[$data->getKey()];
         }
 
-        throw new \InvalidArgumentException("Invalid data, please check the data.");
+        throw new \InvalidArgumentException('Invalid data, please check the data.');
     }
 }
