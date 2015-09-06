@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes;
+namespace Sunspikes\Ratelimit;
 
 use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
 use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
@@ -61,14 +61,14 @@ class RateLimiter
 
         $config = include $configFile;
 
-        if ('desarrolla' == $config['adapter']) {
+        if ('desarrolla' === $config['adapter']) {
             $cacheFactory = new DesarrollaCacheFactory();
             $cache = $cacheFactory->make($config);
 
             $this->adapter = new DesarrollaCacheAdapter($cache);
+        } else {
+            throw new \InvalidArgumentException('No adapter found, please check your config.');
         }
-
-        throw new \InvalidArgumentException('No adapter found, please check your config.');
     }
 
     /**

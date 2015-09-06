@@ -52,7 +52,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      */
     public function make($config)
     {
-        $this->config = $config;
+        $this->config = $config['desarrolla'];
         $driver = $this->getDriver();
 
         return new Cache($driver);
@@ -76,7 +76,7 @@ class DesarrollaCacheFactory implements FactoryInterface
         $driverCreateMethod = 'create'.ucfirst($driver).'Driver';
 
         if (method_exists($this, $driverCreateMethod)) {
-            $driver = new $this->{$driverCreateMethod}();
+            $driver = $this->{$driverCreateMethod}();
             $driver->setOption('ttl',
                 $this->config['default_ttl']
                     ?: static::DEFAULT_TTL

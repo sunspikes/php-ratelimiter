@@ -121,7 +121,3 @@ $requestThrottler = $factory->make($data, $adapter);
 
 // Now you have the request throttler
 ```
-
-TODO
-----
-- More Tests

@@ -34,6 +34,6 @@ class StringHydrator implements DataHydratorInterface
      */
     public function hydrate($data, $limit, $ttl)
     {
-        new Data($data, $limit, $ttl);
+        return new Data($data, $limit, $ttl);
     }
 }
