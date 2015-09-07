@@ -8,4 +8,4 @@ before_script:
   - composer install --prefer-source --dev
 
 script:
-  - phpunit --colors --verbose --coverage-clover build/logs/clover.xml  -c tests/phpunit.xml
+  - phpunit --colors --verbose --coverage-clover build/logs/clover.xml

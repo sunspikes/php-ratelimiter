@@ -11,9 +11,7 @@
 
     <testsuites>
         <testsuite name="PHP Ratelimiter Test Suite">
-            <directory>Cache/</directory>
-            <directory>Throttle/</directory>
-            <file>RatelimiterTest.php</file>
+            <directory suffix=".php">./tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>
