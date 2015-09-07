@@ -121,3 +121,14 @@ $requestThrottler = $factory->make($data, $adapter);
 
 // Now you have the request throttler
 ```
+## Author
+
+Krishnaprasad MG [@sunspikes]
+
+## Contributing
+
+Please feel free to send pull requests.
+
+## License
+
+This is an open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
