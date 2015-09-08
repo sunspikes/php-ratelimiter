@@ -1,0 +1,10 @@
+promoted: false
+src-branch: master
+src-path: /src
+docs-path: /docs
+title: PHP Ratelimiter API Documentation
+defaultpackagename: PhpRatelimiter
+template: responsive
+visibility: public,protected,private
+sourcecode: true
+parseprivate: true
