@@ -98,7 +98,7 @@ class DoctrineCacheAdapter implements CacheAdapterInterface
 $adapter = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ApcCache());
 ```
 
-Also you can have custom hydrators by extending ```Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface```
+Also you can have custom hydrators by implementing ```Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface```
 
 For example to use a Symfony Request object instead of custom URL for ratelimiting
 
@@ -107,6 +107,7 @@ class RequestHydrator implements DataHydratorInterface
 {
     public function hydrate($data, $limit, $ttl)
     {
+        // Make the key string
         $key = $data->getClientIp() . $data->getPathInfo();
 
         return new Data($key, $limit, $ttl);
