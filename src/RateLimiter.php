@@ -27,20 +27,36 @@ namespace Sunspikes\Ratelimit;
 
 use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
 use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
-use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
-use Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator;
-use Sunspikes\Ratelimit\Throttle\Hydrator\StringHydrator;
+use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
+use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory as HydratorFactory;
 
 class RateLimiter
 {
-    /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface */
-    private $adapter;
-    /* @var array */
-    private $throttlers;
+    /**
+     * @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface
+     */
+    protected $adapter;
+
+    /**
+     * @var \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface[]
+     */
+    protected $throttlers;
+
     /* @var int */
-    private $limit;
+    protected $limit;
+
     /* @var int */
-    private $ttl;
+    protected $ttl;
+
+    /**
+     * @var ThrottlerFactoryInterface
+     */
+    protected $throttlerFactory;
+
+    /**
+     * @var HydratorFactory
+     */
+    protected $hydratorFactory;
 
     /**
      * @param int    $limit
@@ -49,8 +65,13 @@ class RateLimiter
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($limit, $ttl, $configFile = null)
-    {
+    public function __construct(
+        ThrottlerFactoryInterface $throttlerFactory,
+        HydratorFactory $hydratorFactory,
+        $limit,
+        $ttl,
+        $configFile = null
+    ) {
         $this->limit = $limit;
         $this->ttl = $ttl;
 
@@ -69,39 +90,36 @@ class RateLimiter
         } else {
             throw new \InvalidArgumentException('No adapter found, please check your config.');
         }
+
+        $this->throttlerFactory = $throttlerFactory;
+        $this->hydratorFactory = $hydratorFactory;
     }
 
     /**
      * Build the throttler for given data
      *
      * @param mixed $data
+     * @param int|null $limit
+     * @param int|null $ttl
      *
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function get($data)
+    public function get($data, $limit = null, $ttl = null)
     {
-        if (!empty($data)) {
-            if (is_array($data)) {
-                $hydrator = new ArrayHydrator();
-            } elseif (is_string($data)) {
-                $hydrator = new StringHydrator();
-            } else {
-                throw new \InvalidArgumentException('Unsupported data, please check the data.');
-            }
-
-            // Create the data object
-            $data = $hydrator->hydrate($data, $this->limit, $this->ttl);
-
-            if (!isset($this->throttlers[$data->getKey()])) {
-                $factory = new ThrottlerFactory();
-                /** @noinspection PhpParamsInspection */
-                $this->throttlers[$data->getKey()] = $factory->make($data, $this->adapter);
-            }
-
-            return $this->throttlers[$data->getKey()];
+        if (empty($data)) {
+            throw new \InvalidArgumentException('Invalid data, please check the data.');
         }
 
-        throw new \InvalidArgumentException('Invalid data, please check the data.');
+        $limit = is_null($limit) ? $this->limit : $limit;
+        $ttl = is_null($ttl) ? $this->ttl : $ttl;
+
+        $object = $this->hydratorFactory->make($data)->hydrate($data, $limit, $ttl);
+
+        if (!isset($this->throttlers[$object->getKey()])) {
+            /** @noinspection PhpParamsInspection */
+            $this->throttlers[$object->getKey()] = $this->throttlerFactory->make($object, $this->adapter);
+        }
+        return $this->throttlers[$object->getKey()];
     }
 }

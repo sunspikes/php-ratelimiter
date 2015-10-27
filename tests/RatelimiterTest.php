@@ -4,6 +4,8 @@ namespace Sunspikes\Tests\Ratelimit;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\RateLimiter;
+use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
+use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 
 class RatelimiterTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +13,10 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->ratelimiter = new RateLimiter(3, 600);
+        $mThrottlerFactory = new ThrottlerFactory();
+        $mHydratorFactory =  new HydratorFactory();
+
+        $this->ratelimiter = new RateLimiter($mThrottlerFactory, $mHydratorFactory, 3, 600);
     }
 
     public function testThrottlePreLimit()
