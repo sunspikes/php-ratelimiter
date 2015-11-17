@@ -28,7 +28,7 @@ namespace Sunspikes\Ratelimit\Cache\Adapter;
 /**
  * Adapter for the cache library Desarrolla2\Cache
  */
-class DesarrollaCacheAdapter extends AbstractCacheAdapter implements CacheAdapterInterface
+class DesarrollaCacheAdapter extends AbstractCacheAdapter
 {
     /**
      * @param \Desarrolla2\Cache\CacheInterface $cache
