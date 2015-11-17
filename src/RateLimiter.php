@@ -40,7 +40,7 @@ class RateLimiter
     protected $ttl;
     /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface */
     protected $adapter;
-    /* @var \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface */
+    /* @var ThrottlerFactory */
     protected $throttlerFactory;
     /* @var HydratorFactory */
     protected $hydratorFactory;
@@ -93,14 +93,14 @@ class RateLimiter
 
         if (!empty($data)) {
             // Create the data object
-            $data = $this->hydratorFactory->make($data)->hydrate($data, $this->limit, $this->ttl);
+            $dataObject = $this->hydratorFactory->make($data)->hydrate($data, $this->limit, $this->ttl);
 
-            if (!isset($this->throttlers[$data->getKey()])) {
+            if (!isset($this->throttlers[$dataObject->getKey()])) {
                 /** @noinspection PhpParamsInspection */
-                $this->throttlers[$data->getKey()] = $this->throttlerFactory->make($data, $this->adapter);
+                $this->throttlers[$dataObject->getKey()] = $this->throttlerFactory->make($dataObject, $this->adapter);
             }
 
-            return $this->throttlers[$data->getKey()];
+            return $this->throttlers[$dataObject->getKey()];
         }
 
         throw new \InvalidArgumentException('Invalid data, please check the data.');
