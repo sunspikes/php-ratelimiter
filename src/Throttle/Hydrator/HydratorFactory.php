@@ -23,18 +23,30 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Adapter;
+namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
-/**
- * Adapter for the cache library Desarrolla2\Cache
- */
-class DesarrollaCacheAdapter extends AbstractCacheAdapter implements CacheAdapterInterface
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
+
+class HydratorFactory
 {
     /**
-     * @param \Desarrolla2\Cache\CacheInterface $cache
+     * Create the hydrator
+     *
+     * @param mixed $data
+     *
+     * @return \Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface
+     * @throws InvalidDataTypeException
      */
-    public function __construct($cache)
+    public function make($data)
     {
-        $this->cache = $cache;
+        if (is_string($data)) {
+            return new StringHydrator();
+        }
+
+        if (is_array($data)) {
+            return new ArrayHydrator();
+        }
+
+        throw new InvalidDataTypeException('Data type not supported, please check the data.');
     }
 }

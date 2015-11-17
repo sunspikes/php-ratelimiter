@@ -23,18 +23,11 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Adapter;
+namespace Sunspikes\Ratelimit\Throttle\Exception;
 
 /**
- * Adapter for the cache library Desarrolla2\Cache
+ * Invalid data type exception
  */
-class DesarrollaCacheAdapter extends AbstractCacheAdapter implements CacheAdapterInterface
+class InvalidDataTypeException extends \Exception
 {
-    /**
-     * @param \Desarrolla2\Cache\CacheInterface $cache
-     */
-    public function __construct($cache)
-    {
-        $this->cache = $cache;
-    }
 }
