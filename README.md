@@ -8,6 +8,8 @@ A framework independent, flexible and highly extensible rate limiter for PHP.
 [![Code Coverage](https://scrutinizer-ci.com/g/sunspikes/php-ratelimiter/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/sunspikes/php-ratelimiter/?branch=master)
 [![Code Climate](https://codeclimate.com/github/sunspikes/php-ratelimiter/badges/gpa.svg)](https://codeclimate.com/github/sunspikes/php-ratelimiter)
 [![Build Status](https://travis-ci.org/sunspikes/php-ratelimiter.svg?branch=master)](https://travis-ci.org/sunspikes/php-ratelimiter)
+[![Latest Stable Version](https://poser.pugx.org/sunspikes/php-ratelimiter/v/stable)](https://packagist.org/packages/sunspikes/php-ratelimiter)
+[![License](https://poser.pugx.org/sunspikes/php-ratelimiter/license)](https://packagist.org/packages/sunspikes/php-ratelimiter)
 
 ## Installation
 
