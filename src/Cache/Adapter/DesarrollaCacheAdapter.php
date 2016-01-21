@@ -25,16 +25,65 @@
 
 namespace Sunspikes\Ratelimit\Cache\Adapter;
 
+use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+
 /**
  * Adapter for the cache library Desarrolla2\Cache
  */
-class DesarrollaCacheAdapter extends AbstractCacheAdapter
+class DesarrollaCacheAdapter implements CacheAdapterInterface
 {
+    /* @var \Desarrolla2\Cache\CacheInterface $cache */
+    protected $cache;
+
     /**
      * @param \Desarrolla2\Cache\CacheInterface $cache
      */
     public function __construct($cache)
     {
         $this->cache = $cache;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function get($key)
+    {
+        if ($this->cache->has($key)) {
+            return $this->cache->get($key);
+        }
+
+        throw new ItemNotFoundException('Cannot find the item in cache');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function set($key, $value, $ttl = null)
+    {
+        $this->cache->set($key, $value, $ttl);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function delete($key)
+    {
+        $this->cache->delete($key);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function has($key)
+    {
+        return $this->cache->has($key);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function clear()
+    {
+        $this->cache->clear();
     }
 }
