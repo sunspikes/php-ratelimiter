@@ -84,6 +84,6 @@ class DesarrollaCacheAdapter implements CacheAdapterInterface
      */
     public function clear()
     {
-        $this->cache->clear();
+        $this->cache->clearCache();
     }
 }
