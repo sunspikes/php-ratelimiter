@@ -25,27 +25,31 @@
 
 namespace Sunspikes\Ratelimit;
 
-use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
-use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
+use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
-use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory as HydratorFactory;
+use Sunspikes\Ratelimit\Throttle\Hydrator\FactoryInterface as HydratorFactoryInterface;
 
 class RateLimiter
 {
     /**
-     * @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface
+     * @var CacheAdapterInterface
      */
     protected $adapter;
 
     /**
-     * @var \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface[]
+     * @var ThrottlerInterface[]
      */
     protected $throttlers;
 
-    /* @var int */
+    /**
+     * @var int
+     */
     protected $limit;
 
-    /* @var int */
+    /**
+     * @var int
+     */
     protected $ttl;
 
     /**
@@ -54,57 +58,40 @@ class RateLimiter
     protected $throttlerFactory;
 
     /**
-     * @var HydratorFactory
+     * @var HydratorFactoryInterface
      */
     protected $hydratorFactory;
 
     /**
-     * @param ThrottlerFactoryInterface $throttlerFactory,
-     * @param HydratorFactory           $hydratorFactory,
+     * @param ThrottlerFactoryInterface $throttlerFactory
+     * @param HydratorFactoryInterface  $hydratorFactory
+     * @param CacheAdapterInterface     $cacheAdapter
      * @param int                       $limit
      * @param int                       $ttl
-     * @param string                    $configFile
-     *
-     * @throws \InvalidArgumentException
      */
     public function __construct(
         ThrottlerFactoryInterface $throttlerFactory,
-        HydratorFactory $hydratorFactory,
+        HydratorFactoryInterface $hydratorFactory,
+        CacheAdapterInterface $cacheAdapter,
         $limit,
-        $ttl,
-        $configFile = null
+        $ttl
     ) {
-        $this->limit = $limit;
-        $this->ttl = $ttl;
-
-        // Default config from distribution
-        if (null === $configFile) {
-            $configFile = __DIR__.'/../config/config.php';
-        }
-
-        $config = include $configFile;
-
-        if ('desarrolla' === $config['adapter']) {
-            $cacheFactory = new DesarrollaCacheFactory();
-            $cache = $cacheFactory->make($config);
-
-            $this->adapter = new DesarrollaCacheAdapter($cache);
-        } else {
-            throw new \InvalidArgumentException('No adapter found, please check your config.');
-        }
-
         $this->throttlerFactory = $throttlerFactory;
         $this->hydratorFactory = $hydratorFactory;
+        $this->adapter = $cacheAdapter;
+        $this->limit = $limit;
+        $this->ttl = $ttl;
     }
 
     /**
      * Build the throttler for given data
      *
-     * @param mixed $data
+     * @param mixed    $data
      * @param int|null $limit
      * @param int|null $ttl
      *
      * @return mixed
+     *
      * @throws \InvalidArgumentException
      */
     public function get($data, $limit = null, $ttl = null)
@@ -113,13 +100,11 @@ class RateLimiter
             throw new \InvalidArgumentException('Invalid data, please check the data.');
         }
 
-        $limit = is_null($limit) ? $this->limit : $limit;
-        $ttl = is_null($ttl) ? $this->ttl : $ttl;
-
+        $limit = null === $limit ? $this->limit : $limit;
+        $ttl = null === $ttl ? $this->ttl : $ttl;
         $object = $this->hydratorFactory->make($data)->hydrate($data, $limit, $ttl);
 
         if (!isset($this->throttlers[$object->getKey()])) {
-            /** @noinspection PhpParamsInspection */
             $this->throttlers[$object->getKey()] = $this->throttlerFactory->make($object, $this->adapter);
         }
 
