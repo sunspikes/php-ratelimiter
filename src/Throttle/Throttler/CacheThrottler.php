@@ -129,6 +129,8 @@ class CacheThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
+     * Get cache ttl
+     *
      * @return int
      */
     public function getTtl()
@@ -137,6 +139,8 @@ class CacheThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
+     * Get throttle limit
+     *
      * @return int
      */
     public function getLimit()

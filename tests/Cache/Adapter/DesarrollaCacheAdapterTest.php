@@ -47,7 +47,7 @@ class DesarrollaCacheAdapterTest extends \PHPUnit_Framework_TestCase
             ->with('delete-key')
             ->andReturnNull();
 
-        $cache->shouldReceive('clear')
+        $cache->shouldReceive('clearCache')
             ->withNoArgs()
             ->andReturnNull();
 

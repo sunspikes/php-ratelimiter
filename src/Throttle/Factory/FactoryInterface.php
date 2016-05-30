@@ -33,7 +33,7 @@ interface FactoryInterface
     /**
      * Create the throttler
      *
-     * @param Data                 $data
+     * @param Data $data
      * @param CacheAdapterInterface $cache
      *
      * @return \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface

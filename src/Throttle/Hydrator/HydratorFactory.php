@@ -25,24 +25,17 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
-use InvalidArgumentException;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
 
-/**
- * This is the transformer factory class.
- *
- * @author Graham Campbell <graham@alt-three.com>
- * @author Mike Feijs <mike@feijs.nl>
- */
 class HydratorFactory
 {
     /**
-     * Make a new transformer instance.
+     * Create the hydrator
      *
      * @param mixed $data
      *
-     * @throws \InvalidArgumentException
-     *
      * @return \Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface
+     * @throws InvalidDataTypeException
      */
     public function make($data)
     {
@@ -54,6 +47,6 @@ class HydratorFactory
             return new ArrayHydrator();
         }
 
-        throw new InvalidArgumentException('Unsupported datatype, please check the data.');
+        throw new InvalidDataTypeException('Data type not supported, please check the data.');
     }
 }

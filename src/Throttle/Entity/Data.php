@@ -38,8 +38,8 @@ class Data
 
     /**
      * @param string $data
-     * @param int    $limit
-     * @param int    $ttl
+     * @param int $limit
+     * @param int $ttl
      */
     public function __construct($data, $limit, $ttl)
     {
