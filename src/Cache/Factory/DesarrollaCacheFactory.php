@@ -48,20 +48,38 @@ class DesarrollaCacheFactory implements FactoryInterface
     protected $config;
 
     /**
+     * @param string|null $configFile
+     * @param array       $configArray
+     */
+    public function __construct($configFile = null, array $configArray = [])
+    {
+        // Default config from distribution
+        if (null === $configFile) {
+            $configFile = __DIR__.'/../../../config/config.php';
+        }
+
+        $config = include $configFile;
+
+        if (!isset($config['adapter']) || !isset($config['desarrolla']) || 'desarrolla' !== $config['adapter']) {
+            throw new \InvalidArgumentException('Invalid adapter found, please check your config.');
+        }
+
+        $this->config = array_merge($config['desarrolla'], $configArray);
+    }
+
+    /**
      * @inheritdoc
      */
-    public function make($config)
+    public function make()
     {
-        $this->config = $config['desarrolla'];
-        $driver = $this->getDriver();
-
-        return new Cache($driver);
+        return new Cache($this->getDriver());
     }
 
     /**
      * Make the driver based on given config
      *
      * @return null|\Desarrolla2\Cache\Adapter\AdapterInterface
+     *
      * @throws DriverNotFoundException
      * @throws InvalidConfigException
      */
