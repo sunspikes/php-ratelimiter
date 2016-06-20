@@ -59,9 +59,11 @@ class RateLimiter
     protected $hydratorFactory;
 
     /**
-     * @param int    $limit
-     * @param int    $ttl
-     * @param string $configFile
+     * @param ThrottlerFactoryInterface $throttlerFactory,
+     * @param HydratorFactory           $hydratorFactory,
+     * @param int                       $limit
+     * @param int                       $ttl
+     * @param string                    $configFile
      *
      * @throws \InvalidArgumentException
      */
@@ -120,6 +122,7 @@ class RateLimiter
             /** @noinspection PhpParamsInspection */
             $this->throttlers[$object->getKey()] = $this->throttlerFactory->make($object, $this->adapter);
         }
+
         return $this->throttlers[$object->getKey()];
     }
 }

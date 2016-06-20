@@ -40,8 +40,8 @@ interface CacheAdapterInterface
      * Set value in cache
      *
      * @param string $key
-     * @param mixed  $value
-     * @param int    $ttl
+     * @param mixed $value
+     * @param int $ttl
      *
      * @return mixed
      */

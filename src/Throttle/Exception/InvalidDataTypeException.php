@@ -23,56 +23,11 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Adapter;
+namespace Sunspikes\Ratelimit\Throttle\Exception;
 
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
-
-class AbstractCacheAdapter implements CacheAdapterInterface
+/**
+ * Invalid data type exception
+ */
+class InvalidDataTypeException extends \Exception
 {
-    /* @var mixed */
-    protected $cache;
-
-    /**
-     * @inheritdoc
-     */
-    public function get($key)
-    {
-        if ($this->cache->has($key)) {
-            return $this->cache->get($key);
-        }
-
-        throw new ItemNotFoundException('Cannot find the item in cache');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function set($key, $value, $ttl = null)
-    {
-        $this->cache->set($key, $value, $ttl);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function delete($key)
-    {
-        $this->cache->delete($key);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function has($key)
-    {
-        return $this->cache->has($key);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function clear()
-    {
-        $this->cache->clear();
-    }
 }
