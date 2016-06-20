@@ -25,14 +25,14 @@
 
 namespace Sunspikes\Ratelimit\Cache\Factory;
 
+use Desarrolla2\Cache\CacheInterface;
+
 interface FactoryInterface
 {
     /**
      * Create a cache driver adapter
      *
-     * @param array $config
-     *
-     * @return mixed
+     * @return CacheInterface
      */
-    public function make($config);
+    public function make();
 }

@@ -36,7 +36,8 @@ compatible autoloader.
 
 ```php
 // 1. Make a rate limiter with limit 3 attempts in 10 minutes
-$ratelimiter = new RateLimiter(3, 600);
+$adapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
+$ratelimiter = new RateLimiter(new ThrottlerFactory(), new HydratorFactory(), $cacheAdapter, 3, 600);
 
 // 2. Get a throttler for path /login 
 $loginThrottler = $ratelimiter->get('/login');
