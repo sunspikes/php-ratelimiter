@@ -31,6 +31,8 @@ return [
         // config for redis
     ],
     'memcache'    => [
-        // config for memcache
+        'servers' => [
+            'localhost'
+        ]
     ],
 ];
