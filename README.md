@@ -36,7 +36,8 @@ compatible autoloader.
 
 ```php
 // 1. Make a rate limiter with limit 3 attempts in 10 minutes
-$ratelimiter = new RateLimiter(3, 600);
+$adapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
+$ratelimiter = new RateLimiter(new ThrottlerFactory(), new HydratorFactory(), $cacheAdapter, 3, 600);
 
 // 2. Get a throttler for path /login 
 $loginThrottler = $ratelimiter->get('/login');
@@ -118,13 +119,29 @@ class RequestHydrator implements DataHydratorInterface
 
 // Hydrate the request to Data object
 $hydrator = new RequestHydrator();
-$data = $hydrator->hydrate(new \Symfony\Component\HttpFoundation\Request(), 3, 600);
-
-$factory = new ThrottlerFactory();
-$requestThrottler = $factory->make($data, $adapter);
-
-// Now you have the request throttler
 ```
+
+Then decorate or extend the HydratorFactory to recognize your data
+
+```php
+class MyHydratorFactory impements Hydrator\FactoryInterface
+{
+    /**
+     * Hydrator\FactoryInterface
+     */
+    private $defaultFactory;
+
+    public function make($data)
+    {
+        if ($data instanceof Request) {
+            return new RequestHydrator();
+        }
+
+        return $defaultFactory->make($data);
+    }
+}
+```
+
 ## Author
 
 Krishnaprasad MG [@sunspikes]

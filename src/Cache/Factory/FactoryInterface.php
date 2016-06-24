@@ -30,9 +30,7 @@ interface FactoryInterface
     /**
      * Create a cache driver adapter
      *
-     * @param array $config
-     *
      * @return mixed
      */
-    public function make($config);
+    public function make();
 }
