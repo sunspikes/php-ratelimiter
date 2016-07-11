@@ -8,17 +8,8 @@ class DesarrollaCacheFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testFactory()
     {
-        $config = [
-            'adapter' => 'desarrolla',
-            'desarrolla' => [
-                'driver' => 'notcache',
-                'default_ttl' => 3600,
-                'notcache' => [],
-            ],
-        ];
-
         $factory = new DesarrollaCacheFactory();
-        $cache = $factory->make($config);
+        $cache = $factory->make();
 
         $this->assertInstanceOf('\Desarrolla2\Cache\Cache', $cache);
     }
