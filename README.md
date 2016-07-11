@@ -36,7 +36,7 @@ compatible autoloader.
 
 ```php
 // 1. Make a rate limiter with limit 3 attempts in 10 minutes
-$adapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
+$cacheAdapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
 $ratelimiter = new RateLimiter(new ThrottlerFactory(), new HydratorFactory(), $cacheAdapter, 3, 600);
 
 // 2. Get a throttler for path /login 
@@ -71,12 +71,11 @@ You can configure the drivers in ```config.php```, for example to use memcache c
 
 ```php
 return [
-    'adapter'    => 'desarrolla',
-    'desarrolla' => [
-        'default_ttl' => 3600,
-        'driver'      => 'memcache',
+    'default_ttl' => 3600,
+    'driver'      => 'memcache',
+    'memcache' => [
         //....
-    ]
+    ],
 ];
 ```
 
@@ -124,12 +123,16 @@ $hydrator = new RequestHydrator();
 Then decorate or extend the HydratorFactory to recognize your data
 
 ```php
-class MyHydratorFactory impements Hydrator\FactoryInterface
+use Hydrator\FactoryInterface;
+
+class MyHydratorFactory implements FactoryInterface
 {
-    /**
-     * Hydrator\FactoryInterface
-     */
     private $defaultFactory;
+
+    public function __construct(FactoryInterface $defaultFactory)
+    {
+        $this->defaultFactory = $defaultFactory;
+    }
 
     public function make($data)
     {
@@ -137,7 +140,7 @@ class MyHydratorFactory impements Hydrator\FactoryInterface
             return new RequestHydrator();
         }
 
-        return $defaultFactory->make($data);
+        return $this->defaultFactory->make($data);
     }
 }
 ```
