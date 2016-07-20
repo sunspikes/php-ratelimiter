@@ -60,11 +60,7 @@ class DesarrollaCacheFactory implements FactoryInterface
 
         $config = include $configFile;
 
-        if (!isset($config['adapter']) || !isset($config['desarrolla']) || 'desarrolla' !== $config['adapter']) {
-            throw new \InvalidArgumentException('Invalid adapter found, please check your config.');
-        }
-
-        $this->config = array_merge($config['desarrolla'], $configArray);
+        $this->config = array_merge($config, $configArray);
     }
 
     /**

@@ -28,10 +28,7 @@ namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
 
 /**
- * This is the transformer factory class.
- *
- * @author Graham Campbell <graham@alt-three.com>
- * @author Mike Feijs <mike@feijs.nl>
+ * @inheritdoc
  */
 class HydratorFactory implements FactoryInterface
 {
