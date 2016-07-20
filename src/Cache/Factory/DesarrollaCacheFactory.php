@@ -202,10 +202,10 @@ class DesarrollaCacheFactory implements FactoryInterface
     {
         $server = null;
 
-        if (isset($this->config['servers'])) {
+        if (isset($this->config['memcache']['servers'])) {
             $server = new \Memcache();
 
-            foreach ($this->config['servers'] as $host) {
+            foreach ($this->config['memcache']['servers'] as $host) {
                 $server->addserver($host);
             }
         }
