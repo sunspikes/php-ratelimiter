@@ -119,19 +119,7 @@ class CacheThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * Get the cache adapter
-     *
-     * @return \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface
-     */
-    public function getCache()
-    {
-        return $this->cache;
-    }
-
-    /**
-     * Get cache ttl
-     *
-     * @return int
+     * @inheritdoc
      */
     public function getTtl()
     {
@@ -139,9 +127,7 @@ class CacheThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * Get throttle limit
-     *
-     * @return int
+     * @inheritdoc
      */
     public function getLimit()
     {
