@@ -172,6 +172,7 @@ class DesarrollaCacheFactory implements FactoryInterface
                 $this->config['mysql']['host'],
                 $this->config['mysql']['username'],
                 $this->config['mysql']['password'],
+                $this->config['mysql']['dbname'],
                 $this->config['mysql']['port']
             );
         }
