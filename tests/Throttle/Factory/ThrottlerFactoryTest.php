@@ -8,28 +8,21 @@ use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
-use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
-use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface;
 
 class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var CacheAdapterInterface|MockInterface
      */
-    private $cacheAdapter;
+    protected $cacheAdapter;
 
     /**
-     * @var TimeAdapterInterface|MockInterface
+     * @var FactoryInterface
      */
-    private $timeAdapter;
-
-    /**
-     * @var ThrottlerFactory
-     */
-    private $factory;
+    protected $factory;
 
     /**
      * @inheritdoc
@@ -37,9 +30,7 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
-        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
-
-        $this->factory = new ThrottlerFactory($this->cacheAdapter, $this->timeAdapter);
+        $this->factory = new ThrottlerFactory($this->cacheAdapter);
     }
 
     public function testMakeFixedWindow()
@@ -47,14 +38,6 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
         self::assertInstanceOf(
             CacheThrottler::class,
             $this->factory->make($this->getData(), new FixedWindowSettings(3, 600))
-        );
-    }
-
-    public function testMakeLeakyBucket()
-    {
-        self::assertInstanceOf(
-            LeakyBucketThrottler::class,
-            $this->factory->make($this->getData(), new LeakyBucketSettings(120, 60))
         );
     }
 
@@ -76,7 +59,7 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @return Data
      */
-    private function getData()
+    protected function getData()
     {
         return new Data('someKey');
     }

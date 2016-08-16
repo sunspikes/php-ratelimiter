@@ -6,7 +6,7 @@ use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
 use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 use Sunspikes\Ratelimit\RateLimiter;
-use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
+use Sunspikes\Ratelimit\Throttle\Factory\BucketThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
@@ -37,10 +37,7 @@ class LeakyBucketTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->ratelimiter = new RateLimiter(
-            new ThrottlerFactory(
-                new DesarrollaCacheAdapter($cacheFactory->make()),
-                $this->timeAdapter
-            ),
+            new BucketThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
             new LeakyBucketSettings(3, 600, 3)
         );

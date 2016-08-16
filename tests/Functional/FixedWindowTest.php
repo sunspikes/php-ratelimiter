@@ -28,10 +28,7 @@ class FixedWindowTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->ratelimiter = new RateLimiter(
-            new ThrottlerFactory(
-                new DesarrollaCacheAdapter($cacheFactory->make()),
-                new PhpTimeAdapter()
-            ),
+            new ThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make())),
             new HydratorFactory(),
             new FixedWindowSettings(3, 600)
         );
