@@ -25,27 +25,24 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
-class Data
+final class Data
 {
-    /* @var string */
-    protected $data;
-    /* @var int */
-    protected $limit;
-    /* @var int */
-    protected $ttl;
-    /* @var string */
-    protected $key;
+    /**
+     * @var string
+     */
+    private $data;
+
+    /**
+     * @var string
+     */
+    private $key;
 
     /**
      * @param string $data
-     * @param int $limit
-     * @param int $ttl
      */
-    public function __construct($data, $limit, $ttl)
+    public function __construct($data)
     {
         $this->data = $data;
-        $this->limit = $limit;
-        $this->ttl = $ttl;
     }
 
     /**
@@ -56,26 +53,6 @@ class Data
     public function getData()
     {
         return $this->data;
-    }
-
-    /**
-     * Get limit
-     *
-     * @return int
-     */
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * Get TTL
-     *
-     * @return int
-     */
-    public function getTtl()
-    {
-        return $this->ttl;
     }
 
     /**

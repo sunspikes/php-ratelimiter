@@ -40,10 +40,6 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->timeAdapter = Mockery::mock(TimeAdapterInterface::class);
         $this->cacheAdapter = Mockery::mock(CacheAdapterInterface::class);
 
-        // Expected bucket initialisation
-        $this->timeAdapter->shouldReceive('now')->once()->andReturn(self::INITIAL_TIME);
-        $this->mockSetUsedCapacity(0, self::INITIAL_TIME);
-
         $this->throttler = new LeakyBucketThrottler(
             $this->cacheAdapter,
             $this->timeAdapter,

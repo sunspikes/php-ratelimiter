@@ -27,22 +27,67 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
+use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class ThrottlerFactory implements FactoryInterface
 {
     /**
+     * @var CacheAdapterInterface
+     */
+    private $cacheAdapter;
+
+    /**
+     * @var TimeAdapterInterface
+     */
+    private $timeAdapter;
+
+    /**
+     * @param CacheAdapterInterface $cacheAdapter
+     * @param TimeAdapterInterface  $timeAdapter
+     */
+    public function __construct(CacheAdapterInterface $cacheAdapter, TimeAdapterInterface $timeAdapter)
+    {
+        $this->cacheAdapter = $cacheAdapter;
+        $this->timeAdapter = $timeAdapter;
+    }
+
+    /**
      * @inheritdoc
      */
-    public function make(Data $data, CacheAdapterInterface $cache)
+    public function make(Data $data, ThrottleSettingsInterface $settings)
     {
-        $throttler = new CacheThrottler(
-            $cache,
-            (string) $data->getKey(),
-            (int) $data->getLimit(),
-            (int) $data->getTtl()
-        );
+        if (!$settings->isValid()) {
+            throw new \InvalidArgumentException('Provided throttler settings not valid');
+        }
 
-        return $throttler;
+        if ($settings instanceof FixedWindowSettings) {
+            return new CacheThrottler(
+                $this->cacheAdapter,
+                $data->getKey(),
+                $settings->getLimit(),
+                $settings->getTime()
+            );
+        }
+
+        if ($settings instanceof LeakyBucketSettings) {
+            return new LeakyBucketThrottler(
+                $this->cacheAdapter,
+                $this->timeAdapter,
+                $data->getKey(),
+                $settings->getTokenLimit(),
+                $settings->getTimeLimit(),
+                $settings->getThreshold(),
+                $settings->getCacheTtl()
+            );
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Unable to create throttler for %s settings', get_class($settings))
+        );
     }
 }

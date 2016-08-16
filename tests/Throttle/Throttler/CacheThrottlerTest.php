@@ -51,11 +51,6 @@ class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(true, $this->throttler->check());
     }
 
-    public function testGetCache()
-    {
-        $this->assertEquals(1, count($this->throttler->getCache()));
-    }
-
     public function testThrottle()
     {
         $this->throttler->hit();

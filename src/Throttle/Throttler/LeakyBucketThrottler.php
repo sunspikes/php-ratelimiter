@@ -94,9 +94,6 @@ final class LeakyBucketThrottler implements ThrottlerInterface
         $this->timeLimit = $timeLimit;
         $this->cacheTtl = $cacheTtl;
         $this->threshold = null !== $threshold ? $threshold : $tokenLimit;
-
-        // Clear the bucket
-        $this->setUsedCapacity(0);
     }
 
     /**
@@ -145,7 +142,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
 
             $lastTokenCount = $this->cache->get($this->key.self::TOKEN_CACHE_KEY);
         } catch (ItemNotFoundException $exception) {
-            $this->clear();
+            $this->clear(); //Clear the bucket
 
             return 0;
         }
