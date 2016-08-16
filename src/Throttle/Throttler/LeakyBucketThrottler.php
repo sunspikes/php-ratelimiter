@@ -161,7 +161,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
     /**
      * @inheritdoc
      */
-    public function getTtl()
+    public function getTime()
     {
         return $this->timeLimit;
     }

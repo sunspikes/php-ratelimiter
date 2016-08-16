@@ -2,6 +2,7 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
+use Mockery as M;
 use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
@@ -28,7 +29,7 @@ class FixedWindowSettingsTest extends \PHPUnit_Framework_TestCase
     public function testInvalidMerge()
     {
         $this->setExpectedException(\InvalidArgumentException::class);
-        (new FixedWindowSettings())->merge(\Mockery::mock(ThrottleSettingsInterface::class));
+        (new FixedWindowSettings())->merge(M::mock(ThrottleSettingsInterface::class));
     }
 
     /**

@@ -120,7 +120,7 @@ class CacheThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function getTtl()
+    public function getTime()
     {
         return $this->ttl;
     }

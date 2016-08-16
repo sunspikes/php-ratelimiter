@@ -2,7 +2,7 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Factory;
 
-use Mockery;
+use Mockery as M;
 use Mockery\MockInterface;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
@@ -36,8 +36,8 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cacheAdapter = Mockery::mock(CacheAdapterInterface::class);
-        $this->timeAdapter = Mockery::mock(TimeAdapterInterface::class);
+        $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
+        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
 
         $this->factory = new ThrottlerFactory($this->cacheAdapter, $this->timeAdapter);
     }
@@ -66,7 +66,7 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testUnknownSettings()
     {
-        $settings = Mockery::mock(ThrottleSettingsInterface::class);
+        $settings = M::mock(ThrottleSettingsInterface::class);
         $settings->shouldReceive('isValid')->andReturn(true);
 
         $this->setExpectedException(\InvalidArgumentException::class);
