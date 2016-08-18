@@ -14,7 +14,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
     const CACHE_TTL = 3600;
     const INITIAL_TIME = 0;
     const TOKEN_LIMIT = 120;
-    const TIME_LIMIT = 240;
+    const TIME_LIMIT = 24000;
     const THRESHOLD = 30;
 
     /**
@@ -90,7 +90,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->mockSetUsedCapacity(self::THRESHOLD + 1, self::INITIAL_TIME);
 
         $expectedWaitTime = self::TIME_LIMIT / self::TOKEN_LIMIT;
-        $this->timeAdapter->shouldReceive('sleep')->with($expectedWaitTime)->once();
+        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
 
         $this->assertEquals($expectedWaitTime, $this->throttler->hit());
     }

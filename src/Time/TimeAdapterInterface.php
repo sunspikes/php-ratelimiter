@@ -33,7 +33,7 @@ interface TimeAdapterInterface
     public function now();
 
     /**
-     * @param int $seconds
+     * @param int $microseconds
      */
-    public function sleep($seconds);
+    public function usleep($microseconds);
 }

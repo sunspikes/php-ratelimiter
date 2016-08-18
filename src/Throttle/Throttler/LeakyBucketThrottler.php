@@ -74,9 +74,9 @@ final class LeakyBucketThrottler implements ThrottlerInterface
      * @param TimeAdapterInterface  $timeAdapter
      * @param string                $key          Cache key prefix
      * @param int                   $tokenLimit   Bucket capacity
-     * @param int                   $timeLimit    Refill time
+     * @param int                   $timeLimit    Refill time in milliseconds
      * @param int|null              $threshold    Capacity threshold on which to start throttling (default: 0)
-     * @param int|null              $cacheTtl     Cache ttl time (default: cache ttl)
+     * @param int|null              $cacheTtl     Cache ttl time (default: null => CacheAdapter ttl)
      */
     public function __construct(
         CacheAdapterInterface $cache,
@@ -112,7 +112,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
         $tokenCount = $this->count();
 
         if (0 !== $wait = $this->getWaitTime($tokenCount)) {
-            $this->timeProvider->sleep($wait);
+            $this->timeProvider->usleep($wait * 1e3);
         }
 
         $this->setUsedCapacity($tokenCount + 1);

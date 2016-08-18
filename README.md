@@ -151,9 +151,13 @@ class MyHydratorFactory implements FactoryInterface
 #### Fixed Window
 A fixed window throttler will allow X requests in time Y. Any further access attempts will be counted, but return false as status. See [Overview example](#overview) for instantiation.
 
+__Note: time limit is in seconds__
+
 #### Leaky Bucket
 A [leaky bucket](https://en.wikipedia.org/wiki/Leaky_bucket) throttler will allow X requests divided over time Y.
 Any access attempts past the threshold (default: 0) will be delayed by Y / X and return false as status.
+
+__Note: time limit is in milliseconds__
 
 ```php
 // Make a rate limiter with limit 120 attempts per minute, start delaying after 30 requests

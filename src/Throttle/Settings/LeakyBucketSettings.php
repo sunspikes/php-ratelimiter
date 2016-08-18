@@ -49,9 +49,9 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
 
     /**
      * @param int|null $tokenLimit
-     * @param int|null $timeLimit
+     * @param int|null $timeLimit  In milliseconds
      * @param int|null $threshold
-     * @param int|null $cacheTtl
+     * @param int|null $cacheTtl   In seconds
      */
     public function __construct($tokenLimit = null, $timeLimit = null, $threshold = null, $cacheTtl = null)
     {

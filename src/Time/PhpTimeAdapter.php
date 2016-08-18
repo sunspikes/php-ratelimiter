@@ -36,10 +36,10 @@ final class PhpTimeAdapter implements TimeAdapterInterface
     }
 
     /**
-     * @param int $seconds
+     * @param int $microseconds
      */
-    public function sleep($seconds)
+    public function usleep($microseconds)
     {
-        sleep($seconds);
+        usleep($microseconds);
     }
 }
