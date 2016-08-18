@@ -155,13 +155,16 @@ __Note: time limit is in seconds__
 
 #### Leaky Bucket
 A [leaky bucket](https://en.wikipedia.org/wiki/Leaky_bucket) throttler will allow X requests divided over time Y.
-Any access attempts past the threshold (default: 0) will be delayed by Y / X and return false as status.
+
+Any access attempts past the threshold T (default: 0) will be delayed by ![equation](http://www.sciweavers.org/tex2img.php?eq=%5Cfrac%7BY%7D%7BX-T%7D%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).
+
+`access()` will return false if delayed, `hit()` will return the number of milliseconds waited
 
 __Note: time limit is in milliseconds__
 
 ```php
 // Make a rate limiter with limit 120 attempts per minute, start delaying after 30 requests
-$settings = new LeakyBucketSettings(120, 60, 30);
+$settings = new LeakyBucketSettings(120, 60000, 30);
 
 $cacheAdapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
 $timeAdapter = new PhpTimeAdapter();

@@ -14,8 +14,8 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 class LeakyBucketTest extends \PHPUnit_Framework_TestCase
 {
     const THRESHOLD = 3;
-    const TIME_LIMIT = 60000;
-    const TOKEN_LIMIT = 300;    //300 requests per minute
+    const TIME_LIMIT = 27000;
+    const TOKEN_LIMIT = 30;    //30 requests per 27 seconds
 
     /**
      * @var TimeAdapterInterface|M\MockInterface
@@ -68,7 +68,8 @@ class LeakyBucketTest extends \PHPUnit_Framework_TestCase
 
     public function testThrottleAccess()
     {
-        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * self::TIME_LIMIT / self::TOKEN_LIMIT)->once();
+        $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - self::THRESHOLD);
+        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
 
         $throttle = $this->ratelimiter->get('access-test');
         $throttle->access();

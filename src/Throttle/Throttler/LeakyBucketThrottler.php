@@ -147,7 +147,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
             return 0;
         }
 
-        return  (int) ceil($lastTokenCount - ($this->tokenlimit * $timeSinceLastRequest / $this->timeLimit));
+        return  (int) ceil($lastTokenCount - ($this->tokenlimit * $timeSinceLastRequest / ($this->timeLimit)));
     }
 
     /**
@@ -185,7 +185,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
             return 0;
         }
 
-        return ceil($this->timeLimit/$this->tokenlimit);
+        return ceil($this->timeLimit / ($this->tokenlimit - $this->threshold));
     }
 
     /**
