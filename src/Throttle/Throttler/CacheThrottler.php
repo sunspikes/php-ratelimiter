@@ -25,11 +25,12 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
+use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
 class CacheThrottler implements ThrottlerInterface, \Countable
 {
-    /* @var \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface */
+    /* @var CacheAdapterInterface */
     protected $cache;
     /* @var string */
     protected $key;
@@ -41,14 +42,12 @@ class CacheThrottler implements ThrottlerInterface, \Countable
     protected $counter;
 
     /**
-     * Short description for Function
-     *
-     * @param \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface $cache
+     * @param CacheAdapterInterface $cache
      * @param string $key
      * @param int $limit
      * @param int $ttl
      */
-    public function __construct($cache, $key, $limit, $ttl)
+    public function __construct(CacheAdapterInterface $cache, $key, $limit, $ttl)
     {
         $this->cache = $cache;
         $this->key = $key;
@@ -119,29 +118,15 @@ class CacheThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * Get the cache adapter
-     *
-     * @return \Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface
+     * @inheritdoc
      */
-    public function getCache()
-    {
-        return $this->cache;
-    }
-
-    /**
-     * Get cache ttl
-     *
-     * @return int
-     */
-    public function getTtl()
+    public function getTime()
     {
         return $this->ttl;
     }
 
     /**
-     * Get throttle limit
-     *
-     * @return int
+     * @inheritdoc
      */
     public function getLimit()
     {

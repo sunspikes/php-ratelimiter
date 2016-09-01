@@ -23,17 +23,23 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Hydrator;
+namespace Sunspikes\Ratelimit\Time;
 
-use Sunspikes\Ratelimit\Throttle\Entity\Data;
-
-class StringHydrator implements DataHydratorInterface
+final class PhpTimeAdapter implements TimeAdapterInterface
 {
     /**
-     * @inheritdoc
+     * @return int
      */
-    public function hydrate($data)
+    public function now()
     {
-        return new Data($data);
+        return time();
+    }
+
+    /**
+     * @param int $microseconds
+     */
+    public function usleep($microseconds)
+    {
+        usleep($microseconds);
     }
 }

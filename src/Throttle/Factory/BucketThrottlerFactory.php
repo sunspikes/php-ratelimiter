@@ -27,56 +27,45 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
-use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
+use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-class ThrottlerFactory implements FactoryInterface
+class BucketThrottlerFactory extends ThrottlerFactory
 {
     /**
-     * @var CacheAdapterInterface
+     * @var TimeAdapterInterface
      */
-    protected $cacheAdapter;
+    private $timeAdapter;
 
     /**
      * @param CacheAdapterInterface $cacheAdapter
+     * @param TimeAdapterInterface  $timeAdapter
      */
-    public function __construct(CacheAdapterInterface $cacheAdapter)
+    public function __construct(CacheAdapterInterface $cacheAdapter, TimeAdapterInterface $timeAdapter)
     {
-        $this->cacheAdapter = $cacheAdapter;
+        parent::__construct($cacheAdapter);
+        $this->timeAdapter = $timeAdapter;
     }
 
     /**
      * @inheritdoc
      */
-    public function make(Data $data, ThrottleSettingsInterface $settings)
-    {
-        if (!$settings->isValid()) {
-            throw new \InvalidArgumentException('Provided throttler settings not valid');
-        }
-
-        return $this->createThrottler($data, $settings);
-    }
-
-    /**
-     * @param Data                      $data
-     * @param ThrottleSettingsInterface $settings
-     *
-     * @return CacheThrottler
-     */
     protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
     {
-        if ($settings instanceof FixedWindowSettings) {
-            return new CacheThrottler(
+        if ($settings instanceof LeakyBucketSettings) {
+            return new LeakyBucketThrottler(
                 $this->cacheAdapter,
+                $this->timeAdapter,
                 $data->getKey(),
-                $settings->getLimit(),
-                $settings->getTime()
+                $settings->getTokenLimit(),
+                $settings->getTimeLimit(),
+                $settings->getThreshold(),
+                $settings->getCacheTtl()
             );
         }
 
-        throw new \InvalidArgumentException(
-            sprintf('Unable to create throttler for %s settings', get_class($settings))
-        );
+        return parent::createThrottler($data, $settings);
     }
 }

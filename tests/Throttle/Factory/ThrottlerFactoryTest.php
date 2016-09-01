@@ -3,28 +3,64 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Factory;
 
 use Mockery as M;
+use Mockery\MockInterface;
+use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
+use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
+use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface;
 
 class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testFactory()
+    /**
+     * @var CacheAdapterInterface|MockInterface
+     */
+    protected $cacheAdapter;
+
+    /**
+     * @var FactoryInterface
+     */
+    protected $factory;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
     {
-        $dataMock = M::mock('\Sunspikes\Ratelimit\Throttle\Entity\Data');
-        $dataMock->shouldReceive('getKey')
-            ->andReturn('getKey')
-            ->once();
-        $dataMock->shouldReceive('getLimit')
-            ->andReturn(3)
-            ->once();
-        $dataMock->shouldReceive('getTtl')
-            ->andReturn(600)
-            ->once();
+        $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
+        $this->factory = new ThrottlerFactory($this->cacheAdapter);
+    }
 
-        $adapterMock = M::mock('\Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface');
+    public function testMakeFixedWindow()
+    {
+        self::assertInstanceOf(
+            CacheThrottler::class,
+            $this->factory->make($this->getData(), new FixedWindowSettings(3, 600))
+        );
+    }
 
-        $factory = new ThrottlerFactory();
-        $throttler = $factory->make($dataMock, $adapterMock);
+    public function testInvalidSettings()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->factory->make($this->getData(), new FixedWindowSettings());
+    }
 
-        $this->assertInstanceOf('\Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler', $throttler);
+    public function testUnknownSettings()
+    {
+        $settings = M::mock(ThrottleSettingsInterface::class);
+        $settings->shouldReceive('isValid')->andReturn(true);
+
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->factory->make($this->getData(), $settings);
+    }
+
+    /**
+     * @return Data
+     */
+    protected function getData()
+    {
+        return new Data('someKey');
     }
 }

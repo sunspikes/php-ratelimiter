@@ -61,4 +61,18 @@ interface ThrottlerInterface
      * @return bool
      */
     public function check();
+
+    /**
+     * Get time window
+     *
+     * @return int
+     */
+    public function getTime();
+
+    /**
+     * Get throttle limit
+     *
+     * @return int
+     */
+    public function getLimit();
 }

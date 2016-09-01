@@ -37,7 +37,8 @@ compatible autoloader.
 ```php
 // 1. Make a rate limiter with limit 3 attempts in 10 minutes
 $cacheAdapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
-$ratelimiter = new RateLimiter(new ThrottlerFactory(), new HydratorFactory(), $cacheAdapter, 3, 600);
+$settings = new FixedWindowSettings(3, 600);
+$ratelimiter = new RateLimiter(new ThrottlerFactory($cacheAdapter), new HydratorFactory(), $settings);
 
 // 2. Get a throttler for path /login 
 $loginThrottler = $ratelimiter->get('/login');
@@ -143,6 +144,35 @@ class MyHydratorFactory implements FactoryInterface
         return $this->defaultFactory->make($data);
     }
 }
+```
+
+### Throttler types
+
+#### Fixed Window
+A fixed window throttler will allow X requests in time Y. Any further access attempts will be counted, but return false as status. See [Overview example](#overview) for instantiation.
+
+__Note: time limit is in seconds__
+
+#### Leaky Bucket
+A [leaky bucket](https://en.wikipedia.org/wiki/Leaky_bucket) throttler will allow X requests divided over time Y.
+
+Any access attempts past the threshold T (default: 0) will be delayed by ![equation](http://www.sciweavers.org/tex2img.php?eq=%5Cfrac%7BY%7D%7BX-T%7D%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).
+
+`access()` will return false if delayed, `hit()` will return the number of milliseconds waited
+
+__Note: time limit is in milliseconds__
+
+```php
+// Make a rate limiter with limit 120 attempts per minute, start delaying after 30 requests
+$settings = new LeakyBucketSettings(120, 60000, 30);
+
+$cacheAdapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
+$timeAdapter = new PhpTimeAdapter();
+
+$throttlerFactory = new BucketThrottlerFactory($cacheAdapter, $timeAdapter);
+$hydratorFactory = new HydratorFactory();
+
+$ratelimiter = new RateLimiter($throttlerFactory, $hydratorFactory, $settings);
 ```
 
 ## Author
