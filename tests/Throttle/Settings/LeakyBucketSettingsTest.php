@@ -39,9 +39,9 @@ class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider inputProvider
      */
-    public function testIsValid($tokenLimit, $timeLimit, $result)
+    public function testIsValid($tokenLimit, $timeLimit, $threshold, $result)
     {
-        self::assertEquals($result, (new LeakyBucketSettings($tokenLimit, $timeLimit))->isValid());
+        self::assertEquals($result, (new LeakyBucketSettings($tokenLimit, $timeLimit, $threshold))->isValid());
     }
 
     /**
@@ -50,11 +50,12 @@ class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
     public function inputProvider()
     {
         return [
-            [null, null, false],
-            [null, 600, false],
-            [3, null, false],
-            [3, 0, false],
-            [3, 600, true],
+            [null, null, null, false],
+            [null, 600, null, false],
+            [3, null, null, false],
+            [3, 0, null, false],
+            [3, 600, 3, false],
+            [30, 600, 15, true],
         ];
     }
 }

@@ -85,7 +85,11 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
      */
     public function isValid()
     {
-        return null !== $this->tokenLimit && null !== $this->timeLimit && 0 !== $this->timeLimit;
+        return
+            null !== $this->tokenLimit &&
+            null !== $this->timeLimit &&
+            0 !== $this->timeLimit &&
+            $this->tokenLimit !== $this->threshold;
     }
 
     /**
