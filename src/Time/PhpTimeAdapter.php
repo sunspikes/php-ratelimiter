@@ -28,11 +28,13 @@ namespace Sunspikes\Ratelimit\Time;
 final class PhpTimeAdapter implements TimeAdapterInterface
 {
     /**
-     * @return int
+     * @return float
      */
     public function now()
     {
-        return time();
+        list($usec, $sec) = explode(" ", microtime());
+
+        return ((float) $usec + (float) $sec);
     }
 
     /**

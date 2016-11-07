@@ -55,7 +55,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
     {
         //More time has passed than the given window
         $this->mockTimePassed(self::TIME_LIMIT + 1, 2);
-        $this->mockSetUsedCapacity(1, self::INITIAL_TIME + self::TIME_LIMIT + 1);
+        $this->mockSetUsedCapacity(1, (self::INITIAL_TIME + self::TIME_LIMIT + 1) / 1e3);
 
         $this->assertEquals(true, $this->throttler->access());
     }
@@ -90,7 +90,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->mockSetUsedCapacity(self::THRESHOLD + 1, self::INITIAL_TIME);
 
         $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - self::THRESHOLD);
-        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
+        $this->timeAdapter->shouldReceive('usleep')->with($expectedWaitTime)->once();
 
         $this->assertEquals($expectedWaitTime, $this->throttler->hit());
     }
@@ -167,11 +167,11 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
      */
     private function mockTimePassed($timeDiff, $numCalls)
     {
-        $this->timeAdapter->shouldReceive('now')->times($numCalls)->andReturn(self::INITIAL_TIME + $timeDiff);
+        $this->timeAdapter->shouldReceive('now')->times($numCalls)->andReturn((self::INITIAL_TIME + $timeDiff) / 1e3);
 
         $this->cacheAdapter
             ->shouldReceive('get')
             ->with('key'.LeakyBucketThrottler::TIME_CACHE_KEY)
-            ->andReturn(self::INITIAL_TIME);
+            ->andReturn(self::INITIAL_TIME / 1e3);
     }
 }
