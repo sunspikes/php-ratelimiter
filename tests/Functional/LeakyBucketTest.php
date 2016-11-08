@@ -69,7 +69,7 @@ class LeakyBucketTest extends \PHPUnit_Framework_TestCase
     public function testThrottleAccess()
     {
         $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - self::THRESHOLD);
-        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
+        $this->timeAdapter->shouldReceive('usleep')->with($expectedWaitTime)->once();
 
         $throttle = $this->ratelimiter->get('access-test');
         $throttle->access();

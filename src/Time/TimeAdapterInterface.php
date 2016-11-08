@@ -28,7 +28,7 @@ namespace Sunspikes\Ratelimit\Time;
 interface TimeAdapterInterface
 {
     /**
-     * @return int
+     * @return float
      */
     public function now();
 

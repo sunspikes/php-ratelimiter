@@ -111,8 +111,8 @@ final class LeakyBucketThrottler implements ThrottlerInterface
     {
         $tokenCount = $this->count();
 
-        if (0 !== $wait = $this->getWaitTime($tokenCount)) {
-            $this->timeProvider->usleep($wait * 1e3);
+        if (0 < $wait = $this->getWaitTime($tokenCount)) {
+            $this->timeProvider->usleep($wait);
         }
 
         $this->setUsedCapacity($tokenCount + 1);
@@ -134,7 +134,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
     public function count()
     {
         try {
-            $timeSinceLastRequest = $this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY);
+            $timeSinceLastRequest = 1e3 * ($this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY));
 
             if ($timeSinceLastRequest > $this->timeLimit) {
                 return 0;
@@ -147,7 +147,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
             return 0;
         }
 
-        return  (int) ceil($lastTokenCount - ($this->tokenlimit * $timeSinceLastRequest / ($this->timeLimit)));
+        return  (int) max(0, ceil($lastTokenCount - ($this->tokenlimit * $timeSinceLastRequest / ($this->timeLimit))));
     }
 
     /**
@@ -185,7 +185,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
             return 0;
         }
 
-        return ceil($this->timeLimit / ($this->tokenlimit - $this->threshold));
+        return ceil($this->timeLimit / max(1, ($this->tokenlimit - $this->threshold)));
     }
 
     /**

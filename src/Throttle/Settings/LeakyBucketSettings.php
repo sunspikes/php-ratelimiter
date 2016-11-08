@@ -88,8 +88,7 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
         return
             null !== $this->tokenLimit &&
             null !== $this->timeLimit &&
-            0 !== $this->timeLimit &&
-            $this->tokenLimit !== $this->threshold;
+            0 !== $this->timeLimit;
     }
 
     /**
