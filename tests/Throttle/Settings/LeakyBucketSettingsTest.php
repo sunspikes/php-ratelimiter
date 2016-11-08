@@ -54,7 +54,7 @@ class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
             [null, 600, null, false],
             [3, null, null, false],
             [3, 0, null, false],
-            [3, 600, 3, false],
+            [3, 600, 3, true],
             [30, 600, 15, true],
         ];
     }
