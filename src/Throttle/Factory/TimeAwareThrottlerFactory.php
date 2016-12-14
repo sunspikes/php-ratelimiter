@@ -29,9 +29,13 @@ use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
+use Sunspikes\Ratelimit\Throttle\Throttler\FixedWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\MovingWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\RetrialQueueThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class TimeAwareThrottlerFactory extends ThrottlerFactory
@@ -56,6 +60,24 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
      */
     protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
     {
+        if ($settings instanceof RetrialQueueSettings) {
+            return new RetrialQueueThrottler(
+                $this->createNestableController($data, $settings),
+                $this->timeAdapter
+            );
+        }
+
+        return $this->createNestableController($data, $settings);
+    }
+
+    /**
+     * @param Data                      $data
+     * @param ThrottleSettingsInterface $settings
+     *
+     * @return ThrottlerInterface
+     */
+    private function createNestableController(Data $data, ThrottleSettingsInterface $settings)
+    {
         if ($settings instanceof LeakyBucketSettings) {
             return new LeakyBucketThrottler(
                 $this->cacheAdapter,
@@ -73,7 +95,18 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
                 $this->cacheAdapter,
                 $this->timeAdapter,
                 $data->getKey(),
-                $settings->getTokenLimit(),
+                $settings->getHitLimit(),
+                $settings->getTimeLimit(),
+                $settings->getCacheTtl()
+            );
+        }
+
+        if ($settings instanceof FixedWindowSettings) {
+            return new FixedWindowThrottler(
+                $this->cacheAdapter,
+                $this->timeAdapter,
+                $data->getKey(),
+                $settings->getHitLimit(),
                 $settings->getTimeLimit(),
                 $settings->getCacheTtl()
             );

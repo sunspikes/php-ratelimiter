@@ -23,8 +23,34 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Settings;
+namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-final class MovingWindowSettings extends AbstractWindowSettings
+use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+
+final class FixedWindowThrottler extends AbstractWindowThrottler
 {
+    /**
+     * @inheritdoc
+     */
+    public function hit()
+    {
+        $this->cache->set($this->key.self::HITS_CACHE_KEY, $this->count() + 1, $this->cacheTtl);
+
+        try {
+            $this->cache->get($this->key.self::TIME_CACHE_KEY);
+        } catch (ItemNotFoundException $exception) {
+            $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function clear()
+    {
+        parent::clear();
+        $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+    }
 }
