@@ -62,16 +62,11 @@ final class RetrialQueueThrottler implements ThrottlerInterface
      */
     public function hit()
     {
-        $limit = $this->internalThrottler->getLimit();
-        $count = $this->internalThrottler->count();
-
-        if ($limit < $count) {
-            return $this->internalThrottler->hit();
+        if (0 !== $waitTime = $this->getWaitTime()) {
+            $this->timeProvider->usleep(1e6 * $waitTime);
         }
 
-        $this->timeProvider->usleep(1e3 * (1 + $count - $limit) * ($this->internalThrottler->getTime() / $limit));
-
-        return $this;
+        return $this->internalThrottler->hit();
     }
 
     /**
@@ -112,5 +107,30 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     public function getLimit()
     {
         return $this->internalThrottler->getLimit();
+    }
+
+    /**
+     * @return int time in seconds
+     */
+    private function getWaitTime()
+    {
+        $hitLimit = $this->internalThrottler->getLimit();
+        $hitCount = $this->internalThrottler->count();
+
+        if ($hitCount < $hitLimit) {
+            return 0;
+        }
+
+        if ($this->internalThrottler instanceof ElasticWindowThrottler) {
+            return $this->internalThrottler->getTime();
+        }
+
+        $waitTime = (1 + $hitCount - $hitLimit) * ($this->internalThrottler->getTime() / $hitLimit);
+
+        if ($this->internalThrottler instanceof LeakyBucketThrottler) {
+            $waitTime /= 1e3;
+        }
+
+        return $waitTime;
     }
 }

@@ -34,15 +34,33 @@ final class FixedWindowThrottler extends AbstractWindowThrottler
      */
     public function hit()
     {
-        $this->cache->set($this->key.self::HITS_CACHE_KEY, $this->count() + 1, $this->cacheTtl);
+        $this->setCachedHitCount($this->count() + 1);
 
         try {
-            $this->cache->get($this->key.self::TIME_CACHE_KEY);
+            if (($this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY)) > $this->timeLimit) {
+                $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+            }
         } catch (ItemNotFoundException $exception) {
             $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
         }
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count()
+    {
+        try {
+            if (($this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY)) > $this->timeLimit) {
+                return 0;
+            }
+
+            return $this->getCachedHitCount();
+        } catch (ItemNotFoundException $exception) {
+            return 0;
+        }
     }
 
     /**

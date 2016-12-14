@@ -27,6 +27,7 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
@@ -62,7 +63,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
     {
         if ($settings instanceof RetrialQueueSettings) {
             return new RetrialQueueThrottler(
-                $this->createNestableController($data, $settings),
+                $this->createNestableController($data, $settings->getInternalThrottlerSettings()),
                 $this->timeAdapter
             );
         }

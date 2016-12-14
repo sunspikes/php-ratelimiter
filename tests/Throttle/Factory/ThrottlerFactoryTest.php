@@ -33,7 +33,7 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory = new ThrottlerFactory($this->cacheAdapter);
     }
 
-    public function testMakeFixedWindow()
+    public function testMakeElasticWindow()
     {
         self::assertInstanceOf(
             ElasticWindowThrottler::class,

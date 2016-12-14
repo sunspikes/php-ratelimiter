@@ -4,16 +4,15 @@ namespace Sunspikes\Tests\Functional;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
-use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
+use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-class LeakyBucketTest extends \PHPUnit_Framework_TestCase
+class LeakyBucketTest extends AbstractThrottlerTestCase
 {
-    const THRESHOLD = 3;
     const TIME_LIMIT = 27000;
     const TOKEN_LIMIT = 30;    //30 requests per 27 seconds
 
@@ -23,11 +22,6 @@ class LeakyBucketTest extends \PHPUnit_Framework_TestCase
     private $timeAdapter;
 
     /**
-     * @var Ratelimiter
-     */
-    private $ratelimiter;
-
-    /**
      * @inheritdoc
      */
     protected function setUp()
@@ -35,66 +29,26 @@ class LeakyBucketTest extends \PHPUnit_Framework_TestCase
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->timeAdapter->shouldReceive('now')->andReturn(time());
 
-        $cacheFactory = new DesarrollaCacheFactory(null, [
-            'driver' => 'memory',
-            'memory' => ['limit' => 10],
-        ]);
+        parent::setUp();
+    }
 
-        $this->ratelimiter = new RateLimiter(
+    /**
+     * @inheritdoc
+     */
+    protected function createRatelimiter(FactoryInterface $cacheFactory)
+    {
+        return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
-            new LeakyBucketSettings(self::TOKEN_LIMIT, self::TIME_LIMIT, self::THRESHOLD)
+            new LeakyBucketSettings(self::TOKEN_LIMIT, self::TIME_LIMIT, $this->getMaxAttempts())
         );
-    }
-
-    public function testThrottlePreLimit()
-    {
-        $throttle = $this->ratelimiter->get('pre-limit-test');
-        $throttle->hit();
-        $throttle->hit();
-
-        $this->assertTrue($throttle->check());
-    }
-
-    public function testThrottlePostLimit()
-    {
-        $throttle = $this->ratelimiter->get('post-limit-test');
-        $throttle->hit();
-        $throttle->hit();
-        $throttle->hit();
-
-        $this->assertFalse($throttle->check());
     }
 
     public function testThrottleAccess()
     {
-        $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - self::THRESHOLD);
+        $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - $this->getMaxAttempts());
         $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
 
-        $throttle = $this->ratelimiter->get('access-test');
-        $throttle->access();
-        $throttle->access();
-        $throttle->access();
-
-        $this->assertFalse($throttle->access());
-    }
-
-    public function testThrottleCount()
-    {
-        $throttle = $this->ratelimiter->get('count-test');
-        $throttle->access();
-        $throttle->access();
-        $throttle->access();
-
-        $this->assertEquals(3, $throttle->count());
-    }
-
-    public function testClear()
-    {
-        $throttle = $this->ratelimiter->get('clear-test');
-        $throttle->hit();
-        $throttle->clear();
-
-        self::assertEquals(0, $throttle->count());
+        parent::testThrottleAccess();
     }
 }
