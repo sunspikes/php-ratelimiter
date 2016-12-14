@@ -8,14 +8,13 @@ use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
-use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-class LeakyBucketTest extends \PHPUnit_Framework_TestCase
+class MovingTest extends \PHPUnit_Framework_TestCase
 {
-    const THRESHOLD = 3;
-    const TIME_LIMIT = 27000;
-    const TOKEN_LIMIT = 30;    //30 requests per 27 seconds
+    const TIME_LIMIT = 27;
+    const TOKEN_LIMIT = 3;    //3 requests per 27 seconds
 
     /**
      * @var TimeAdapterInterface|M\MockInterface
@@ -43,7 +42,7 @@ class LeakyBucketTest extends \PHPUnit_Framework_TestCase
         $this->ratelimiter = new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
-            new LeakyBucketSettings(self::TOKEN_LIMIT, self::TIME_LIMIT, self::THRESHOLD)
+            new MovingWindowSettings(self::TOKEN_LIMIT, self::TIME_LIMIT)
         );
     }
 
@@ -68,9 +67,6 @@ class LeakyBucketTest extends \PHPUnit_Framework_TestCase
 
     public function testThrottleAccess()
     {
-        $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - self::THRESHOLD);
-        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
-
         $throttle = $this->ratelimiter->get('access-test');
         $throttle->access();
         $throttle->access();

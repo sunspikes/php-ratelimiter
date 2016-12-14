@@ -28,11 +28,13 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\MovingWindowThrottler;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-class BucketThrottlerFactory extends ThrottlerFactory
+class TimeAwareThrottlerFactory extends ThrottlerFactory
 {
     /**
      * @var TimeAdapterInterface
@@ -62,6 +64,17 @@ class BucketThrottlerFactory extends ThrottlerFactory
                 $settings->getTokenLimit(),
                 $settings->getTimeLimit(),
                 $settings->getThreshold(),
+                $settings->getCacheTtl()
+            );
+        }
+
+        if ($settings instanceof MovingWindowSettings) {
+            return new MovingWindowThrottler(
+                $this->cacheAdapter,
+                $this->timeAdapter,
+                $data->getKey(),
+                $settings->getTokenLimit(),
+                $settings->getTimeLimit(),
                 $settings->getCacheTtl()
             );
         }
