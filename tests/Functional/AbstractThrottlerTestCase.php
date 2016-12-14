@@ -12,7 +12,7 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var Ratelimiter
      */
-    private $ratelimiter;
+    protected $ratelimiter;
 
     /**
      * @inheritdoc

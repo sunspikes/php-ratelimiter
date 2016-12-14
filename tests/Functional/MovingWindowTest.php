@@ -13,6 +13,13 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class MovingWindowTest extends AbstractThrottlerTestCase
 {
+    const TIME_LIMIT = 24;
+
+    /**
+     * @var int
+     */
+    private $startTime;
+
     /**
      * @var TimeAdapterInterface|M\MockInterface
      */
@@ -24,9 +31,24 @@ class MovingWindowTest extends AbstractThrottlerTestCase
     protected function setUp()
     {
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
-        $this->timeAdapter->shouldReceive('now')->andReturn(time());
+        $this->timeAdapter->shouldReceive('now')->andReturn($this->startTime = time())->byDefault();
 
         parent::setUp();
+    }
+
+    public function testWindowMoves()
+    {
+        $throttle = $this->ratelimiter->get('window-moves');
+
+        for ($i = -1; $i < $this->getMaxAttempts(); $i++) {
+            $throttle->hit();
+        }
+
+        //override time
+        $this->timeAdapter->shouldReceive('now')->andReturn($this->startTime + self::TIME_LIMIT);
+        $throttle->hit();
+
+        self::assertEquals(2, $throttle->count());
     }
 
     /**
@@ -37,15 +59,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
-            new MovingWindowSettings($this->getMaxAttempts(), 27)
+            new MovingWindowSettings($this->getMaxAttempts(), self::TIME_LIMIT)
         );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getMaxAttempts()
-    {
-        return 3;
     }
 }

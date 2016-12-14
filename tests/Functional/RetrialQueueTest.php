@@ -8,13 +8,13 @@ use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
-use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-class LeakyBucketTest extends AbstractThrottlerTestCase
+class RetrialQueueTest extends AbstractThrottlerTestCase
 {
-    const TIME_LIMIT = 27000;
-    const TOKEN_LIMIT = 30;    //30 requests per 27 seconds
+    const TIME_LIMIT = 24;
 
     /**
      * @var TimeAdapterInterface|M\MockInterface
@@ -34,10 +34,18 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
 
     public function testThrottleAccess()
     {
-        $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - $this->getMaxAttempts());
-        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
+        $expectedWaitTime = self::TIME_LIMIT / $this->getMaxAttempts();
+        $this->timeAdapter->shouldReceive('usleep')->with(1e6 * $expectedWaitTime)->once()->ordered();
+        $this->timeAdapter->shouldReceive('usleep')->with(2 * 1e6 * $expectedWaitTime)->once()->ordered();
 
-        parent::testThrottleAccess();
+        $throttle = $this->ratelimiter->get('access-test');
+
+        for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
+            $throttle->access();
+        }
+
+        $this->assertFalse($throttle->access());
+        $this->assertFalse($throttle->access());
     }
 
     /**
@@ -48,7 +56,7 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
-            new LeakyBucketSettings(self::TOKEN_LIMIT, self::TIME_LIMIT, $this->getMaxAttempts())
+            new RetrialQueueSettings(new MovingWindowSettings($this->getMaxAttempts(), self::TIME_LIMIT))
         );
     }
 }
