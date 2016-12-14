@@ -27,9 +27,9 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
-use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 
 class ThrottlerFactory implements FactoryInterface
 {
@@ -62,12 +62,12 @@ class ThrottlerFactory implements FactoryInterface
      * @param Data                      $data
      * @param ThrottleSettingsInterface $settings
      *
-     * @return CacheThrottler
+     * @return ElasticWindowThrottler
      */
     protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
     {
-        if ($settings instanceof FixedWindowSettings) {
-            return new CacheThrottler(
+        if ($settings instanceof ElasticWindowSettings) {
+            return new ElasticWindowThrottler(
                 $this->cacheAdapter,
                 $data->getKey(),
                 $settings->getLimit(),

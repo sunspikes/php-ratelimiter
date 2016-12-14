@@ -4,9 +4,9 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 
-class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
+class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 {
     private $throttler;
 
@@ -22,7 +22,7 @@ class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
             ->with('key')
             ->andReturn(0, 1, 2, 3, 4);
 
-        $this->throttler = new CacheThrottler($cacheAdapter, 'key', 3, 600);
+        $this->throttler = new ElasticWindowThrottler($cacheAdapter, 'key', 3, 600);
     }
 
     public function testAccess()

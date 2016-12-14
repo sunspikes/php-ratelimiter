@@ -3,15 +3,15 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
 use Mockery as M;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
-class FixedWindowSettingsTest extends \PHPUnit_Framework_TestCase
+class ElasticWindowSettingsTest extends \PHPUnit_Framework_TestCase
 {
     public function testMergeWithEmpty()
     {
-        $settings = new FixedWindowSettings(3, 600);
-        $mergedSettings = $settings->merge(new FixedWindowSettings());
+        $settings = new ElasticWindowSettings(3, 600);
+        $mergedSettings = $settings->merge(new ElasticWindowSettings());
 
         self::assertEquals(3, $mergedSettings->getLimit());
         self::assertEquals(600, $mergedSettings->getTime());
@@ -19,8 +19,8 @@ class FixedWindowSettingsTest extends \PHPUnit_Framework_TestCase
 
     public function testMergeWithNonEmpty()
     {
-        $settings = new FixedWindowSettings(null, 600);
-        $mergedSettings = $settings->merge(new FixedWindowSettings(3, 700));
+        $settings = new ElasticWindowSettings(null, 600);
+        $mergedSettings = $settings->merge(new ElasticWindowSettings(3, 700));
 
         self::assertEquals(3, $mergedSettings->getLimit());
         self::assertEquals(700, $mergedSettings->getTime());
@@ -29,7 +29,7 @@ class FixedWindowSettingsTest extends \PHPUnit_Framework_TestCase
     public function testInvalidMerge()
     {
         $this->setExpectedException(\InvalidArgumentException::class);
-        (new FixedWindowSettings())->merge(M::mock(ThrottleSettingsInterface::class));
+        (new ElasticWindowSettings())->merge(M::mock(ThrottleSettingsInterface::class));
     }
 
     /**
@@ -37,7 +37,7 @@ class FixedWindowSettingsTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsValid($limit, $time, $result)
     {
-        self::assertEquals($result, (new FixedWindowSettings($limit, $time))->isValid());
+        self::assertEquals($result, (new ElasticWindowSettings($limit, $time))->isValid());
     }
 
     /**

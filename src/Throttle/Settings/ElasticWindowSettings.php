@@ -25,7 +25,7 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class FixedWindowSettings implements ThrottleSettingsInterface
+final class ElasticWindowSettings implements ThrottleSettingsInterface
 {
     /**
      * @var int|null

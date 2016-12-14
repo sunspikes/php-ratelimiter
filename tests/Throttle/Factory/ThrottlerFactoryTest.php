@@ -7,9 +7,9 @@ use Mockery\MockInterface;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
-use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface;
 
 class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
@@ -36,15 +36,15 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
     public function testMakeFixedWindow()
     {
         self::assertInstanceOf(
-            CacheThrottler::class,
-            $this->factory->make($this->getData(), new FixedWindowSettings(3, 600))
+            ElasticWindowThrottler::class,
+            $this->factory->make($this->getData(), new ElasticWindowSettings(3, 600))
         );
     }
 
     public function testInvalidSettings()
     {
         $this->setExpectedException(\InvalidArgumentException::class);
-        $this->factory->make($this->getData(), new FixedWindowSettings());
+        $this->factory->make($this->getData(), new ElasticWindowSettings());
     }
 
     public function testUnknownSettings()

@@ -7,10 +7,9 @@ use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
-use Sunspikes\Ratelimit\Time\PhpTimeAdapter;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 
-class FixedWindowTest extends \PHPUnit_Framework_TestCase
+class ElasticWindowTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Ratelimiter
@@ -30,7 +29,7 @@ class FixedWindowTest extends \PHPUnit_Framework_TestCase
         $this->ratelimiter = new RateLimiter(
             new ThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make())),
             new HydratorFactory(),
-            new FixedWindowSettings(3, 600)
+            new ElasticWindowSettings(3, 600)
         );
     }
 

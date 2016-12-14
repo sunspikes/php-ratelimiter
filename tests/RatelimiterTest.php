@@ -8,7 +8,7 @@ use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
 use Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface;
 use Sunspikes\Ratelimit\Throttle\Hydrator\FactoryInterface as HydratorFactoryInterface;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
@@ -79,7 +79,7 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
             ->with($object, M::type(ThrottleSettingsInterface::class))
             ->andReturn(M::mock(ThrottlerInterface::class));
 
-        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', new FixedWindowSettings()));
+        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', new ElasticWindowSettings()));
     }
 
     public function testGetWithUnmergableSettings()
