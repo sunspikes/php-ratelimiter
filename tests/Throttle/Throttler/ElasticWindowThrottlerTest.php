@@ -48,7 +48,7 @@ class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCheck()
     {
-        $this->assertTrue(true, $this->throttler->check());
+        $this->assertTrue($this->throttler->check());
     }
 
     public function testThrottle()

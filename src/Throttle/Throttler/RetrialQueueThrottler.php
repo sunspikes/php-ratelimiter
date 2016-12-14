@@ -54,7 +54,10 @@ final class RetrialQueueThrottler implements ThrottlerInterface
      */
     public function access()
     {
-        return 0 === $this->hit();
+        $status = $this->check();
+        $this->hit();
+
+        return $status;
     }
 
     /**

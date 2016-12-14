@@ -141,7 +141,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         //More time has passed than the given window
         $this->mockTimePassed(self::TIME_LIMIT + 1, 1);
 
-        $this->assertTrue(true, $this->throttler->check());
+        $this->assertTrue($this->throttler->check());
     }
 
     /**
