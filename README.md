@@ -37,7 +37,7 @@ compatible autoloader.
 ```php
 // 1. Make a rate limiter with limit 3 attempts in 10 minutes
 $cacheAdapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
-$settings = new FixedWindowSettings(3, 600);
+$settings = new ElasticWindowSettings(3, 600);
 $ratelimiter = new RateLimiter(new ThrottlerFactory($cacheAdapter), new HydratorFactory(), $settings);
 
 // 2. Get a throttler for path /login 
@@ -148,8 +148,17 @@ class MyHydratorFactory implements FactoryInterface
 
 ### Throttler types
 
-#### Fixed Window
-A fixed window throttler will allow X requests in time Y. Any further access attempts will be counted, but return false as status. See [Overview example](#overview) for instantiation.
+#### Elastic Window
+An elastic window throttler will allow X requests in Y seconds. Any further access attempts will be counted, but return false as status. Note that the window will be extended with Y seconds on every hit. This means there need to be no hits during Y seconds for the counter to be reset to 0. 
+
+See [Overview example](#overview) for instantiation.
+
+__Note: time limit is in seconds__
+
+#### Moving Window
+A moving window throttler will allow X requests during the previous Y seconds. Any further access attempts will be counted, but return false as status. The window is never extended beyond Y seconds. 
+
+See [Overview example](#overview) for instantiation.
 
 __Note: time limit is in seconds__
 
