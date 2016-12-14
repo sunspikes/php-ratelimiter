@@ -90,7 +90,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->mockSetUsedCapacity(self::THRESHOLD + 1, self::INITIAL_TIME);
 
         $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - self::THRESHOLD);
-        $this->timeAdapter->shouldReceive('usleep')->with($expectedWaitTime)->once();
+        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once()->ordered();
 
         $this->assertEquals($expectedWaitTime, $this->throttler->hit());
     }
@@ -153,12 +153,14 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->cacheAdapter
             ->shouldReceive('set')
             ->with('key'.LeakyBucketThrottler::TOKEN_CACHE_KEY, $tokens, self::CACHE_TTL)
-            ->once();
+            ->once()
+            ->ordered('set-cache');
 
         $this->cacheAdapter
             ->shouldReceive('set')
             ->with('key'.LeakyBucketThrottler::TIME_CACHE_KEY, $time, self::CACHE_TTL)
-            ->once();
+            ->once()
+            ->ordered('set-cache');
     }
 
     /**

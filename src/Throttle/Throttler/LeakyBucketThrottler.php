@@ -111,11 +111,11 @@ final class LeakyBucketThrottler implements ThrottlerInterface
     {
         $tokenCount = $this->count();
 
-        if (0 < $wait = $this->getWaitTime($tokenCount)) {
-            $this->timeProvider->usleep($wait);
-        }
-
         $this->setUsedCapacity($tokenCount + 1);
+
+        if (0 < $wait = $this->getWaitTime($tokenCount)) {
+            $this->timeProvider->usleep(1e3 * $wait);
+        }
 
         return $wait;
     }
