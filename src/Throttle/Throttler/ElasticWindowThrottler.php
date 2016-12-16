@@ -28,7 +28,7 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
-class ElasticWindowThrottler implements ThrottlerInterface, \Countable
+class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
 {
     /* @var CacheAdapterInterface */
     protected $cache;
@@ -131,5 +131,17 @@ class ElasticWindowThrottler implements ThrottlerInterface, \Countable
     public function getLimit()
     {
         return $this->limit;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRetryTimeout()
+    {
+        if ($this->check()) {
+            return 0;
+        }
+
+        return 1e3 * $this->ttl;
     }
 }

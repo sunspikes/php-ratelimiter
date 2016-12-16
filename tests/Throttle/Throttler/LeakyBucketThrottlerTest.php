@@ -28,7 +28,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
     private $timeAdapter;
 
     /**
-     * @var ThrottlerInterface
+     * @var LeakyBucketThrottler
      */
     private $throttler;
 
@@ -142,6 +142,26 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->mockTimePassed(self::TIME_LIMIT + 1, 1);
 
         $this->assertTrue($this->throttler->check());
+    }
+
+
+    public function testGetRetryTimeoutPreLimit()
+    {
+        $this->mockTimePassed(self::TIME_LIMIT + 2, 1);
+
+        $this->assertEquals(0, $this->throttler->getRetryTimeout());
+    }
+
+    public function testGetRetryTimeoutPostLimit()
+    {
+        $this->mockTimePassed(0, 1);
+
+        $this->cacheAdapter
+            ->shouldReceive('get')
+            ->with('key'.LeakyBucketThrottler::TOKEN_CACHE_KEY)
+            ->andReturn(self::THRESHOLD);
+
+        $this->assertSame((int) ceil(self::TIME_LIMIT / self::TOKEN_LIMIT), $this->throttler->getRetryTimeout());
     }
 
     /**

@@ -40,6 +40,24 @@ class FixedWindowThrottlerTest extends AbstractWindowThrottlerTest
         $this->assertEquals(self::HIT_LIMIT / 3, $this->throttler->count());
     }
 
+    public function testGetRetryTimeoutPreLimit()
+    {
+        $this->mockTimePassed(self::TIME_LIMIT + 1, 1);
+
+        $this->assertEquals(0, $this->throttler->getRetryTimeout());
+    }
+
+    public function testGetRetryTimeoutPostLimit()
+    {
+        $this->mockTimePassed(self::TIME_LIMIT / 2, 2);
+        $this->cacheAdapter
+            ->shouldReceive('get')
+            ->with('key'.FixedWindowThrottler::HITS_CACHE_KEY)
+            ->andReturn(self::HIT_LIMIT + 1);
+
+        $this->assertEquals(5e2 * self::TIME_LIMIT, $this->throttler->getRetryTimeout());
+    }
+
     /**
      * @inheritdoc
      */

@@ -27,7 +27,7 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
-final class FixedWindowThrottler extends AbstractWindowThrottler
+final class FixedWindowThrottler extends AbstractWindowThrottler implements RetriableThrottlerInterface
 {
     /**
      * @inheritdoc
@@ -70,5 +70,17 @@ final class FixedWindowThrottler extends AbstractWindowThrottler
     {
         parent::clear();
         $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRetryTimeout()
+    {
+        if ($this->check()) {
+            return 0;
+        }
+
+        return 1e3 * ($this->timeLimit - $this->timeProvider->now() + $this->cache->get($this->key.self::TIME_CACHE_KEY));
     }
 }

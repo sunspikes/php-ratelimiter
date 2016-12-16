@@ -4,17 +4,13 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
-use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
-use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
-use Sunspikes\Ratelimit\Throttle\Throttler\MovingWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\RetriableThrottlerInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\RetrialQueueThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
 {
-    //const INITIAL_TIME = 0;
     const HIT_LIMIT = 8;
     const TIME_LIMIT = 24;
 
@@ -46,7 +42,7 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
 
-        $this->internalThrottler = M::mock(ThrottlerInterface::class);
+        $this->internalThrottler = M::mock(RetriableThrottlerInterface::class);
         $this->internalThrottler->shouldReceive('getLimit')->andReturn(self::HIT_LIMIT);
         $this->internalThrottler->shouldReceive('getTime')->andReturn(self::TIME_LIMIT);
 
@@ -56,7 +52,7 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
     public function testAccess()
     {
         $this->internalThrottler->shouldReceive('check')->andReturn(true);
-        $this->internalThrottler->shouldReceive('count')->andReturn(self::HIT_LIMIT - 1);
+        $this->internalThrottler->shouldReceive('getRetryTimeout')->andReturn(0);
         $this->internalThrottler->shouldReceive('hit')->once();
 
         $this->timeAdapter->shouldNotReceive('usleep');
@@ -66,7 +62,7 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHitBelowThreshold()
     {
-        $this->internalThrottler->shouldReceive('count')->andReturn(self::HIT_LIMIT - 1);
+        $this->internalThrottler->shouldReceive('getRetryTimeout')->andReturn(0);
         $this->internalThrottler->shouldReceive('hit')->once()->andReturnSelf();
 
         $this->timeAdapter->shouldNotReceive('usleep');
@@ -76,11 +72,10 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHitOnThreshold()
     {
-        $this->internalThrottler->shouldReceive('count')->andReturn(self::HIT_LIMIT + 1);
+        $this->internalThrottler->shouldReceive('getRetryTimeout')->andReturn(1e3);
         $this->internalThrottler->shouldReceive('hit')->once()->andReturnSelf();
 
-        $expectedWaitTime = 2 * self::TIME_LIMIT / self::HIT_LIMIT;
-        $this->timeAdapter->shouldReceive('usleep')->with(1e6 * $expectedWaitTime)->once();
+        $this->timeAdapter->shouldReceive('usleep')->with(1e6)->once();
 
         $this->assertEquals($this->internalThrottler, $this->throttler->hit());
     }

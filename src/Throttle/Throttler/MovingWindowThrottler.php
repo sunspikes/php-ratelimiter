@@ -27,7 +27,7 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
-final class MovingWindowThrottler extends AbstractWindowThrottler
+final class MovingWindowThrottler extends AbstractWindowThrottler implements RetriableThrottlerInterface
 {
     /**
      * @inheritdoc
@@ -59,5 +59,17 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
         } catch (ItemNotFoundException $exception) {
             return 0;
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRetryTimeout()
+    {
+        if ($this->hitLimit > $hitCount = $this->count()) {
+            return 0;
+        }
+
+        return 1e3 * (1 + $hitCount - $this->hitLimit) * ($this->timeLimit / $this->hitLimit);
     }
 }

@@ -28,6 +28,24 @@ class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
         $this->assertEquals(self::HIT_LIMIT / 6, $this->throttler->count());
     }
 
+    public function testGetRetryTimeoutPreLimit()
+    {
+        $this->mockTimePassed(self::TIME_LIMIT + 1, 1);
+
+        $this->assertEquals(0, $this->throttler->getRetryTimeout());
+    }
+
+    public function testGetRetryTimeoutPostLimit()
+    {
+        $this->mockTimePassed(0, 1);
+        $this->cacheAdapter
+            ->shouldReceive('get')
+            ->with('key'.MovingWindowThrottler::HITS_CACHE_KEY)
+            ->andReturn(self::HIT_LIMIT * 1.5 - 1);
+
+        $this->assertEquals(5e2 * self::TIME_LIMIT, $this->throttler->getRetryTimeout());
+    }
+
     /**
      * @inheritdoc
      */

@@ -6,7 +6,7 @@ use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Throttle\Throttler\AbstractWindowThrottler;
-use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
+use Sunspikes\Ratelimit\Throttle\Throttler\RetriableThrottlerInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +27,7 @@ abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
     protected $timeAdapter;
 
     /**
-     * @var ThrottlerInterface
+     * @var RetriableThrottlerInterface
      */
     protected $throttler;
 

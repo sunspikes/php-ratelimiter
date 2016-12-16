@@ -29,7 +29,7 @@ use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-final class LeakyBucketThrottler implements ThrottlerInterface
+final class LeakyBucketThrottler implements RetriableThrottlerInterface
 {
     const TIME_CACHE_KEY = ':time';
     const TOKEN_CACHE_KEY = ':tokens';
@@ -175,6 +175,18 @@ final class LeakyBucketThrottler implements ThrottlerInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getRetryTimeout()
+    {
+        if ($this->threshold > $this->count() + 1) {
+            return 0;
+        }
+
+        return (int) ceil($this->timeLimit / $this->tokenlimit);
+    }
+
+    /**
      * @param int $tokenCount
      *
      * @return int
@@ -185,7 +197,7 @@ final class LeakyBucketThrottler implements ThrottlerInterface
             return 0;
         }
 
-        return ceil($this->timeLimit / max(1, ($this->tokenlimit - $this->threshold)));
+        return (int) ceil($this->timeLimit / max(1, ($this->tokenlimit - $this->threshold)));
     }
 
     /**

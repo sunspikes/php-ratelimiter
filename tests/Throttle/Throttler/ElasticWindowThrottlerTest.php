@@ -8,9 +8,17 @@ use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 
 class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 {
+    const TTL = 600;
+
+    /**
+     * @var ElasticWindowThrottler
+     */
     private $throttler;
 
-    public function setUp()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
     {
         $cacheAdapter = M::mock(CacheAdapterInterface::class);
 
@@ -22,7 +30,7 @@ class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
             ->with('key')
             ->andReturn(0, 1, 2, 3, 4);
 
-        $this->throttler = new ElasticWindowThrottler($cacheAdapter, 'key', 3, 600);
+        $this->throttler = new ElasticWindowThrottler($cacheAdapter, 'key', 3, self::TTL);
     }
 
     public function testAccess()
@@ -57,5 +65,16 @@ class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->throttler->hit();
         $this->throttler->hit();
         $this->assertFalse($this->throttler->access());
+    }
+
+    public function testGetRetryTimeout()
+    {
+        $this->assertEquals(0, $this->throttler->getRetryTimeout());
+
+        $this->throttler->hit();
+        $this->throttler->hit();
+        $this->throttler->hit();
+
+        $this->assertEquals(1e3 * self::TTL, $this->throttler->getRetryTimeout());
     }
 }
