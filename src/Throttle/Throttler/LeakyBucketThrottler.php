@@ -147,6 +147,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
             return 0;
         }
 
+        // Return the `used` token count, minus the amount of tokens which have been `refilled` since the previous request
         return  (int) max(0, ceil($lastTokenCount - ($this->tokenlimit * $timeSinceLastRequest / ($this->timeLimit))));
     }
 

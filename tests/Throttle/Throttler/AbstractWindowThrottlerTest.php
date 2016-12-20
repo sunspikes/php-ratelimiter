@@ -44,27 +44,9 @@ abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function testAccess()
     {
-        $this->cacheAdapter
-            ->shouldReceive('set')
-            ->with('key'.AbstractWindowThrottler::HITS_CACHE_KEY, 1, self::CACHE_TTL)
-            ->once();
-
-        $this->cacheAdapter
-            ->shouldReceive('set')
-            ->with('key'.AbstractWindowThrottler::TIME_CACHE_KEY, self::TIME_LIMIT + 2, self::CACHE_TTL)
-            ->once();
+        $this->mockTimePassed(self::TIME_LIMIT + 2);
 
         $this->assertEquals(true, $this->throttler->access());
-    }
-
-    public function testClear()
-    {
-        $this->cacheAdapter
-            ->shouldReceive('set')
-            ->with('key'.AbstractWindowThrottler::HITS_CACHE_KEY, 0, self::CACHE_TTL)
-            ->once();
-
-        $this->throttler->clear();
     }
 
     public function testCountWithMissingCacheItem()
@@ -78,7 +60,7 @@ abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
     public function testCountWithMoreTimePassedThanLimit()
     {
         //More time has passed than the given window
-        $this->mockTimePassed(self::TIME_LIMIT + 1, 1);
+        $this->mockTimePassed(self::TIME_LIMIT + 1);
 
         $this->assertEquals(0, $this->throttler->count());
     }
@@ -86,7 +68,7 @@ abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
     public function testCheck()
     {
         //More time has passed than the given window
-        $this->mockTimePassed(self::TIME_LIMIT + 1, 1);
+        $this->mockTimePassed(self::TIME_LIMIT + 1);
 
         $this->assertTrue($this->throttler->check());
     }
@@ -102,15 +84,9 @@ abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $timeDiff
-     * @param int $numCalls
      */
-    protected function mockTimePassed($timeDiff, $numCalls)
+    protected function mockTimePassed($timeDiff)
     {
-        $this->timeAdapter->shouldReceive('now')->times($numCalls)->andReturn(self::INITIAL_TIME + $timeDiff);
-
-        $this->cacheAdapter
-            ->shouldReceive('get')
-            ->with('key'.AbstractWindowThrottler::TIME_CACHE_KEY)
-            ->andReturn(self::INITIAL_TIME);
+        $this->timeAdapter->shouldReceive('now')->andReturn(self::INITIAL_TIME + $timeDiff);
     }
 }

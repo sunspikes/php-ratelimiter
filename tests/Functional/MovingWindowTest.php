@@ -40,15 +40,24 @@ class MovingWindowTest extends AbstractThrottlerTestCase
     {
         $throttle = $this->ratelimiter->get('window-moves');
 
-        for ($i = -1; $i < $this->getMaxAttempts(); $i++) {
+        $timeValues = [];
+
+        for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
+            $timeValues[] = $this->startTime + $i;
+            $timeValues[] = $this->startTime + $i;
+        }
+
+        $timeValues[] = $this->startTime + self::TIME_LIMIT + 1;
+        $timeValues[] = $this->startTime + self::TIME_LIMIT + 1;
+
+        $this->timeAdapter->shouldReceive('now')->andReturnValues($timeValues);
+
+        for ($i = 0; $i < $this->getMaxAttempts() + 1; $i++) {
             $throttle->hit();
         }
 
-        //override time
-        $this->timeAdapter->shouldReceive('now')->andReturn($this->startTime + self::TIME_LIMIT);
-        $throttle->hit();
-
-        self::assertEquals(2, $throttle->count());
+        // First hit should have expired
+        self::assertEquals($this->getMaxAttempts(), $throttle->count());
     }
 
     /**

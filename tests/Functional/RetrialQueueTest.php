@@ -8,7 +8,7 @@ use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
-use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
@@ -34,18 +34,9 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
 
     public function testThrottleAccess()
     {
-        $expectedWaitTime = self::TIME_LIMIT / $this->getMaxAttempts();
-        $this->timeAdapter->shouldReceive('usleep')->with(1e6 * $expectedWaitTime)->once()->ordered();
-        $this->timeAdapter->shouldReceive('usleep')->with(2 * 1e6 * $expectedWaitTime)->once()->ordered();
+        $this->timeAdapter->shouldReceive('usleep')->with(1e6 * self::TIME_LIMIT)->once();
 
-        $throttle = $this->ratelimiter->get('access-test');
-
-        for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
-            $throttle->access();
-        }
-
-        $this->assertFalse($throttle->access());
-        $this->assertFalse($throttle->access());
+        parent::testThrottleAccess();
     }
 
     /**
@@ -56,7 +47,7 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
-            new RetrialQueueSettings(new MovingWindowSettings($this->getMaxAttempts(), self::TIME_LIMIT))
+            new RetrialQueueSettings(new FixedWindowSettings($this->getMaxAttempts(), self::TIME_LIMIT))
         );
     }
 }

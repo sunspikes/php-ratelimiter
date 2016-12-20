@@ -29,6 +29,14 @@ use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
 final class FixedWindowThrottler extends AbstractWindowThrottler implements RetriableThrottlerInterface
 {
+    const TIME_CACHE_KEY = ':time';
+    const HITS_CACHE_KEY = ':hits';
+
+    /**
+     * @var int|null
+     */
+    private $hitCount;
+
     /**
      * @inheritdoc
      */
@@ -36,6 +44,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
     {
         $this->setCachedHitCount($this->count() + 1);
 
+        // Update the window start time if the previous window has passed, or no cached window exists
         try {
             if (($this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY)) > $this->timeLimit) {
                 $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
@@ -68,7 +77,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
      */
     public function clear()
     {
-        parent::clear();
+        $this->setCachedHitCount(0);
         $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
     }
 
@@ -81,6 +90,31 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
             return 0;
         }
 
+        // Return the time until the current window ends
+        // Try/catch for the ItemNotFoundException is not required, in that case $this->check() will return true
         return 1e3 * ($this->timeLimit - $this->timeProvider->now() + $this->cache->get($this->key.self::TIME_CACHE_KEY));
+    }
+
+    /**
+     * @return int
+     *
+     * @throws ItemNotFoundException
+     */
+    private function getCachedHitCount()
+    {
+        if (null !== $this->hitCount) {
+            return $this->hitCount;
+        }
+
+        return $this->cache->get($this->key.self::HITS_CACHE_KEY);
+    }
+
+    /**
+     * @param int $hitCount
+     */
+    private function setCachedHitCount($hitCount)
+    {
+        $this->hitCount = $hitCount;
+        $this->cache->set($this->key.self::HITS_CACHE_KEY, $hitCount, $this->cacheTtl);
     }
 }

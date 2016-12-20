@@ -26,14 +26,10 @@
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-abstract class AbstractWindowThrottler implements ThrottlerInterface
+abstract class AbstractWindowThrottler
 {
-    const TIME_CACHE_KEY = ':time';
-    const HITS_CACHE_KEY = ':hits';
-
     /**
      * @var CacheAdapterInterface
      */
@@ -63,11 +59,6 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface
      * @var TimeAdapterInterface
      */
     protected $timeProvider;
-
-    /**
-     * @var int|null
-     */
-    private $hitCount;
 
     /**
      * @param CacheAdapterInterface $cache
@@ -104,14 +95,6 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface
         return $status;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function clear()
-    {
-        $this->hitCount = 0;
-        $this->cache->set($this->key.self::HITS_CACHE_KEY, 0, $this->cacheTtl);
-    }
 
     /**
      * @inheritdoc
@@ -146,27 +129,4 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface
      * @inheritdoc
      */
     abstract public function count();
-
-    /**
-     * @return int
-     *
-     * @throws ItemNotFoundException
-     */
-    protected function getCachedHitCount()
-    {
-        if (null !== $this->hitCount) {
-            return $this->hitCount;
-        }
-
-        return $this->cache->get($this->key.self::HITS_CACHE_KEY);
-    }
-
-    /**
-     * @param int $hitCount
-     */
-    protected function setCachedHitCount($hitCount)
-    {
-        $this->hitCount = $hitCount;
-        $this->cache->set($this->key.self::HITS_CACHE_KEY, $hitCount, $this->cacheTtl);
-    }
 }

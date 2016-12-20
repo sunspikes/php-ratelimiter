@@ -198,7 +198,7 @@ $settings = new LeakyBucketSettings(120, 60000, 30);
 ```
 
 #### Retrial Queue
-The retrial queue encapsulates another throttlers.
+The retrial queue encapsulates another throttler.
 When this throttler receives a hit which would fail on the internal throttler, 
 the request is delayed until the internal throttler has capacity again.   
 

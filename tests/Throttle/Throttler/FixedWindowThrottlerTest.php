@@ -9,8 +9,15 @@ class FixedWindowThrottlerTest extends AbstractWindowThrottlerTest
 {
     public function testAccess()
     {
-        //More time has passed than the given window
-        $this->mockTimePassed(self::TIME_LIMIT + 2, 4);
+        $this->cacheAdapter
+            ->shouldReceive('set')
+            ->with('key'.FixedWindowThrottler::HITS_CACHE_KEY, 1, self::CACHE_TTL)
+            ->once();
+
+        $this->cacheAdapter
+            ->shouldReceive('set')
+            ->with('key'.FixedWindowThrottler::TIME_CACHE_KEY, self::TIME_LIMIT + 2, self::CACHE_TTL)
+            ->once();
 
         parent::testAccess();
     }
@@ -24,13 +31,18 @@ class FixedWindowThrottlerTest extends AbstractWindowThrottlerTest
             ->with('key'.FixedWindowThrottler::TIME_CACHE_KEY, self::INITIAL_TIME + 3, self::CACHE_TTL)
             ->once();
 
-        parent::testClear();
+        $this->cacheAdapter
+            ->shouldReceive('set')
+            ->with('key'.FixedWindowThrottler::HITS_CACHE_KEY, 0, self::CACHE_TTL)
+            ->once();
+
+        $this->throttler->clear();
     }
 
     public function testCountWithLessTimePassedThanLimit()
     {
         //Less time has passed than the given window
-        $this->mockTimePassed(self::TIME_LIMIT / 6, 1);
+        $this->mockTimePassed(self::TIME_LIMIT / 6);
 
         $this->cacheAdapter
             ->shouldReceive('get')
@@ -42,14 +54,16 @@ class FixedWindowThrottlerTest extends AbstractWindowThrottlerTest
 
     public function testGetRetryTimeoutPreLimit()
     {
-        $this->mockTimePassed(self::TIME_LIMIT + 1, 1);
+        //More time has passed than the given window
+        $this->mockTimePassed(self::TIME_LIMIT + 1);
 
         $this->assertEquals(0, $this->throttler->getRetryTimeout());
     }
 
     public function testGetRetryTimeoutPostLimit()
     {
-        $this->mockTimePassed(self::TIME_LIMIT / 2, 2);
+        //Less time has passed than the given window
+        $this->mockTimePassed(self::TIME_LIMIT / 2);
         $this->cacheAdapter
             ->shouldReceive('get')
             ->with('key'.FixedWindowThrottler::HITS_CACHE_KEY)
@@ -71,5 +85,18 @@ class FixedWindowThrottlerTest extends AbstractWindowThrottlerTest
             self::TIME_LIMIT,
             self::CACHE_TTL
         );
+    }
+
+    /**
+     * @param int $timeDiff
+     */
+    protected function mockTimePassed($timeDiff)
+    {
+        parent::mockTimePassed($timeDiff);
+
+        $this->cacheAdapter
+            ->shouldReceive('get')
+            ->with('key'.FixedWindowThrottler::TIME_CACHE_KEY)
+            ->andReturn(self::INITIAL_TIME);
     }
 }
