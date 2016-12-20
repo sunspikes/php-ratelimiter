@@ -105,13 +105,11 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
 
         $startTime = (int) ceil($this->timeProvider->now()) - $this->timeLimit;
 
-        // Clear all counts before the window front-edge
-        $this->hitCountMapping = array_filter(
-            $this->hitCountMapping,
-            function ($key) use ($startTime) {
-                return $startTime <= $key;
-            },
-            ARRAY_FILTER_USE_KEY
-        );
+        // Clear all entries older than the window front-edge
+        $relevantTimestamps = array_filter(array_keys($this->hitCountMapping), function ($key) use ($startTime) {
+            return $startTime <= $key;
+        });
+
+        $this->hitCountMapping = array_intersect_key($this->hitCountMapping, array_flip($relevantTimestamps));
     }
 }
