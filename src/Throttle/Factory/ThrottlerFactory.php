@@ -27,22 +27,56 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
-use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
+use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 
 class ThrottlerFactory implements FactoryInterface
 {
     /**
+     * @var CacheAdapterInterface
+     */
+    protected $cacheAdapter;
+
+    /**
+     * @param CacheAdapterInterface $cacheAdapter
+     */
+    public function __construct(CacheAdapterInterface $cacheAdapter)
+    {
+        $this->cacheAdapter = $cacheAdapter;
+    }
+
+    /**
      * @inheritdoc
      */
-    public function make(Data $data, CacheAdapterInterface $cache)
+    public function make(Data $data, ThrottleSettingsInterface $settings)
     {
-        $throttler = new CacheThrottler(
-            $cache,
-            (string) $data->getKey(),
-            (int) $data->getLimit(),
-            (int) $data->getTtl()
-        );
+        if (!$settings->isValid()) {
+            throw new \InvalidArgumentException('Provided throttler settings not valid');
+        }
 
-        return $throttler;
+        return $this->createThrottler($data, $settings);
+    }
+
+    /**
+     * @param Data                      $data
+     * @param ThrottleSettingsInterface $settings
+     *
+     * @return ElasticWindowThrottler
+     */
+    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
+    {
+        if ($settings instanceof ElasticWindowSettings) {
+            return new ElasticWindowThrottler(
+                $this->cacheAdapter,
+                $data->getKey(),
+                $settings->getLimit(),
+                $settings->getTime()
+            );
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Unable to create throttler for %s settings', get_class($settings))
+        );
     }
 }

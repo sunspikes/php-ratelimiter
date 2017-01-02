@@ -28,13 +28,11 @@ namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 interface DataHydratorInterface
 {
     /**
-     * Hydrate the given data
+     * Hydrate a data object with the given data
      *
      * @param mixed $data
-     * @param int $limit
-     * @param int $ttl
      *
      * @return \Sunspikes\Ratelimit\Throttle\Entity\Data
      */
-    public function hydrate($data, $limit, $ttl);
+    public function hydrate($data);
 }

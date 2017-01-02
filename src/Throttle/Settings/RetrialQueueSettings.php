@@ -23,17 +23,50 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Hydrator;
+namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-use Sunspikes\Ratelimit\Throttle\Entity\Data;
-
-class StringHydrator implements DataHydratorInterface
+final class RetrialQueueSettings implements ThrottleSettingsInterface
 {
+    /**
+     * @var ThrottleSettingsInterface
+     */
+    private $internalThrottlerSettings;
+
+    /**
+     * @param ThrottleSettingsInterface $internalThrottlerSettings
+     */
+    public function __construct(ThrottleSettingsInterface $internalThrottlerSettings)
+    {
+        $this->internalThrottlerSettings = $internalThrottlerSettings;
+    }
+
     /**
      * @inheritdoc
      */
-    public function hydrate($data)
+    public function merge(ThrottleSettingsInterface $settings)
     {
-        return new Data($data);
+        if (!$settings instanceof self) {
+            throw new \InvalidArgumentException(
+                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
+            );
+        }
+
+        return new self($this->internalThrottlerSettings->merge($settings->getInternalThrottlerSettings()));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isValid()
+    {
+        return $this->internalThrottlerSettings->isValid();
+    }
+
+    /**
+     * @return ThrottleSettingsInterface
+     */
+    public function getInternalThrottlerSettings()
+    {
+        return $this->internalThrottlerSettings;
     }
 }

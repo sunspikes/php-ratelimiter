@@ -23,17 +23,19 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Hydrator;
+namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-use Sunspikes\Ratelimit\Throttle\Entity\Data;
-
-class StringHydrator implements DataHydratorInterface
+interface ThrottleSettingsInterface
 {
     /**
-     * @inheritdoc
+     * @param ThrottleSettingsInterface $settings
+     *
+     * @return ThrottleSettingsInterface
      */
-    public function hydrate($data)
-    {
-        return new Data($data);
-    }
+    public function merge(ThrottleSettingsInterface $settings);
+
+    /**
+     * @return bool
+     */
+    public function isValid();
 }

@@ -25,18 +25,20 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
 interface FactoryInterface
 {
     /**
      * Create the throttler
      *
-     * @param Data $data
-     * @param CacheAdapterInterface $cache
+     * @param Data                      $data
+     * @param ThrottleSettingsInterface $settings
      *
-     * @return \Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface
+     * @return ThrottlerInterface
+     * @throws \InvalidArgumentException
      */
-    public function make(Data $data, CacheAdapterInterface $cache);
+    public function make(Data $data, ThrottleSettingsInterface $settings);
 }

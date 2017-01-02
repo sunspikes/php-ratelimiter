@@ -23,17 +23,8 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Hydrator;
+namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-use Sunspikes\Ratelimit\Throttle\Entity\Data;
-
-class StringHydrator implements DataHydratorInterface
+final class FixedWindowSettings extends AbstractWindowSettings
 {
-    /**
-     * @inheritdoc
-     */
-    public function hydrate($data)
-    {
-        return new Data($data);
-    }
 }

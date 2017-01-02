@@ -23,49 +23,68 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Entity;
+namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class Data
+final class ElasticWindowSettings implements ThrottleSettingsInterface
 {
     /**
-     * @var string
+     * @var int|null
      */
-    private $data;
+    private $limit;
 
     /**
-     * @var string
+     * @var int|null
      */
-    private $key;
+    private $time;
 
     /**
-     * @param string $data
+     * @param int|null $limit
+     * @param int|null $time
      */
-    public function __construct($data)
+    public function __construct($limit = null, $time = null)
     {
-        $this->data = $data;
+        $this->limit = $limit;
+        $this->time = $time;
     }
 
     /**
-     * Get data
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getData()
+    public function merge(ThrottleSettingsInterface $settings)
     {
-        return $this->data;
-    }
-
-    /**
-     * Get key
-     *
-     * @return string
-     */
-    public function getKey()
-    {
-        if (is_null($this->key)) {
-            $this->key = sha1($this->data);
+        if (!$settings instanceof self) {
+            throw new \InvalidArgumentException(
+                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
+            );
         }
 
-        return $this->key;
+        return new self(
+            null === $settings->getLimit() ? $this->limit : $settings->getLimit(),
+            null === $settings->getTime() ? $this->time : $settings->getTime()
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isValid()
+    {
+        return null !== $this->limit && null !== $this->time;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTime()
+    {
+        return $this->time;
     }
 }

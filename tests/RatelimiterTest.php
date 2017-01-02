@@ -3,85 +3,135 @@
 namespace Sunspikes\Tests\Ratelimit;
 
 use Mockery as M;
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\RateLimiter;
-use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
-use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
+use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
+use Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface;
+use Sunspikes\Ratelimit\Throttle\Hydrator\FactoryInterface as HydratorFactoryInterface;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
 class RatelimiterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CacheAdapterInterface|M\MockInterface
+     * @var ThrottleSettingsInterface|M\MockInterface
      */
-    private $mockCacheAdapter;
+    private $defaultSettings;
 
     /**
-     * @var RateLimiter
+     * @var ThrottlerFactoryInterface|M\MockInterface
+     */
+    private $throttlerFactory;
+
+    /**
+     * @var HydratorFactoryInterface|M\MockInterface
+     */
+    private $hydratorFactory;
+
+    /**
+     * @var Ratelimiter
      */
     private $ratelimiter;
 
-    public function setUp()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
     {
-        $throttlerFactory = new ThrottlerFactory();
-        $hydratorFactory =  new HydratorFactory();
-        $this->mockCacheAdapter = M::mock(CacheAdapterInterface::class);
+        $this->throttlerFactory = M::mock(ThrottlerFactoryInterface::class);
+        $this->hydratorFactory =  M::mock(HydratorFactoryInterface::class);
+        $this->defaultSettings = M::mock(ThrottleSettingsInterface::class);
 
-        $this->ratelimiter = new RateLimiter($throttlerFactory, $hydratorFactory, $this->mockCacheAdapter, 3, 600);
+        $this->ratelimiter = new RateLimiter(
+            $this->throttlerFactory,
+            $this->hydratorFactory,
+            $this->defaultSettings
+        );
     }
 
-    public function testThrottlePreLimit()
+    public function testGetWithInvalidData()
     {
-        $this->mockCacheAdapter->shouldReceive('set')->times(2);
-        $this->mockCacheAdapter->shouldReceive('get')->once()->andThrow(ItemNotFoundException::class);
-        $this->mockCacheAdapter->shouldReceive('get')->once()->andReturn(2);
-
-        $throttle = $this->ratelimiter->get('pre-limit-test');
-        $throttle->hit();
-        $throttle->hit();
-
-        $this->assertTrue($throttle->check());
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->ratelimiter->get('');
     }
 
-    public function testThrottlePostLimit()
+    public function testGetWithDefaultSettings()
     {
-        $this->mockCacheAdapter->shouldReceive('set')->times(3);
-        $this->mockCacheAdapter->shouldReceive('get')->once()->andThrow(ItemNotFoundException::class);
-        $this->mockCacheAdapter->shouldReceive('get')->twice()->andReturn(2, 3);
+        $object = $this->getHydratedObject('key');
 
-        $throttle = $this->ratelimiter->get('post-limit-test');
-        $throttle->hit();
-        $throttle->hit();
-        $throttle->hit();
+        $this->throttlerFactory
+            ->shouldReceive('make')
+            ->with($object, $this->defaultSettings)
+            ->andReturn(M::mock(ThrottlerInterface::class));
 
-        $this->assertFalse($throttle->check());
+        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key'));
     }
 
-    public function testThrottleAccess()
+    public function testGetWithMergableSettings()
     {
-        $this->mockCacheAdapter->shouldReceive('set')->times(4);
-        $this->mockCacheAdapter->shouldReceive('get')->once()->andThrow(ItemNotFoundException::class);
-        $this->mockCacheAdapter->shouldReceive('get')->times(3)->andReturn(2, 3, 4);
+        $object = $this->getHydratedObject('key');
 
-        $throttle = $this->ratelimiter->get('access-test');
-        $throttle->access();
-        $throttle->access();
-        $throttle->access();
+        $this->defaultSettings->shouldReceive('merge')->once()->andReturn(M::mock(ThrottleSettingsInterface::class));
 
-        $this->assertFalse($throttle->access());
+        $this->throttlerFactory
+            ->shouldReceive('make')
+            ->with($object, M::type(ThrottleSettingsInterface::class))
+            ->andReturn(M::mock(ThrottlerInterface::class));
+
+        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', new ElasticWindowSettings()));
     }
 
-    public function testThrottleCount()
+    public function testGetWithUnmergableSettings()
     {
-        $this->mockCacheAdapter->shouldReceive('set')->times(3);
-        $this->mockCacheAdapter->shouldReceive('get')->once()->andThrow(ItemNotFoundException::class);
-        $this->mockCacheAdapter->shouldReceive('get')->times(3)->andReturn(2, 3, 3);
+        $object = $this->getHydratedObject('key');
 
-        $throttle = $this->ratelimiter->get('count-test');
-        $throttle->access();
-        $throttle->access();
-        $throttle->access();
+        $newSettings = M::mock(ThrottleSettingsInterface::class);
+        $this->defaultSettings->shouldReceive('merge')->once()->andReturn($newSettings);
 
-        $this->assertEquals(3, $throttle->count());
+        $this->throttlerFactory
+            ->shouldReceive('make')
+            ->with($object, $newSettings)
+            ->andReturn(M::mock(ThrottlerInterface::class));
+
+        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', $newSettings));
+    }
+
+    public function testGetThrottlerCaching()
+    {
+        $object1 = $this->getHydratedObject('key1');
+        $object2 = $this->getHydratedObject('key2');
+
+        $this->throttlerFactory
+            ->shouldReceive('make')
+            ->with($object1, M::type(ThrottleSettingsInterface::class))
+            ->once()
+            ->andReturn(M::mock(ThrottlerInterface::class));
+
+        $this->throttlerFactory
+            ->shouldReceive('make')
+            ->with($object2, M::type(ThrottleSettingsInterface::class))
+            ->once()
+            ->andReturn(M::mock(ThrottlerInterface::class));
+
+        self::assertSame($this->ratelimiter->get('key1'), $this->ratelimiter->get('key1'));
+        self::assertNotSame($this->ratelimiter->get('key1'), $this->ratelimiter->get('key2'));
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return Data
+     */
+    private function getHydratedObject($key)
+    {
+        $object = new Data('data-'.$key);
+
+        $dataHydrator = M::mock(DataHydratorInterface::class);
+        $dataHydrator->shouldReceive('hydrate')->with($key)->andReturn($object);
+
+        $this->hydratorFactory->shouldReceive('make')->with($key)->andReturn($dataHydrator);
+
+        return $object;
     }
 }

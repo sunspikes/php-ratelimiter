@@ -4,13 +4,21 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Throttle\Throttler\CacheThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 
-class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
+class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 {
+    const TTL = 600;
+
+    /**
+     * @var ElasticWindowThrottler
+     */
     private $throttler;
 
-    public function setUp()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
     {
         $cacheAdapter = M::mock(CacheAdapterInterface::class);
 
@@ -22,7 +30,7 @@ class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
             ->with('key')
             ->andReturn(0, 1, 2, 3, 4);
 
-        $this->throttler = new CacheThrottler($cacheAdapter, 'key', 3, 600);
+        $this->throttler = new ElasticWindowThrottler($cacheAdapter, 'key', 3, self::TTL);
     }
 
     public function testAccess()
@@ -48,12 +56,7 @@ class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCheck()
     {
-        $this->assertTrue(true, $this->throttler->check());
-    }
-
-    public function testGetCache()
-    {
-        $this->assertEquals(1, count($this->throttler->getCache()));
+        $this->assertTrue($this->throttler->check());
     }
 
     public function testThrottle()
@@ -62,5 +65,16 @@ class CacheThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->throttler->hit();
         $this->throttler->hit();
         $this->assertFalse($this->throttler->access());
+    }
+
+    public function testGetRetryTimeout()
+    {
+        $this->assertEquals(0, $this->throttler->getRetryTimeout());
+
+        $this->throttler->hit();
+        $this->throttler->hit();
+        $this->throttler->hit();
+
+        $this->assertEquals(1e3 * self::TTL, $this->throttler->getRetryTimeout());
     }
 }

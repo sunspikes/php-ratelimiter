@@ -23,17 +23,14 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Hydrator;
+namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Throttle\Entity\Data;
-
-class StringHydrator implements DataHydratorInterface
+interface RetriableThrottlerInterface extends ThrottlerInterface
 {
     /**
-     * @inheritdoc
+     * Return the number of milliseconds to wait before a valid request can be made
+     *
+     * @return int
      */
-    public function hydrate($data)
-    {
-        return new Data($data);
-    }
+    public function getRetryTimeout();
 }

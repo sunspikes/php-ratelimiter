@@ -25,32 +25,18 @@
 
 namespace Sunspikes\Ratelimit;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
 use Sunspikes\Ratelimit\Throttle\Hydrator\FactoryInterface as HydratorFactoryInterface;
 
-class RateLimiter
+class RateLimiter implements RateLimiterInterface
 {
-    /**
-     * @var CacheAdapterInterface
-     */
-    protected $adapter;
-
     /**
      * @var ThrottlerInterface[]
      */
     protected $throttlers;
-
-    /**
-     * @var int
-     */
-    protected $limit;
-
-    /**
-     * @var int
-     */
-    protected $ttl;
 
     /**
      * @var ThrottlerFactoryInterface
@@ -63,53 +49,60 @@ class RateLimiter
     protected $hydratorFactory;
 
     /**
+     * @var ThrottleSettingsInterface
+     */
+    private $defaultSettings;
+
+    /**
      * @param ThrottlerFactoryInterface $throttlerFactory
      * @param HydratorFactoryInterface  $hydratorFactory
-     * @param CacheAdapterInterface     $cacheAdapter
-     * @param int                       $limit
-     * @param int                       $ttl
+     * @param ThrottleSettingsInterface $defaultSettings
      */
     public function __construct(
         ThrottlerFactoryInterface $throttlerFactory,
         HydratorFactoryInterface $hydratorFactory,
-        CacheAdapterInterface $cacheAdapter,
-        $limit,
-        $ttl
+        ThrottleSettingsInterface $defaultSettings
     ) {
         $this->throttlerFactory = $throttlerFactory;
         $this->hydratorFactory = $hydratorFactory;
-        $this->adapter = $cacheAdapter;
-        $this->limit = $limit;
-        $this->ttl = $ttl;
+        $this->defaultSettings = $defaultSettings;
     }
 
     /**
-     * Build the throttler for given data
-     *
-     * @param mixed    $data
-     * @param int|null $limit
-     * @param int|null $ttl
-     *
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException
+     * @inheritdoc
      */
-    public function get($data, $limit = null, $ttl = null)
+    public function get($data, ThrottleSettingsInterface $settings = null)
     {
         if (empty($data)) {
             throw new \InvalidArgumentException('Invalid data, please check the data.');
         }
 
-        $limit = null === $limit ? $this->limit : $limit;
-        $ttl = null === $ttl ? $this->ttl : $ttl;
+        $object = $this->hydratorFactory->make($data)->hydrate($data);
 
-        // Create the data object
-        $dataObject = $this->hydratorFactory->make($data)->hydrate($data, $limit, $ttl);
-
-        if (!isset($this->throttlers[$dataObject->getKey()])) {
-            $this->throttlers[$dataObject->getKey()] = $this->throttlerFactory->make($dataObject, $this->adapter);
+        if (!isset($this->throttlers[$object->getKey()])) {
+            $this->throttlers[$object->getKey()] = $this->createThrottler($object, $settings);
         }
 
-        return $this->throttlers[$dataObject->getKey()];
+        return $this->throttlers[$object->getKey()];
+    }
+
+    /**
+     * @param Data                           $object
+     * @param ThrottleSettingsInterface|null $settings
+     *
+     * @return ThrottlerInterface
+     */
+    private function createThrottler(Data $object, ThrottleSettingsInterface $settings = null)
+    {
+        if (null === $settings) {
+            $settings = $this->defaultSettings;
+        } else {
+            try {
+                $settings = $this->defaultSettings->merge($settings);
+            } catch (\InvalidArgumentException $exception) {
+            }
+        }
+
+        return $this->throttlerFactory->make($object, $settings);
     }
 }

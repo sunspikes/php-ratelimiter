@@ -7,7 +7,7 @@ use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 
 class DesarrollaCacheFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testFactory()
+    public function testMake()
     {
         $factory = new DesarrollaCacheFactory();
         $cache = $factory->make();
