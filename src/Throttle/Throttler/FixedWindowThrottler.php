@@ -29,8 +29,8 @@ use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
 final class FixedWindowThrottler extends AbstractWindowThrottler implements RetriableThrottlerInterface
 {
-    const TIME_CACHE_KEY = ':time';
-    const HITS_CACHE_KEY = ':hits';
+    const CACHE_KEY_TIME = ':time';
+    const CACHE_KEY_HITS = ':hits';
 
     /**
      * @var int|null
@@ -46,11 +46,11 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
 
         // Update the window start time if the previous window has passed, or no cached window exists
         try {
-            if (($this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY)) > $this->timeLimit) {
-                $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+            if (($this->timeProvider->now() - $this->cache->get($this->getTimeCacheKey())) > $this->timeLimit) {
+                $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
             }
         } catch (ItemNotFoundException $exception) {
-            $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+            $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
         }
 
         return $this;
@@ -62,7 +62,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
     public function count()
     {
         try {
-            if (($this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY)) > $this->timeLimit) {
+            if (($this->timeProvider->now() - $this->cache->get($this->getTimeCacheKey())) > $this->timeLimit) {
                 return 0;
             }
 
@@ -78,7 +78,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
     public function clear()
     {
         $this->setCachedHitCount(0);
-        $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+        $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
     }
 
     /**
@@ -92,7 +92,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
 
         // Return the time until the current window ends
         // Try/catch for the ItemNotFoundException is not required, in that case $this->check() will return true
-        $cachedTime = $this->cache->get($this->key.self::TIME_CACHE_KEY);
+        $cachedTime = $this->cache->get($this->getTimeCacheKey());
 
         return self::SECOND_TO_MILLISECOND_MULTIPLIER * ($this->timeLimit - $this->timeProvider->now() + $cachedTime);
     }
@@ -108,7 +108,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
             return $this->hitCount;
         }
 
-        return $this->cache->get($this->key.self::HITS_CACHE_KEY);
+        return $this->cache->get($this->getHitsCacheKey());
     }
 
     /**
@@ -117,6 +117,22 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
     private function setCachedHitCount($hitCount)
     {
         $this->hitCount = $hitCount;
-        $this->cache->set($this->key.self::HITS_CACHE_KEY, $hitCount, $this->cacheTtl);
+        $this->cache->set($this->getHitsCacheKey(), $hitCount, $this->cacheTtl);
+    }
+
+    /**
+     * @return string
+     */
+    private function getHitsCacheKey()
+    {
+        return $this->key.self::CACHE_KEY_HITS;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTimeCacheKey()
+    {
+        return $this->key.self::CACHE_KEY_TIME;
     }
 }
