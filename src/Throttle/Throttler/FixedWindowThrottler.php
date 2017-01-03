@@ -92,7 +92,9 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
 
         // Return the time until the current window ends
         // Try/catch for the ItemNotFoundException is not required, in that case $this->check() will return true
-        return 1e3 * ($this->timeLimit - $this->timeProvider->now() + $this->cache->get($this->key.self::TIME_CACHE_KEY));
+        $cachedTime = $this->cache->get($this->key.self::TIME_CACHE_KEY);
+
+        return self::SECOND_TO_MILLISECOND_MULTIPLIER * ($this->timeLimit - $this->timeProvider->now() + $cachedTime);
     }
 
     /**

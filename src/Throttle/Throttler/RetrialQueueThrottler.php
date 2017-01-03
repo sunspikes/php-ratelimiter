@@ -66,7 +66,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     public function hit()
     {
         if (0 !== $waitTime = $this->internalThrottler->getRetryTimeout()) {
-            $this->timeProvider->usleep(1e3 * $waitTime);
+            $this->timeProvider->usleep(self::MILLISECOND_TO_MICROSECOND_MULTIPLIER * $waitTime);
         }
 
         return $this->internalThrottler->hit();

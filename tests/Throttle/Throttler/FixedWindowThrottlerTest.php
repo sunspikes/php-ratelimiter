@@ -4,6 +4,7 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Throttle\Throttler\FixedWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
 class FixedWindowThrottlerTest extends AbstractWindowThrottlerTest
 {
@@ -69,7 +70,10 @@ class FixedWindowThrottlerTest extends AbstractWindowThrottlerTest
             ->with('key'.FixedWindowThrottler::HITS_CACHE_KEY)
             ->andReturn(self::HIT_LIMIT + 1);
 
-        $this->assertEquals(5e2 * self::TIME_LIMIT, $this->throttler->getRetryTimeout());
+        $this->assertEquals(
+            ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER / 2 * self::TIME_LIMIT,
+            $this->throttler->getRetryTimeout()
+        );
     }
 
     /**

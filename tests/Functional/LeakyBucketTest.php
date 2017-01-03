@@ -9,6 +9,7 @@ use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class LeakyBucketTest extends AbstractThrottlerTestCase
@@ -35,7 +36,9 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
     public function testThrottleAccess()
     {
         $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - $this->getMaxAttempts());
-        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once();
+        $this->timeAdapter->shouldReceive('usleep')
+            ->with(ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER * $expectedWaitTime)
+            ->once();
 
         parent::testThrottleAccess();
     }

@@ -72,7 +72,8 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHitOnThreshold()
     {
-        $this->internalThrottler->shouldReceive('getRetryTimeout')->andReturn(1e3);
+        $this->internalThrottler->shouldReceive('getRetryTimeout')
+            ->andReturn(ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER);
         $this->internalThrottler->shouldReceive('hit')->once()->andReturnSelf();
 
         $this->timeAdapter->shouldReceive('usleep')->with(1e6)->once();

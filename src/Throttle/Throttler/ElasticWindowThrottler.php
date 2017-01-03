@@ -142,6 +142,6 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
             return 0;
         }
 
-        return 1e3 * $this->ttl;
+        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->ttl;
     }
 }

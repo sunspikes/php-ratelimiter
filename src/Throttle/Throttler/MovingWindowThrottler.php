@@ -78,11 +78,14 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
         // Then return the time remaining for that timestamp to expire
         foreach ($this->hitCountMapping as $timestamp => $hitCount) {
             if ($this->hitLimit > $totalHitCount -= $hitCount) {
-                return 1e3 * max(0, $this->timeLimit - ((int) ceil($this->timeProvider->now()) - $timestamp));
+                return self::SECOND_TO_MILLISECOND_MULTIPLIER * max(
+                    0,
+                    $this->timeLimit - ((int) ceil($this->timeProvider->now()) - $timestamp)
+                );
             }
         }
 
-        return 1e3 * $this->timeLimit;
+        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->timeLimit;
     }
 
     /**
