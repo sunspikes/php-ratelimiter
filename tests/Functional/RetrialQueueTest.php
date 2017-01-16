@@ -10,6 +10,7 @@ use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class RetrialQueueTest extends AbstractThrottlerTestCase
@@ -34,7 +35,12 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
 
     public function testThrottleAccess()
     {
-        $this->timeAdapter->shouldReceive('usleep')->with(1e6 * self::TIME_LIMIT)->once();
+        $this->timeAdapter->shouldReceive('usleep')
+            ->with(
+                ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER *
+                ThrottlerInterface::MILLISECOND_TO_MICROSECOND_MULTIPLIER *
+                self::TIME_LIMIT
+            )->once();
 
         parent::testThrottleAccess();
     }

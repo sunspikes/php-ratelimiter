@@ -27,6 +27,9 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 interface ThrottlerInterface
 {
+    const SECOND_TO_MILLISECOND_MULTIPLIER = 1000;
+    const MILLISECOND_TO_MICROSECOND_MULTIPLIER = 1000;
+
     /**
      * Access the resource and return status
      *

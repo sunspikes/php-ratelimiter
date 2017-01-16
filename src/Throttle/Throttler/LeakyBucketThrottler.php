@@ -31,8 +31,8 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 final class LeakyBucketThrottler implements RetriableThrottlerInterface
 {
-    const TIME_CACHE_KEY = ':time';
-    const TOKEN_CACHE_KEY = ':tokens';
+    const CACHE_KEY_TIME = ':time';
+    const CACHE_KEY_TOKEN = ':tokens';
 
     /**
      * @var CacheAdapterInterface
@@ -114,7 +114,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
         $this->setUsedCapacity($tokenCount + 1);
 
         if (0 < $wait = $this->getWaitTime($tokenCount)) {
-            $this->timeProvider->usleep(1e3 * $wait);
+            $this->timeProvider->usleep(self::MILLISECOND_TO_MICROSECOND_MULTIPLIER * $wait);
         }
 
         return $wait;
@@ -134,13 +134,14 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
     public function count()
     {
         try {
-            $timeSinceLastRequest = 1e3 * ($this->timeProvider->now() - $this->cache->get($this->key.self::TIME_CACHE_KEY));
+            $cachedTime = $this->cache->get($this->getTimeCacheKey());
+            $timeSinceLastRequest = self::SECOND_TO_MILLISECOND_MULTIPLIER * ($this->timeProvider->now() - $cachedTime);
 
             if ($timeSinceLastRequest > $this->timeLimit) {
                 return 0;
             }
 
-            $lastTokenCount = $this->cache->get($this->key.self::TOKEN_CACHE_KEY);
+            $lastTokenCount = $this->cache->get($this->getTokenCacheKey());
         } catch (ItemNotFoundException $exception) {
             $this->clear(); //Clear the bucket
 
@@ -206,7 +207,23 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
      */
     private function setUsedCapacity($tokens)
     {
-        $this->cache->set($this->key.self::TOKEN_CACHE_KEY, $tokens, $this->cacheTtl);
-        $this->cache->set($this->key.self::TIME_CACHE_KEY, $this->timeProvider->now(), $this->cacheTtl);
+        $this->cache->set($this->getTokenCacheKey(), $tokens, $this->cacheTtl);
+        $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
+    }
+
+    /**
+     * @return string
+     */
+    private function getTokenCacheKey()
+    {
+        return $this->key.self::CACHE_KEY_TOKEN;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTimeCacheKey()
+    {
+        return $this->key.self::CACHE_KEY_TIME;
     }
 }

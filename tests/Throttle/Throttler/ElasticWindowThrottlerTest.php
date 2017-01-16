@@ -5,6 +5,7 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
 class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,6 +76,9 @@ class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->throttler->hit();
         $this->throttler->hit();
 
-        $this->assertEquals(1e3 * self::TTL, $this->throttler->getRetryTimeout());
+        $this->assertEquals(
+            ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER * self::TTL,
+            $this->throttler->getRetryTimeout()
+        );
     }
 }

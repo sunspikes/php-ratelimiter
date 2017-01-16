@@ -55,7 +55,10 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
     {
         //More time has passed than the given window
         $this->mockTimePassed(self::TIME_LIMIT + 1, 2);
-        $this->mockSetUsedCapacity(1, (self::INITIAL_TIME + self::TIME_LIMIT + 1) / 1e3);
+        $this->mockSetUsedCapacity(
+            1,
+            (self::INITIAL_TIME + self::TIME_LIMIT + 1) / ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER
+        );
 
         $this->assertEquals(true, $this->throttler->access());
     }
@@ -68,7 +71,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         // Used tokens one below threshold
         $this->cacheAdapter
             ->shouldReceive('get')
-            ->with('key'.LeakyBucketThrottler::TOKEN_CACHE_KEY)
+            ->with('key'.LeakyBucketThrottler::CACHE_KEY_TOKEN)
             ->andReturn(self::THRESHOLD - 1);
 
         $this->mockSetUsedCapacity(self::THRESHOLD, self::INITIAL_TIME);
@@ -84,13 +87,16 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         // Used tokens on threshold
         $this->cacheAdapter
             ->shouldReceive('get')
-            ->with('key'.LeakyBucketThrottler::TOKEN_CACHE_KEY)
+            ->with('key'.LeakyBucketThrottler::CACHE_KEY_TOKEN)
             ->andReturn(self::THRESHOLD);
 
         $this->mockSetUsedCapacity(self::THRESHOLD + 1, self::INITIAL_TIME);
 
         $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - self::THRESHOLD);
-        $this->timeAdapter->shouldReceive('usleep')->with(1e3 * $expectedWaitTime)->once()->ordered();
+        $this->timeAdapter->shouldReceive('usleep')
+            ->with(ThrottlerInterface::MILLISECOND_TO_MICROSECOND_MULTIPLIER * $expectedWaitTime)
+            ->once()
+            ->ordered();
 
         $this->assertEquals($expectedWaitTime, $this->throttler->hit());
     }
@@ -105,7 +111,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCountWithMissingCacheItem()
     {
-        $this->timeAdapter->shouldReceive('now')->twice()->andReturn(self::INITIAL_TIME + 1);
+        $this->timeAdapter->shouldReceive('now')->once()->andReturn(self::INITIAL_TIME + 1);
         $this->cacheAdapter->shouldReceive('get')->andThrow(ItemNotFoundException::class);
 
         $this->mockSetUsedCapacity(0, self::INITIAL_TIME + 1);
@@ -129,7 +135,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
         // Previously 1/2 of tokens used
         $this->cacheAdapter
             ->shouldReceive('get')
-            ->with('key'.LeakyBucketThrottler::TOKEN_CACHE_KEY)
+            ->with('key'.LeakyBucketThrottler::CACHE_KEY_TOKEN)
             ->andReturn(self::TOKEN_LIMIT / 2);
 
         // So bucket should be filled for 1/3
@@ -158,7 +164,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
 
         $this->cacheAdapter
             ->shouldReceive('get')
-            ->with('key'.LeakyBucketThrottler::TOKEN_CACHE_KEY)
+            ->with('key'.LeakyBucketThrottler::CACHE_KEY_TOKEN)
             ->andReturn(self::THRESHOLD);
 
         $this->assertSame((int) ceil(self::TIME_LIMIT / self::TOKEN_LIMIT), $this->throttler->getRetryTimeout());
@@ -172,13 +178,13 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->cacheAdapter
             ->shouldReceive('set')
-            ->with('key'.LeakyBucketThrottler::TOKEN_CACHE_KEY, $tokens, self::CACHE_TTL)
+            ->with('key'.LeakyBucketThrottler::CACHE_KEY_TOKEN, $tokens, self::CACHE_TTL)
             ->once()
             ->ordered('set-cache');
 
         $this->cacheAdapter
             ->shouldReceive('set')
-            ->with('key'.LeakyBucketThrottler::TIME_CACHE_KEY, $time, self::CACHE_TTL)
+            ->with('key'.LeakyBucketThrottler::CACHE_KEY_TIME, $time, self::CACHE_TTL)
             ->once()
             ->ordered('set-cache');
     }
@@ -189,11 +195,13 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
      */
     private function mockTimePassed($timeDiff, $numCalls)
     {
-        $this->timeAdapter->shouldReceive('now')->times($numCalls)->andReturn((self::INITIAL_TIME + $timeDiff) / 1e3);
+        $this->timeAdapter->shouldReceive('now')
+            ->times($numCalls)
+            ->andReturn((self::INITIAL_TIME + $timeDiff) / ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER);
 
         $this->cacheAdapter
             ->shouldReceive('get')
-            ->with('key'.LeakyBucketThrottler::TIME_CACHE_KEY)
-            ->andReturn(self::INITIAL_TIME / 1e3);
+            ->with('key'.LeakyBucketThrottler::CACHE_KEY_TIME)
+            ->andReturn(self::INITIAL_TIME / ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER);
     }
 }
