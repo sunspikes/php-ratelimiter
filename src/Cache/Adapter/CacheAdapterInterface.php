@@ -25,6 +25,8 @@
 
 namespace Sunspikes\Ratelimit\Cache\Adapter;
 
+use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+
 interface CacheAdapterInterface
 {
     /**
@@ -33,6 +35,8 @@ interface CacheAdapterInterface
      * @param string $key
      *
      * @return mixed
+     * 
+     * @throws ItemNotFoundException
      */
     public function get($key);
 
