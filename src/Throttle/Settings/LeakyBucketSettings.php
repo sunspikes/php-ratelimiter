@@ -25,40 +25,23 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class LeakyBucketSettings implements ThrottleSettingsInterface
+final class LeakyBucketSettings extends AbstractWindowSettings
 {
-    /**
-     * @var int|null
-     */
-    private $tokenLimit;
-
-    /**
-     * @var int|null
-     */
-    private $timeLimit;
-
     /**
      * @var int|null
      */
     private $threshold;
 
     /**
-     * @var int|null
-     */
-    private $cacheTtl;
-
-    /**
-     * @param int|null $tokenLimit
+     * @param int|null $hitLimit
      * @param int|null $timeLimit  In milliseconds
-     * @param int|null $threshold
      * @param int|null $cacheTtl   In seconds
+     * @param int|null $threshold
      */
-    public function __construct($tokenLimit = null, $timeLimit = null, $threshold = null, $cacheTtl = null)
+    public function __construct($hitLimit = null, $timeLimit = null, $cacheTtl = null, $threshold = null)
     {
-        $this->tokenLimit = $tokenLimit;
-        $this->timeLimit = $timeLimit;
+        parent::__construct($hitLimit, $timeLimit, $cacheTtl);
         $this->threshold = $threshold;
-        $this->cacheTtl = $cacheTtl;
     }
 
     /**
@@ -73,10 +56,10 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
         }
 
         return new self(
-            null === $settings->getTokenLimit() ? $this->tokenLimit : $settings->getTokenLimit(),
-            null === $settings->getTimeLimit() ? $this->timeLimit : $settings->getTimeLimit(),
-            null === $settings->getThreshold() ? $this->threshold : $settings->getThreshold(),
-            null === $settings->getCacheTtl() ? $this->cacheTtl : $settings->getCacheTtl()
+            $settings->getTokenLimit() ?? $this->hitLimit,
+            $settings->getTimeLimit() ?? $this->timeLimit,
+            $settings->getCacheTtl() ?? $this->cacheTtl,
+            $settings->getThreshold() ?? $this->threshold
         );
     }
 
@@ -86,25 +69,9 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
     public function isValid()
     {
         return
-            null !== $this->tokenLimit &&
+            null !== $this->hitLimit &&
             null !== $this->timeLimit &&
             0 !== $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getTokenLimit()
-    {
-        return $this->tokenLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getTimeLimit()
-    {
-        return $this->timeLimit;
     }
 
     /**
@@ -113,13 +80,5 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
     public function getThreshold()
     {
         return $this->threshold;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCacheTtl()
-    {
-        return $this->cacheTtl;
     }
 }

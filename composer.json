@@ -10,8 +10,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5",
-        "desarrolla2/cache": "~2.0"
+        "php": "^7.0",
+        "cache/cache": "^0.4"
     },
     "require-dev": {
         "mockery/mockery": "^0.9.4",

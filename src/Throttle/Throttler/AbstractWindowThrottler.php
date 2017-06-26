@@ -25,108 +25,84 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
+use Sunspikes\src\Throttle\Cache\ThrottlerCacheInterface;
 
-abstract class AbstractWindowThrottler
+abstract class AbstractWindowThrottler implements \Countable
 {
     /**
-     * @var CacheAdapterInterface
+     * @var ThrottlerCacheInterface
      */
-    protected $cache;
+    protected $throttlerCache;
 
     /**
-     * @var int|null
+     * @var Data
      */
-    protected $cacheTtl;
+    protected $data;
 
     /**
-     * @var int
+     * @var ThrottleSettingsInterface
      */
-    protected $hitLimit;
-
-    /**
-     * @var string
-     */
-    protected $key;
+    protected $settings;
 
     /**
      * @var int
      */
-    protected $timeLimit;
+    protected $counter;
 
     /**
-     * @var TimeAdapterInterface
+     * @param ThrottlerCacheInterface   $throttlerCache
+     * @param Data                      $data
+     * @param ThrottleSettingsInterface $settings
      */
-    protected $timeProvider;
-
-    /**
-     * @param CacheAdapterInterface $cache
-     * @param TimeAdapterInterface  $timeAdapter
-     * @param string                $key         Cache key prefix
-     * @param int                   $hitLimit    Maximum number of hits
-     * @param int                   $timeLimit   Length of window
-     * @param int|null              $cacheTtl    Cache ttl time (default: null => CacheAdapter ttl)
-     */
-    public function __construct(
-        CacheAdapterInterface $cache,
-        TimeAdapterInterface $timeAdapter,
-        $key,
-        $hitLimit,
-        $timeLimit,
-        $cacheTtl = null
-    ) {
-        $this->cache = $cache;
-        $this->timeProvider = $timeAdapter;
-        $this->key = $key;
-        $this->hitLimit = $hitLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
+    public function __construct(ThrottlerCacheInterface $throttlerCache, Data $data, ThrottleSettingsInterface $settings)
+    {
+        $this->throttlerCache = $throttlerCache;
+        $this->data = $data;
+        $this->settings = $settings;
+        $this->counter = 0;
     }
 
     /**
      * @inheritdoc
      */
-    public function access()
+    public function access(): bool
     {
         $status = $this->check();
+
         $this->hit();
 
         return $status;
     }
 
-
     /**
      * @inheritdoc
      */
-    public function check()
+    public function clear(): ThrottlerInterface
     {
-        return $this->count() < $this->hitLimit;
+        $this->counter = 0;
+        $this->throttlerCache->remove($this->data->getKey());
+
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function getTime()
+    public function count()
     {
-        return $this->timeLimit;
+        $this->counter = $this->throttlerCache->count($this->data->getKey());
+
+        return $this->counter;
     }
 
     /**
      * @inheritdoc
      */
-    public function getLimit()
+    public function check(): bool
     {
-        return $this->hitLimit;
+        return (! $this->throttlerCache->isExpired($this->data->getKey()))
+            && ($this->throttlerCache->count($this->data->getKey()) < $this->settings->getLimit());
     }
-
-    /**
-     * @inheritdoc
-     */
-    abstract public function hit();
-
-    /**
-     * @inheritdoc
-     */
-    abstract public function count();
 }

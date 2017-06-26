@@ -25,89 +25,12 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
-
-final class LeakyBucketThrottler implements RetriableThrottlerInterface
+final class LeakyBucketThrottler extends AbstractWindowThrottler implements ThrottlerInterface
 {
-    const CACHE_KEY_TIME = ':time';
-    const CACHE_KEY_TOKEN = ':tokens';
-
-    /**
-     * @var CacheAdapterInterface
-     */
-    private $cache;
-
-    /**
-     * @var int|null
-     */
-    private $cacheTtl;
-
-    /**
-     * @var string
-     */
-    private $key;
-
-    /**
-     * @var int
-     */
-    private $threshold;
-
-    /**
-     * @var TimeAdapterInterface
-     */
-    private $timeProvider;
-
-    /**
-     * @var int
-     */
-    private $timeLimit;
-
-    /**
-     * @var int
-     */
-    private $tokenlimit;
-
-    /**
-     * @param CacheAdapterInterface $cache
-     * @param TimeAdapterInterface  $timeAdapter
-     * @param string                $key          Cache key prefix
-     * @param int                   $tokenLimit   Bucket capacity
-     * @param int                   $timeLimit    Refill time in milliseconds
-     * @param int|null              $threshold    Capacity threshold on which to start throttling (default: 0)
-     * @param int|null              $cacheTtl     Cache ttl time (default: null => CacheAdapter ttl)
-     */
-    public function __construct(
-        CacheAdapterInterface $cache,
-        TimeAdapterInterface $timeAdapter,
-        $key,
-        $tokenLimit,
-        $timeLimit,
-        $threshold = null,
-        $cacheTtl = null
-    ) {
-        $this->cache = $cache;
-        $this->timeProvider = $timeAdapter;
-        $this->key = $key;
-        $this->tokenlimit = $tokenLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
-        $this->threshold = null !== $threshold ? $threshold : 0;
-    }
-
     /**
      * @inheritdoc
      */
-    public function access()
-    {
-        return 0 === $this->hit();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hit()
+    public function hit(): ThrottlerInterface
     {
         $tokenCount = $this->count();
 
@@ -118,14 +41,6 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
         }
 
         return $wait;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function clear()
-    {
-        $this->setUsedCapacity(0);
     }
 
     /**
