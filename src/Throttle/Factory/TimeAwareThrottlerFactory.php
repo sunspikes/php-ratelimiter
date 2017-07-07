@@ -27,9 +27,9 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\FixedThrottleSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
-use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\MovingThrottleSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\FixedWindowThrottler;
@@ -37,20 +37,20 @@ use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\MovingWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\RetrialQueueThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Time\TimeProviderInterface;
 
 class TimeAwareThrottlerFactory extends ThrottlerFactory
 {
     /**
-     * @var TimeAdapterInterface
+     * @var TimeProviderInterface
      */
     private $timeAdapter;
 
     /**
      * @param CacheAdapterInterface $cacheAdapter
-     * @param TimeAdapterInterface  $timeAdapter
+     * @param TimeProviderInterface $timeAdapter
      */
-    public function __construct(CacheAdapterInterface $cacheAdapter, TimeAdapterInterface $timeAdapter)
+    public function __construct(CacheAdapterInterface $cacheAdapter, TimeProviderInterface $timeAdapter)
     {
         parent::__construct($cacheAdapter);
         $this->timeAdapter = $timeAdapter;
@@ -91,7 +91,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
             );
         }
 
-        if ($settings instanceof MovingWindowSettings) {
+        if ($settings instanceof MovingThrottleSettings) {
             return new MovingWindowThrottler(
                 $this->cacheAdapter,
                 $this->timeAdapter,
@@ -102,7 +102,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
             );
         }
 
-        if ($settings instanceof FixedWindowSettings) {
+        if ($settings instanceof FixedThrottleSettings) {
             return new FixedWindowThrottler(
                 $this->cacheAdapter,
                 $this->timeAdapter,

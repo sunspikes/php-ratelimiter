@@ -30,15 +30,10 @@ interface ThrottleSettingsInterface
     /**
      * @return int
      */
-    public function getLimit(): int;
+    public function getHitLimit(): int;
 
     /**
      * @return int
      */
-    public function getTtl(): int;
-
-    /**
-     * @return bool
-     */
-    public function isValid(): bool;
+    public function getTimeLimit(): int;
 }

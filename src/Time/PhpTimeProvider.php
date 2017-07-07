@@ -23,11 +23,25 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Exception;
+namespace Sunspikes\Ratelimit\Time;
 
-/**
- * Invalid data type exception
- */
-class InvalidDataTypeException extends RateLimiterException
+final class PhpTimeProvider implements TimeProviderInterface
 {
+    /**
+     * @return float
+     */
+    public function now()
+    {
+        list($usec, $sec) = explode(" ", microtime());
+
+        return ((float) $usec + (float) $sec);
+    }
+
+    /**
+     * @param int $microseconds
+     */
+    public function usleep($microseconds)
+    {
+        usleep($microseconds);
+    }
 }

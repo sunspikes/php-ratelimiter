@@ -25,7 +25,9 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-abstract class AbstractWindowSettings implements ThrottleSettingsInterface
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidSettingsException;
+
+abstract class AbstractThrottleSettings implements ThrottleSettingsInterface
 {
     /**
      * @var int|null
@@ -38,72 +40,44 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
     protected $timeLimit;
 
     /**
-     * @var int|null
-     */
-    protected $cacheTtl;
-
-    /**
      * @param int|null $hitLimit
      * @param int|null $timeLimit  In seconds
-     * @param int|null $cacheTtl   In seconds
      */
-    public function __construct($hitLimit = null, $timeLimit = null, $cacheTtl = null)
+    public function __construct($hitLimit = null, $timeLimit = null)
     {
-        $this->hitLimit = $hitLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
+        $this->assertValidLimits($hitLimit, $timeLimit);
+
+        $this->hitLimit = (int) $hitLimit;
+        $this->timeLimit = (int) $timeLimit;
     }
 
     /**
-     * @inheritdoc
+     * @param int $hitLimit
+     * @param int $timeLimit
+     * @throws InvalidSettingsException
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    private function assertValidLimits($hitLimit, $timeLimit)
     {
-        if (!$settings instanceof static) {
-            throw new \InvalidArgumentException(
-                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
+        if ((int) $hitLimit < 1 || (int) $timeLimit < 1) {
+            throw new InvalidSettingsException(
+                sprintf('The configuration is invalid [hitLimit (%s), timeLimit (%s)]', $hitLimit, $timeLimit)
             );
         }
-
-        return new static(
-            null === $settings->getHitLimit() ? $this->hitLimit : $settings->getHitLimit(),
-            null === $settings->getTimeLimit() ? $this->timeLimit : $settings->getTimeLimit(),
-            null === $settings->getCacheTtl() ? $this->cacheTtl : $settings->getCacheTtl()
-        );
     }
 
     /**
-     * @inheritdoc
+     * @return int
      */
-    public function isValid()
-    {
-        return
-            null !== $this->hitLimit &&
-            null !== $this->timeLimit &&
-            0 !== $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getHitLimit()
+    public function getHitLimit(): int
     {
         return $this->hitLimit;
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getTimeLimit()
+    public function getTimeLimit(): int
     {
         return $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCacheTtl()
-    {
-        return $this->cacheTtl;
     }
 }

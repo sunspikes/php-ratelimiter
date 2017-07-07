@@ -23,8 +23,17 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Settings;
+namespace Sunspikes\Ratelimit\Time;
 
-final class FixedWindowSettings extends AbstractWindowSettings
+interface TimeProviderInterface
 {
+    /**
+     * @return float
+     */
+    public function now();
+
+    /**
+     * @param int $microseconds
+     */
+    public function usleep($microseconds);
 }

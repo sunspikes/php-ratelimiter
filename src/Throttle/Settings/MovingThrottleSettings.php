@@ -23,11 +23,8 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Exception;
+namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-/**
- * Invalid data type exception
- */
-class InvalidDataTypeException extends RateLimiterException
+final class MovingThrottleSettings extends AbstractThrottleSettings
 {
 }

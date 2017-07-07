@@ -25,7 +25,9 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class LeakyBucketSettings extends AbstractWindowSettings
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidSettingsException;
+
+final class LeakyBucketSettings extends AbstractThrottleSettings
 {
     /**
      * @var int|null
@@ -35,49 +37,33 @@ final class LeakyBucketSettings extends AbstractWindowSettings
     /**
      * @param int|null $hitLimit
      * @param int|null $timeLimit  In milliseconds
-     * @param int|null $cacheTtl   In seconds
      * @param int|null $threshold
      */
-    public function __construct($hitLimit = null, $timeLimit = null, $cacheTtl = null, $threshold = null)
+    public function __construct($hitLimit = null, $timeLimit = null, $threshold = null)
     {
-        parent::__construct($hitLimit, $timeLimit, $cacheTtl);
+        parent::__construct($hitLimit, $timeLimit);
+
+        $this->assertValidThreshold($threshold);
         $this->threshold = $threshold;
     }
 
     /**
-     * @inheritdoc
+     * @param int $threshold
+     * @throws InvalidSettingsException
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    public function assertValidThreshold($threshold)
     {
-        if (!$settings instanceof self) {
-            throw new \InvalidArgumentException(
-                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
+        if ((int) $threshold < 0) {
+            throw new InvalidSettingsException(
+                sprintf('The configuration is invalid for threshold (%s)', $threshold)
             );
         }
-
-        return new self(
-            $settings->getTokenLimit() ?? $this->hitLimit,
-            $settings->getTimeLimit() ?? $this->timeLimit,
-            $settings->getCacheTtl() ?? $this->cacheTtl,
-            $settings->getThreshold() ?? $this->threshold
-        );
     }
 
     /**
-     * @inheritdoc
+     * @return int
      */
-    public function isValid()
-    {
-        return
-            null !== $this->hitLimit &&
-            null !== $this->timeLimit &&
-            0 !== $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getThreshold()
+    public function getThreshold(): int
     {
         return $this->threshold;
     }

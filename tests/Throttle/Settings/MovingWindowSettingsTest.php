@@ -3,7 +3,7 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
 use Mockery as M;
-use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\MovingThrottleSettings;
 
 class MovingWindowSettingsTest extends AbstractWindowSettingsTest
 {
@@ -12,6 +12,6 @@ class MovingWindowSettingsTest extends AbstractWindowSettingsTest
      */
     protected function getSettings($hitLimit = null, $timeLimit = null, $cacheTtl = null)
     {
-        return new MovingWindowSettings($hitLimit, $timeLimit, $cacheTtl);
+        return new MovingThrottleSettings($hitLimit, $timeLimit, $cacheTtl);
     }
 }

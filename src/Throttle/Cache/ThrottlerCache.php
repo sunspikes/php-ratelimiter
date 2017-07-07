@@ -4,7 +4,7 @@ namespace Sunspikes\src\Throttle\Cache;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Sunspikes\src\Throttle\Cache\Bridge\CacheItemBridge;
+use Sunspikes\src\Throttle\Cache\Bridge\CacheItem;
 
 class ThrottlerCache implements ThrottlerCacheInterface
 {
@@ -117,7 +117,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
      */
     private function setParams(string $key, array $params): CacheItemInterface
     {
-        $item = $this->cacheItemPool->getItem($key) ?? new CacheItemBridge($key);
+        $item = $this->cacheItemPool->getItem($key) ?? new CacheItem($key);
         $item->set(json_encode($params));
         $item->expiresAt(self::CACHE_ITEM_EXPIRY);
 

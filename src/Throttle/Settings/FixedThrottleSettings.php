@@ -25,6 +25,6 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class MovingWindowSettings extends AbstractWindowSettings
+final class FixedThrottleSettings extends AbstractThrottleSettings
 {
 }
