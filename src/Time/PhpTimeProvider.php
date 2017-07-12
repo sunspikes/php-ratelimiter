@@ -23,56 +23,25 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Adapter;
+namespace Sunspikes\Ratelimit\Time;
 
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
-
-interface CacheAdapterInterface
+final class PhpTimeProvider implements TimeProviderInterface
 {
     /**
-     * Get value from cache
-     *
-     * @param string $key
-     *
-     * @return mixed
-     * 
-     * @throws ItemNotFoundException
+     * @return float
      */
-    public function get($key);
+    public function now()
+    {
+        list($usec, $sec) = explode(" ", microtime());
+
+        return ((float) $usec + (float) $sec);
+    }
 
     /**
-     * Set value in cache
-     *
-     * @param string $key
-     * @param mixed $value
-     * @param int $ttl
-     *
-     * @return mixed
+     * @param int $microseconds
      */
-    public function set($key, $value, $ttl = null);
-
-    /**
-     * Delete value from cache
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function delete($key);
-
-    /**
-     * Check if keyed value exists in cache
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has($key);
-
-    /**
-     * Clear cache
-     *
-     * @return void
-     */
-    public function clear();
+    public function usleep($microseconds)
+    {
+        usleep($microseconds);
+    }
 }

@@ -35,26 +35,29 @@ interface ThrottlerInterface
      *
      * @return bool
      */
-    public function access();
+    public function access(): bool;
 
     /**
      * Register a hit for the resource
      *
-     * @return mixed
+     * @return ThrottlerInterface
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function hit();
+    public function hit(): ThrottlerInterface;
 
     /**
      * Clear the hit counter
      *
-     * @return mixed
+     * @return ThrottlerInterface
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function clear();
+    public function clear(): ThrottlerInterface;
 
     /**
      * Get the hit count
      *
-     * @return int
+     * @return int|null
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function count();
 
@@ -62,20 +65,7 @@ interface ThrottlerInterface
      * Check the throttle status
      *
      * @return bool
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function check();
-
-    /**
-     * Get time window
-     *
-     * @return int
-     */
-    public function getTime();
-
-    /**
-     * Get throttle limit
-     *
-     * @return int
-     */
-    public function getLimit();
+    public function check(): bool;
 }

@@ -25,101 +25,46 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class LeakyBucketSettings implements ThrottleSettingsInterface
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidSettingsException;
+
+final class LeakyBucketSettings extends AbstractThrottleSettings
 {
-    /**
-     * @var int|null
-     */
-    private $tokenLimit;
-
-    /**
-     * @var int|null
-     */
-    private $timeLimit;
-
     /**
      * @var int|null
      */
     private $threshold;
 
     /**
-     * @var int|null
-     */
-    private $cacheTtl;
-
-    /**
-     * @param int|null $tokenLimit
+     * @param int|null $hitLimit
      * @param int|null $timeLimit  In milliseconds
      * @param int|null $threshold
-     * @param int|null $cacheTtl   In seconds
      */
-    public function __construct($tokenLimit = null, $timeLimit = null, $threshold = null, $cacheTtl = null)
+    public function __construct($hitLimit = null, $timeLimit = null, $threshold = null)
     {
-        $this->tokenLimit = $tokenLimit;
-        $this->timeLimit = $timeLimit;
+        parent::__construct($hitLimit, $timeLimit);
+
+        $this->assertValidThreshold($threshold);
         $this->threshold = $threshold;
-        $this->cacheTtl = $cacheTtl;
     }
 
     /**
-     * @inheritdoc
+     * @param int $threshold
+     * @throws InvalidSettingsException
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    public function assertValidThreshold($threshold)
     {
-        if (!$settings instanceof self) {
-            throw new \InvalidArgumentException(
-                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
+        if ((int) $threshold < 0) {
+            throw new InvalidSettingsException(
+                sprintf('The configuration is invalid for threshold (%s)', $threshold)
             );
         }
-
-        return new self(
-            null === $settings->getTokenLimit() ? $this->tokenLimit : $settings->getTokenLimit(),
-            null === $settings->getTimeLimit() ? $this->timeLimit : $settings->getTimeLimit(),
-            null === $settings->getThreshold() ? $this->threshold : $settings->getThreshold(),
-            null === $settings->getCacheTtl() ? $this->cacheTtl : $settings->getCacheTtl()
-        );
     }
 
     /**
-     * @inheritdoc
+     * @return int
      */
-    public function isValid()
-    {
-        return
-            null !== $this->tokenLimit &&
-            null !== $this->timeLimit &&
-            0 !== $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getTokenLimit()
-    {
-        return $this->tokenLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getTimeLimit()
-    {
-        return $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getThreshold()
+    public function getThreshold(): int
     {
         return $this->threshold;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCacheTtl()
-    {
-        return $this->cacheTtl;
     }
 }

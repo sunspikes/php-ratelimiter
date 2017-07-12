@@ -3,7 +3,7 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
 use Mockery as M;
-use Sunspikes\Ratelimit\Throttle\Settings\AbstractWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\AbstractThrottleSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
 abstract class AbstractWindowSettingsTest extends \PHPUnit_Framework_TestCase
@@ -59,7 +59,7 @@ abstract class AbstractWindowSettingsTest extends \PHPUnit_Framework_TestCase
      * @param int|null $timeLimit
      * @param int|null $cacheTtl
      *
-     * @return AbstractWindowSettings
+     * @return AbstractThrottleSettings
      */
     abstract protected function getSettings($hitLimit = null, $timeLimit = null, $cacheTtl = null);
 }

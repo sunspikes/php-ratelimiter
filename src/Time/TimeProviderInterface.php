@@ -23,11 +23,17 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Exception;
+namespace Sunspikes\Ratelimit\Time;
 
-/**
- * Item not found in cache
- */
-class ItemNotFoundException extends CacheException
+interface TimeProviderInterface
 {
+    /**
+     * @return float
+     */
+    public function now();
+
+    /**
+     * @param int $microseconds
+     */
+    public function usleep($microseconds);
 }

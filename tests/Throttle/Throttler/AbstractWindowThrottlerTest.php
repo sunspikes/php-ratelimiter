@@ -7,7 +7,7 @@ use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Throttle\Throttler\AbstractWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\RetriableThrottlerInterface;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Time\TimeProviderInterface;
 
 abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
     protected $cacheAdapter;
 
     /**
-     * @var TimeAdapterInterface|\Mockery\MockInterface
+     * @var TimeProviderInterface|\Mockery\MockInterface
      */
     protected $timeAdapter;
 
@@ -36,7 +36,7 @@ abstract class AbstractWindowThrottlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
+        $this->timeAdapter = M::mock(TimeProviderInterface::class);
         $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
 
         $this->throttler = $this->createThrottler('key');

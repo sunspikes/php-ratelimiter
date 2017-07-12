@@ -10,7 +10,7 @@ use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Time\TimeProviderInterface;
 
 class LeakyBucketTest extends AbstractThrottlerTestCase
 {
@@ -18,7 +18,7 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
     const TOKEN_LIMIT = 30;    //30 requests per 27 seconds
 
     /**
-     * @var TimeAdapterInterface|M\MockInterface
+     * @var TimeProviderInterface|M\MockInterface
      */
     private $timeAdapter;
 
@@ -27,7 +27,7 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
      */
     protected function setUp()
     {
-        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
+        $this->timeAdapter = M::mock(TimeProviderInterface::class);
         $this->timeAdapter->shouldReceive('now')->andReturn(time());
 
         parent::setUp();

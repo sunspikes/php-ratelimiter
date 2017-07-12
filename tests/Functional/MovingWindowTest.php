@@ -8,8 +8,8 @@ use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
-use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Throttle\Settings\MovingThrottleSettings;
+use Sunspikes\Ratelimit\Time\TimeProviderInterface;
 
 class MovingWindowTest extends AbstractThrottlerTestCase
 {
@@ -21,7 +21,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
     private $startTime;
 
     /**
-     * @var TimeAdapterInterface|M\MockInterface
+     * @var TimeProviderInterface|M\MockInterface
      */
     private $timeAdapter;
 
@@ -30,7 +30,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
      */
     protected function setUp()
     {
-        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
+        $this->timeAdapter = M::mock(TimeProviderInterface::class);
         $this->timeAdapter->shouldReceive('now')->andReturn($this->startTime = time())->byDefault();
 
         parent::setUp();
@@ -68,7 +68,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
-            new MovingWindowSettings($this->getMaxAttempts(), self::TIME_LIMIT)
+            new MovingThrottleSettings($this->getMaxAttempts(), self::TIME_LIMIT)
         );
     }
 }

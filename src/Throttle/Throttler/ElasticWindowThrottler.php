@@ -25,123 +25,22 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
-
-class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
+class ElasticWindowThrottler extends AbstractWindowThrottler implements ThrottlerInterface
 {
-    /* @var CacheAdapterInterface */
-    protected $cache;
-    /* @var string */
-    protected $key;
-    /* @var int */
-    protected $limit;
-    /* @var int */
-    protected $ttl;
-    /* @var int */
-    protected $counter;
-
-    /**
-     * @param CacheAdapterInterface $cache
-     * @param string $key
-     * @param int $limit
-     * @param int $ttl
-     */
-    public function __construct(CacheAdapterInterface $cache, $key, $limit, $ttl)
-    {
-        $this->cache = $cache;
-        $this->key = $key;
-        $this->limit = $limit;
-        $this->ttl = $ttl;
-    }
-
-    /**
+     /**
      * @inheritdoc
      */
-    public function access()
+    public function hit(): ThrottlerInterface
     {
-        $status = $this->check();
-
-        $this->hit();
-
-        return $status;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hit()
-    {
-        $this->counter = $this->count() + 1;
-
-        $this->cache->set($this->key, $this->counter, $this->ttl);
+        $key = $this->data->getKey();
+        $this->counter = (int) $this->throttlerCache->count($key) + 1;
+        $this->throttlerCache->set(
+            $key,
+            $this->counter,
+            $this->settings->getLimit(),
+            $this->settings->getTtl()
+        );
 
         return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function clear()
-    {
-        $this->counter = 0;
-
-        $this->cache->set($this->key, $this->counter, $this->ttl);
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function count()
-    {
-        if (!is_null($this->counter)) {
-            return $this->counter;
-        }
-
-        try {
-            $this->counter = $this->cache->get($this->key);
-        } catch (ItemNotFoundException $e) {
-            $this->counter = 0;
-        }
-
-        return $this->counter;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function check()
-    {
-        return ($this->count() < $this->limit);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTime()
-    {
-        return $this->ttl;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRetryTimeout()
-    {
-        if ($this->check()) {
-            return 0;
-        }
-
-        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->ttl;
     }
 }

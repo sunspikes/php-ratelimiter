@@ -23,11 +23,8 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Exception;
+namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-/**
- * Invalid driver configuration
- */
-class InvalidConfigException extends CacheException
+final class MovingThrottleSettings extends AbstractThrottleSettings
 {
 }

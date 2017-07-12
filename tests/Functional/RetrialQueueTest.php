@@ -8,17 +8,17 @@ use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
-use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\FixedThrottleSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Time\TimeProviderInterface;
 
 class RetrialQueueTest extends AbstractThrottlerTestCase
 {
     const TIME_LIMIT = 24;
 
     /**
-     * @var TimeAdapterInterface|M\MockInterface
+     * @var TimeProviderInterface|M\MockInterface
      */
     private $timeAdapter;
 
@@ -27,7 +27,7 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
      */
     protected function setUp()
     {
-        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
+        $this->timeAdapter = M::mock(TimeProviderInterface::class);
         $this->timeAdapter->shouldReceive('now')->andReturn(time());
 
         parent::setUp();
@@ -53,7 +53,7 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),
             new HydratorFactory(),
-            new RetrialQueueSettings(new FixedWindowSettings($this->getMaxAttempts(), self::TIME_LIMIT))
+            new RetrialQueueSettings(new FixedThrottleSettings($this->getMaxAttempts(), self::TIME_LIMIT))
         );
     }
 }

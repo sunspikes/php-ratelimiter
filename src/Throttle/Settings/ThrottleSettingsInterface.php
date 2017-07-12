@@ -28,14 +28,12 @@ namespace Sunspikes\Ratelimit\Throttle\Settings;
 interface ThrottleSettingsInterface
 {
     /**
-     * @param ThrottleSettingsInterface $settings
-     *
-     * @return ThrottleSettingsInterface
+     * @return int
      */
-    public function merge(ThrottleSettingsInterface $settings);
+    public function getHitLimit(): int;
 
     /**
-     * @return bool
+     * @return int
      */
-    public function isValid();
+    public function getTimeLimit(): int;
 }

@@ -25,114 +25,15 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
-
-final class FixedWindowThrottler extends AbstractWindowThrottler implements RetriableThrottlerInterface
+final class FixedWindowThrottler extends AbstractWindowThrottler implements ThrottlerInterface
 {
-    const CACHE_KEY_TIME = ':time';
-    const CACHE_KEY_HITS = ':hits';
-
-    /**
-     * @var int|null
-     */
-    private $hitCount;
-
     /**
      * @inheritdoc
      */
-    public function hit()
+    public function hit(): ThrottlerInterface
     {
-        $this->setCachedHitCount($this->count() + 1);
-
-        // Update the window start time if the previous window has passed, or no cached window exists
-        try {
-            if (($this->timeProvider->now() - $this->cache->get($this->getTimeCacheKey())) > $this->timeLimit) {
-                $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
-            }
-        } catch (ItemNotFoundException $exception) {
-            $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
-        }
+        $this->throttlerCache->increment($this->data->getKey());
 
         return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function count()
-    {
-        try {
-            if (($this->timeProvider->now() - $this->cache->get($this->getTimeCacheKey())) > $this->timeLimit) {
-                return 0;
-            }
-
-            return $this->getCachedHitCount();
-        } catch (ItemNotFoundException $exception) {
-            return 0;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function clear()
-    {
-        $this->setCachedHitCount(0);
-        $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRetryTimeout()
-    {
-        if ($this->check()) {
-            return 0;
-        }
-
-        // Return the time until the current window ends
-        // Try/catch for the ItemNotFoundException is not required, in that case $this->check() will return true
-        $cachedTime = $this->cache->get($this->getTimeCacheKey());
-
-        return self::SECOND_TO_MILLISECOND_MULTIPLIER * ($this->timeLimit - $this->timeProvider->now() + $cachedTime);
-    }
-
-    /**
-     * @return int
-     *
-     * @throws ItemNotFoundException
-     */
-    private function getCachedHitCount()
-    {
-        if (null !== $this->hitCount) {
-            return $this->hitCount;
-        }
-
-        return $this->cache->get($this->getHitsCacheKey());
-    }
-
-    /**
-     * @param int $hitCount
-     */
-    private function setCachedHitCount($hitCount)
-    {
-        $this->hitCount = $hitCount;
-        $this->cache->set($this->getHitsCacheKey(), $hitCount, $this->cacheTtl);
-    }
-
-    /**
-     * @return string
-     */
-    private function getHitsCacheKey()
-    {
-        return $this->key.self::CACHE_KEY_HITS;
-    }
-
-    /**
-     * @return string
-     */
-    private function getTimeCacheKey()
-    {
-        return $this->key.self::CACHE_KEY_TIME;
     }
 }

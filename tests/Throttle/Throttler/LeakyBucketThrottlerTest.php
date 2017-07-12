@@ -7,7 +7,7 @@ use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
-use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
+use Sunspikes\Ratelimit\Time\TimeProviderInterface;
 
 class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
     private $cacheAdapter;
 
     /**
-     * @var TimeAdapterInterface|\Mockery\MockInterface
+     * @var TimeProviderInterface|\Mockery\MockInterface
      */
     private $timeAdapter;
 
@@ -37,7 +37,7 @@ class LeakyBucketThrottlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
+        $this->timeAdapter = M::mock(TimeProviderInterface::class);
         $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
 
         $this->throttler = new LeakyBucketThrottler(

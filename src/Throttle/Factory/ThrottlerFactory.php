@@ -25,7 +25,7 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
@@ -34,16 +34,16 @@ use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 class ThrottlerFactory implements FactoryInterface
 {
     /**
-     * @var CacheAdapterInterface
+     * @var CacheItemPoolInterface
      */
-    protected $cacheAdapter;
+    protected $cacheItemPool;
 
     /**
-     * @param CacheAdapterInterface $cacheAdapter
+     * @param CacheItemPoolInterface $cacheItemPool
      */
-    public function __construct(CacheAdapterInterface $cacheAdapter)
+    public function __construct(CacheItemPoolInterface $cacheItemPool)
     {
-        $this->cacheAdapter = $cacheAdapter;
+        $this->cacheItemPool = $cacheItemPool;
     }
 
     /**
@@ -63,15 +63,15 @@ class ThrottlerFactory implements FactoryInterface
      * @param ThrottleSettingsInterface $settings
      *
      * @return ElasticWindowThrottler
+     * @throws \InvalidArgumentException
      */
     protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
     {
         if ($settings instanceof ElasticWindowSettings) {
             return new ElasticWindowThrottler(
-                $this->cacheAdapter,
-                $data->getKey(),
-                $settings->getLimit(),
-                $settings->getTime()
+                $this->cacheItemPool,
+                $data,
+                $settings
             );
         }
 

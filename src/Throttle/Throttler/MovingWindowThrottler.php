@@ -25,8 +25,6 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
-
 final class MovingWindowThrottler extends AbstractWindowThrottler implements RetriableThrottlerInterface
 {
     /**
@@ -50,7 +48,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
 
         //Adds 1 recorded hit to the mapping entry for the current timestamp
         $this->hitCountMapping[$timestamp]++;
-        $this->cache->set($this->key, serialize($this->hitCountMapping), $this->cacheTtl);
+        $this->throttlerCache->setItem($this->data->getKey(), serialize($this->hitCountMapping));
 
         return $this;
     }
@@ -70,43 +68,47 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
      */
     public function getRetryTimeout()
     {
-        if ($this->hitLimit > $totalHitCount = $this->count()) {
+        if ($this->settings->getHitLimit() > $totalHitCount = $this->count()) {
             return 0;
         }
 
         // Check at which 'oldest' possible timestamp enough hits have expired
         // Then return the time remaining for that timestamp to expire
         foreach ($this->hitCountMapping as $timestamp => $hitCount) {
-            if ($this->hitLimit > $totalHitCount -= $hitCount) {
+            if ($this->settings->getHitLimit() > $totalHitCount -= $hitCount) {
                 return self::SECOND_TO_MILLISECOND_MULTIPLIER * max(
                     0,
-                    $this->timeLimit - ((int) ceil($this->timeProvider->now()) - $timestamp)
+                    $this->settings->getTimeLimit() - ((int) ceil($this->timeProvider->now()) - $timestamp)
                 );
             }
         }
 
-        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->timeLimit;
+        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->settings->getTimeLimit();
     }
 
     /**
      * @inheritdoc
      */
-    public function clear()
+    public function clear(): ThrottlerInterface
     {
         $this->hitCountMapping = [];
-        $this->cache->set($this->key, serialize([]), $this->cacheTtl);
+        $this->counter = 0;
+        $this->throttlerCache->set($this->data->getKey(), serialize([]));
+
+        return $this;
     }
 
     private function updateHitCount()
     {
-        try {
-            // Get a stored mapping from cache
-            if (0 === count($this->hitCountMapping)) {
-                $this->hitCountMapping = (array) unserialize($this->cache->get($this->key));
-            }
-        } catch (ItemNotFoundException $exception) {}
+        // Get a stored mapping from cache
+        if (0 === count($this->hitCountMapping)) {
+            $this->hitCountMapping = (array) unserialize(
+                $this->throttlerCache->getItem($this->data->getKey()),
+                false
+            );
+        }
 
-        $startTime = (int) ceil($this->timeProvider->now()) - $this->timeLimit;
+        $startTime = (int) ceil($this->timeProvider->now()) - $this->settings->getTimeLimit();
 
         // Clear all entries older than the window front-edge
         $relevantTimestamps = array_filter(array_keys($this->hitCountMapping), function ($key) use ($startTime) {
