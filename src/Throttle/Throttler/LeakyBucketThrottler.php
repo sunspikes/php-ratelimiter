@@ -27,6 +27,9 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 final class LeakyBucketThrottler extends AbstractWindowThrottler implements ThrottlerInterface
 {
+    const TIME_CACHE_KEY = ':time';
+    const TOKEN_CACHE_KEY = ':tokens';
+
     /**
      * @inheritdoc
      */
@@ -52,7 +55,7 @@ final class LeakyBucketThrottler extends AbstractWindowThrottler implements Thro
             $cachedTime = $this->cache->get($this->getTimeCacheKey());
             $timeSinceLastRequest = self::SECOND_TO_MILLISECOND_MULTIPLIER * ($this->timeProvider->now() - $cachedTime);
 
-            if ($timeSinceLastRequest > $this->timeLimit) {
+            if ($timeSinceLastRequest > $this->settings->getHitLimit()) {
                 return 0;
             }
 
@@ -64,13 +67,13 @@ final class LeakyBucketThrottler extends AbstractWindowThrottler implements Thro
         }
 
         // Return the `used` token count, minus the amount of tokens which have been `refilled` since the previous request
-        return  (int) max(0, ceil($lastTokenCount - ($this->tokenlimit * $timeSinceLastRequest / ($this->timeLimit))));
+        return  (int) max(0, ceil($lastTokenCount - ($this->settings->getHitLimit() * $timeSinceLastRequest / ($this->settings->getTimeLimit()))));
     }
 
     /**
      * @inheritdoc
      */
-    public function check()
+    public function check(): bool
     {
         return 0 === $this->getWaitTime($this->count());
     }
@@ -78,29 +81,13 @@ final class LeakyBucketThrottler extends AbstractWindowThrottler implements Thro
     /**
      * @inheritdoc
      */
-    public function getTime()
-    {
-        return $this->timeLimit;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getLimit()
-    {
-        return $this->tokenlimit;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getRetryTimeout()
     {
-        if ($this->threshold > $this->count() + 1) {
+        if ($this->settings->getThreshold() > $this->count() + 1) {
             return 0;
         }
 
-        return (int) ceil($this->timeLimit / $this->tokenlimit);
+        return (int) ceil($this->settings->getTimeLimit() / $this->settings->getHitLimit());
     }
 
     /**
@@ -110,11 +97,11 @@ final class LeakyBucketThrottler extends AbstractWindowThrottler implements Thro
      */
     private function getWaitTime($tokenCount)
     {
-        if ($this->threshold > $tokenCount) {
+        if ($this->settings->getThreshold() > $tokenCount) {
             return 0;
         }
 
-        return (int) ceil($this->timeLimit / max(1, ($this->tokenlimit - $this->threshold)));
+        return (int) ceil($this->settings->getTimeLimit() / max(1, ($this->settings->getHitLimit() - $this->settings->getThreshold())));
     }
 
     /**
@@ -122,8 +109,8 @@ final class LeakyBucketThrottler extends AbstractWindowThrottler implements Thro
      */
     private function setUsedCapacity($tokens)
     {
-        $this->cache->set($this->getTokenCacheKey(), $tokens, $this->cacheTtl);
-        $this->cache->set($this->getTimeCacheKey(), $this->timeProvider->now(), $this->cacheTtl);
+        $this->throttlerCache->setItem($this->getTokenCacheKey(), $tokens);
+        $this->throttlerCache->setItem($this->getTimeCacheKey(), $this->timeProvider->now());
     }
 
     /**

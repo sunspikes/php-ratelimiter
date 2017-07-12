@@ -28,12 +28,12 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Time\TimeProviderInterface;
-use Sunspikes\src\Throttle\Cache\ThrottlerCacheInterface;
+use Sunspikes\src\Throttle\Cache\ThrottlerCache;
 
 abstract class AbstractWindowThrottler implements \Countable
 {
     /**
-     * @var ThrottlerCacheInterface
+     * @var ThrottlerCache
      */
     protected $throttlerCache;
 
@@ -58,12 +58,12 @@ abstract class AbstractWindowThrottler implements \Countable
     protected $counter;
 
     /**
-     * @param ThrottlerCacheInterface   $throttlerCache
+     * @param ThrottlerCache            $throttlerCache
      * @param Data                      $data
      * @param TimeProviderInterface     $timeProvider
      * @param ThrottleSettingsInterface $settings
      */
-    public function __construct(ThrottlerCacheInterface $throttlerCache, Data $data, TimeProviderInterface $timeProvider, ThrottleSettingsInterface $settings)
+    public function __construct(ThrottlerCache $throttlerCache, Data $data, TimeProviderInterface $timeProvider, ThrottleSettingsInterface $settings)
     {
         $this->throttlerCache = $throttlerCache;
         $this->data = $data;

@@ -22,24 +22,5 @@ interface ThrottlerCacheInterface
     /**
      * @param string $key
      */
-    public function remove(string $key);
-
-    /**
-     * @param string $key
-     */
     public function increment(string $key);
-
-    /**
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function hasItem(string $key): bool;
-
-    /**
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function isExpired(string $key): bool;
 }

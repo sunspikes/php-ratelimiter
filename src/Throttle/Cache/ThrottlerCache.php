@@ -6,7 +6,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Sunspikes\src\Throttle\Cache\Bridge\CacheItem;
 
-class ThrottlerCache implements ThrottlerCacheInterface
+class ThrottlerCache implements GenericCacheInterface, ThrottlerCacheInterface
 {
     const CACHE_ITEM_EXPIRY = 0;
     
@@ -94,6 +94,35 @@ class ThrottlerCache implements ThrottlerCacheInterface
         $params = $this->getParams($key);
 
         return microtime(true) < $params['ttl'];
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $item
+     *
+     * @return mixed
+     */
+    public function setItem(string $key, $item)
+    {
+        $this->setParams($key, [
+            'item' => $item,
+        ]);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function getItem(string $key)
+    {
+        $item = $this->getParams($key);
+
+        if (is_array($item) && isset($item['item'])) {
+            return['item'];
+        }
+
+        return $item;
     }
 
     /**
