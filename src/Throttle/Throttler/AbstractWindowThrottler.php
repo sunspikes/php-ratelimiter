@@ -25,13 +25,13 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 abstract class AbstractWindowThrottler
 {
     /**
-     * @var CacheAdapterInterface
+     * @var ThrottlerCacheInterface
      */
     protected $cache;
 
@@ -61,7 +61,7 @@ abstract class AbstractWindowThrottler
     protected $timeProvider;
 
     /**
-     * @param CacheAdapterInterface $cache
+     * @param ThrottlerCacheInterface $cache
      * @param TimeAdapterInterface  $timeAdapter
      * @param string                $key         Cache key prefix
      * @param int                   $hitLimit    Maximum number of hits
@@ -69,7 +69,7 @@ abstract class AbstractWindowThrottler
      * @param int|null              $cacheTtl    Cache ttl time (default: null => CacheAdapter ttl)
      */
     public function __construct(
-        CacheAdapterInterface $cache,
+        ThrottlerCacheInterface $cache,
         TimeAdapterInterface $timeAdapter,
         $key,
         $hitLimit,

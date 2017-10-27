@@ -25,9 +25,11 @@
 
 namespace Sunspikes\Ratelimit\Cache\Exception;
 
+use Psr\Cache\CacheException as PsrCacheException;
+
 /**
  * The base cache exception
  */
-class CacheException extends \Exception
+class CacheException extends \RuntimeException implements PsrCacheException
 {
 }

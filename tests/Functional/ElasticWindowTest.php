@@ -1,9 +1,8 @@
 <?php
 
-namespace Sunspikes\Tests\Functional;
+namespace Sunspikes\Tests\Ratelimit\Functional;
 
-use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
-use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
+use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
@@ -14,10 +13,10 @@ class ElasticWindowTest extends AbstractThrottlerTestCase
     /**
      * @inheritdoc
      */
-    protected function createRatelimiter(FactoryInterface $cacheFactory)
+    protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {
         return new RateLimiter(
-            new ThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make())),
+            new ThrottlerFactory($throttlerCache),
             new HydratorFactory(),
             new ElasticWindowSettings($this->getMaxAttempts(), 600)
         );

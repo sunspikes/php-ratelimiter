@@ -4,7 +4,7 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Factory;
 
 use Mockery as M;
 use Mockery\MockInterface;
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
@@ -19,9 +19,9 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
 {
     /**
-     * @var CacheAdapterInterface|MockInterface
+     * @var ThrottlerCacheInterface|MockInterface
      */
-    protected $cacheAdapter;
+    protected $throttlerCache;
 
     /**
      * @var TimeAdapterInterface|MockInterface
@@ -34,9 +34,9 @@ class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
     protected function setUp()
     {
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
-        $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
+        $this->throttlerCache = M::mock(ThrottlerCacheInterface::class);
 
-        $this->factory = new TimeAwareThrottlerFactory($this->cacheAdapter, $this->timeAdapter);
+        $this->factory = new TimeAwareThrottlerFactory($this->throttlerCache, $this->timeAdapter);
     }
 
     public function testMakeLeakyBucket()

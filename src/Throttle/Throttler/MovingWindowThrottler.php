@@ -26,6 +26,7 @@
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+use Sunspikes\Ratelimit\Throttle\Entity\CacheHitMapping;
 
 final class MovingWindowThrottler extends AbstractWindowThrottler implements RetriableThrottlerInterface
 {
@@ -50,7 +51,9 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
 
         //Adds 1 recorded hit to the mapping entry for the current timestamp
         $this->hitCountMapping[$timestamp]++;
-        $this->cache->set($this->key, serialize($this->hitCountMapping), $this->cacheTtl);
+
+        $item = new CacheHitMapping($this->hitCountMapping, $this->cacheTtl);
+        $this->cache->setItem($this->key, $item);
 
         return $this;
     }
@@ -94,7 +97,9 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
     public function clear()
     {
         $this->hitCountMapping = [];
-        $this->cache->set($this->key, serialize([]), $this->cacheTtl);
+
+        $item = new CacheHitMapping($this->hitCountMapping, $this->cacheTtl);
+        $this->cache->setItem($this->key, $item);
     }
 
     private function updateHitCount()
@@ -102,7 +107,9 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
         try {
             // Get a stored mapping from cache
             if (0 === count($this->hitCountMapping)) {
-                $this->hitCountMapping = (array) unserialize($this->cache->get($this->key));
+                /** @var CacheHitMapping $item */
+                $item = $this->cache->getItem($this->key);
+                $this->hitCountMapping = $item->getHitMapping();
             }
         } catch (ItemNotFoundException $exception) {}
 

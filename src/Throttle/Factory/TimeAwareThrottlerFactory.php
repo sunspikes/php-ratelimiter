@@ -25,7 +25,7 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
@@ -47,12 +47,12 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
     private $timeAdapter;
 
     /**
-     * @param CacheAdapterInterface $cacheAdapter
+     * @param ThrottlerCacheInterface $throttlerCache
      * @param TimeAdapterInterface  $timeAdapter
      */
-    public function __construct(CacheAdapterInterface $cacheAdapter, TimeAdapterInterface $timeAdapter)
+    public function __construct(ThrottlerCacheInterface $throttlerCache, TimeAdapterInterface $timeAdapter)
     {
-        parent::__construct($cacheAdapter);
+        parent::__construct($throttlerCache);
         $this->timeAdapter = $timeAdapter;
     }
 
@@ -81,7 +81,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
     {
         if ($settings instanceof LeakyBucketSettings) {
             return new LeakyBucketThrottler(
-                $this->cacheAdapter,
+                $this->throttlerCache,
                 $this->timeAdapter,
                 $data->getKey(),
                 $settings->getTokenLimit(),
@@ -93,7 +93,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
 
         if ($settings instanceof MovingWindowSettings) {
             return new MovingWindowThrottler(
-                $this->cacheAdapter,
+                $this->throttlerCache,
                 $this->timeAdapter,
                 $data->getKey(),
                 $settings->getHitLimit(),
@@ -104,7 +104,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
 
         if ($settings instanceof FixedWindowSettings) {
             return new FixedWindowThrottler(
-                $this->cacheAdapter,
+                $this->throttlerCache,
                 $this->timeAdapter,
                 $data->getKey(),
                 $settings->getHitLimit(),

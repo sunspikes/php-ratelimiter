@@ -4,7 +4,7 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Factory;
 
 use Mockery as M;
 use Mockery\MockInterface;
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
@@ -15,9 +15,9 @@ use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface;
 class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CacheAdapterInterface|MockInterface
+     * @var ThrottlerCacheInterface|MockInterface
      */
-    protected $cacheAdapter;
+    protected $throttlerCache;
 
     /**
      * @var FactoryInterface
@@ -29,8 +29,8 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
-        $this->factory = new ThrottlerFactory($this->cacheAdapter);
+        $this->throttlerCache = M::mock(ThrottlerCacheInterface::class);
+        $this->factory = new ThrottlerFactory($this->throttlerCache);
     }
 
     public function testMakeElasticWindow()

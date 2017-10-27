@@ -20,7 +20,7 @@ by including `sunspikes/php-ratelimiter` in your project composer.json require:
 
 ``` json
     "require": {
-        "sunspikes/php-ratelimiter":  "dev-master"
+        "sunspikes/php-ratelimiter":  "^2.0"
     }
 ```
 
@@ -36,9 +36,9 @@ compatible autoloader.
 
 ```php
 // 1. Make a rate limiter with limit 3 attempts in 10 minutes
-$cacheAdapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
+$throttlerCache = new ThrottlerCache($anyPsr6CacheAdapter); 
 $settings = new ElasticWindowSettings(3, 600);
-$ratelimiter = new RateLimiter(new ThrottlerFactory($cacheAdapter), new HydratorFactory(), $settings);
+$ratelimiter = new RateLimiter(new ThrottlerFactory($throttlerCache), new HydratorFactory(), $settings);
 
 // 2. Get a throttler for path /login 
 $loginThrottler = $ratelimiter->get('/login');
@@ -64,41 +64,22 @@ if ($loginThrottler->access()) {
 print $loginThrottler->count(); // or count($throttler)
 ```
 
-### Configuration
+### Using and Extending
 
-By default PHP Ratelimiter uses the [desarolla2 cache adapter](https://github.com/desarrolla2/Cache), the sample configuration provided in ```config/config.php```
+The PHP Ratelimiter is highly extensible, you can use any PSR6 cache adapters as caching backend
 
-You can configure the drivers in ```config.php```, for example to use memcache change the driver to ```'memcache'```
+For example,
 
-```php
-return [
-    'default_ttl' => 3600,
-    'driver'      => 'memcache',
-    'memcache' => [
-        //....
-    ],
-];
-```
+  - PHP Cache (http://www.php-cache.com/en/latest/) 
+  - Symfony (https://symfony.com/doc/current/components/cache.html)
+  - Stash (http://www.stashphp.com)
 
-### Extending
-
-The PHP Ratelimiter is highly extensible, you can have custom adapters by implementing ```Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface``` 
-
-For example to use Doctrine cache adapter
+For example to use Memcache adapter from php cache
 
 ```php
-class DoctrineCacheAdapter implements CacheAdapterInterface
-{
-    public function __construct($cache)
-    {
-        $this->cache = $cache;
-    }
-    
-    // Implement the methods
-}
-
-// Build adapter using APC cache driver
-$adapter = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ApcCache());
+$adapter = new \Cache\Adapter\Memcache\MemcacheCachePool();
+$throttlerCache = new ThrottlerCache($adapter);
+...
 ```
 
 Also you can have custom hydrators by implementing ```Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface```
@@ -157,10 +138,10 @@ See [Overview example](#overview) for instantiation.
 All the following throttlers use time functions, thus needing a different factory for construction:
 
 ```php
-$cacheAdapter = new DesarrollaCacheAdapter((new DesarrollaCacheFactory())->make());
+$throttlerCache = new ThrottlerCache($adapter);
 $timeAdapter = new PhpTimeAdapter();
 
-$throttlerFactory = new TimeAwareThrottlerFactory($cacheAdapter, $timeAdapter);
+$throttlerFactory = new TimeAwareThrottlerFactory($throttlerCache, $timeAdapter);
 $hydratorFactory = new HydratorFactory();
 
 //$settings = ...
@@ -210,6 +191,8 @@ $settings = new RetrialQueueSettings(new LeakyBucketSettings(120, 60000, 120));
 ## Author
 
 Krishnaprasad MG [@sunspikes]
+
+@Feijs
 
 ## Contributing
 
