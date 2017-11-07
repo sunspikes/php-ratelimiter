@@ -84,8 +84,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
     public function clear()
     {
         $this->setCachedHitCount(0);
-        $item = new CacheTime($this->timeProvider->now(), $this->cacheTtl);
-        $this->cache->setItem($this->getTimeCacheKey(), $item);
+        $this->cache->setItem($this->getTimeCacheKey(), new CacheTime($this->timeProvider->now(), $this->cacheTtl));
     }
 
     /**
@@ -127,8 +126,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
     private function setCachedHitCount($hitCount)
     {
         $this->hitCount = $hitCount;
-        $item = new CacheCount($hitCount, $this->cacheTtl);
-        $this->cache->setItem($this->getHitsCacheKey(), $item);
+        $this->cache->setItem($this->getHitsCacheKey(), new CacheCount($hitCount, $this->cacheTtl));
     }
 
     /**

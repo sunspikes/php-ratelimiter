@@ -17,7 +17,7 @@ class ThrottlerCacheTest extends \PHPUnit_Framework_TestCase
         $countItem = new CacheCount(1);
 
         $cacheItem = new CacheItem($key);
-        $cacheItem->set(json_encode(['class' => CacheCount::class, 'data' => $countItem]));
+        $cacheItem->set(serialize($countItem));
 
         $cacheItemPool = M::mock(CacheItemPoolInterface::class);
         $cacheItemPool->shouldReceive('getItem')
@@ -36,10 +36,13 @@ class ThrottlerCacheTest extends \PHPUnit_Framework_TestCase
     public function testGetItemNotFound()
     {
         $key = 'key';
+
+        $cacheItem = new CacheItem('none');
+
         $cacheItemPool = M::mock(CacheItemPoolInterface::class);
         $cacheItemPool->shouldReceive('getItem')
             ->with($key)
-            ->andThrow(CachePoolException::class);
+            ->andReturn($cacheItem);
 
         $cache = new ThrottlerCache($cacheItemPool);
         $cache->getItem($key);

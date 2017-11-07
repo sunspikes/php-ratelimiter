@@ -51,9 +51,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
 
         //Adds 1 recorded hit to the mapping entry for the current timestamp
         $this->hitCountMapping[$timestamp]++;
-
-        $item = new CacheHitMapping($this->hitCountMapping, $this->cacheTtl);
-        $this->cache->setItem($this->key, $item);
+        $this->cache->setItem($this->key, new CacheHitMapping($this->hitCountMapping, $this->cacheTtl));
 
         return $this;
     }
@@ -97,9 +95,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
     public function clear()
     {
         $this->hitCountMapping = [];
-
-        $item = new CacheHitMapping($this->hitCountMapping, $this->cacheTtl);
-        $this->cache->setItem($this->key, $item);
+        $this->cache->setItem($this->key, new CacheHitMapping($this->hitCountMapping, $this->cacheTtl));
     }
 
     private function updateHitCount()

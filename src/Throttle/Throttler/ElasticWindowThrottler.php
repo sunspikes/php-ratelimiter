@@ -74,9 +74,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     public function hit()
     {
         $this->counter = $this->count() + 1;
-        $item = new CacheCount($this->counter, $this->ttl);
-
-        $this->cache->setItem($this->key, $item);
+        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
 
         return $this;
     }
@@ -87,9 +85,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     public function clear()
     {
         $this->counter = 0;
-        $item = new CacheCount($this->counter, $this->ttl);
-
-        $this->cache->setItem($this->key, $item);
+        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
 
         return $this;
     }

@@ -48,77 +48,43 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @param string $key
-     *
-     * @return ThrottlerItemInterface
+     * @inheritdoc
      */
     public function getItem(string $key): ThrottlerItemInterface
-    {
-        $item = $this->getThrottlerItem($key);
-
-        return $item;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function hasItem(string $key): bool
-    {
-        return $this->cacheItemPool->hasItem($key);
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $item
-     * @return bool
-     */
-    public function setItem(string $key, ThrottlerItemInterface $item): bool
-    {
-        return $this->setThrottlerItem($key, $item);
-    }
-
-    /**
-     * @param string $key
-     */
-    public function removeItem(string $key)
-    {
-        $this->cacheItemPool->deleteItem($key);
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return ThrottlerItemInterface
-     * @throws CacheAdapterException
-     * @throws ItemNotFoundException
-     */
-    private function getThrottlerItem(string $key): ThrottlerItemInterface
     {
         try {
             $item = $this->cacheItemPool->getItem($key);
 
             if ($item->isHit()) {
-                $params = json_decode($item->get(), true);
-                $class = $params['class'];
+                $throttlerItem = unserialize($item->get(), ['allowed_classes' => true]);
 
-                return $class::createFromArray($params['data']);
+                if ($throttlerItem instanceof ThrottlerItemInterface) {
+                    return $throttlerItem;
+                }
             }
         } catch (PsrCacheException $e) {
+            throw new CacheAdapterException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 
         throw new ItemNotFoundException('Item not found.');
     }
 
     /**
-     * @param string                 $key
-     * @param ThrottlerItemInterface $item
-     *
-     * @return bool
-     * @throws CacheAdapterException
+     * @inheritdoc
      */
-    private function setThrottlerItem(string $key, ThrottlerItemInterface $item)
+    public function hasItem(string $key): bool
+    {
+        try {
+            return $this->cacheItemPool->hasItem($key);
+        } catch (PsrCacheException $e) {
+            throw new CacheAdapterException($e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setItem(string $key, ThrottlerItemInterface $item): bool
     {
         try {
             $cacheItem = $this->cacheItemPool->getItem($key);
@@ -130,17 +96,21 @@ class ThrottlerCache implements ThrottlerCacheInterface
             throw new CacheAdapterException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 
-        $cacheItem->set(
-            json_encode(
-                [
-                    'class' => get_class($item),
-                    'data'  => $item,
-                ]
-            )
-        );
-
+        $cacheItem->set(serialize($item));
         $cacheItem->expiresAfter($item->getTtl());
 
         return $this->cacheItemPool->save($cacheItem);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeItem(string $key)
+    {
+        try {
+            $this->cacheItemPool->deleteItem($key);
+        }  catch (PsrCacheException $e) {
+            throw new CacheAdapterException($e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
     }
 }

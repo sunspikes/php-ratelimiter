@@ -3,13 +3,14 @@
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
 use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
+use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
 
-class CacheHitMapping implements ThrottlerItemInterface
+class CacheHitMapping extends AbstractCacheItem implements ThrottlerItemInterface
 {
     /** @var array $hitMapping */
     private $hitMapping;
 
-    /** @var int $ttl */
+    /** @var int|null $ttl */
     private $ttl;
 
     /**
@@ -23,30 +24,6 @@ class CacheHitMapping implements ThrottlerItemInterface
     }
 
     /**
-     * @param array $array
-     *
-     * @return ThrottlerItemInterface
-     */
-    public static function createFromArray(array $array): ThrottlerItemInterface
-    {
-        return new static(
-            $array['hitMapping'],
-            $array['ttl']
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'hitMapping' => $this->hitMapping,
-            'ttl' => $this->ttl,
-        ];
-    }
-
-    /**
      * @return array
      */
     public function getHitMapping(): array
@@ -55,10 +32,30 @@ class CacheHitMapping implements ThrottlerItemInterface
     }
 
     /**
-     * @return int|null
+     * @inheritdoc
      */
     public function getTtl()
     {
         return $this->ttl;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function fromArray(array $array)
+    {
+        $this->hitMapping = $array['hitMapping'];
+        $this->ttl = $array['ttl'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function toArray(): array
+    {
+        return [
+            'hitMapping' => $this->hitMapping,
+            'ttl' => $this->ttl,
+        ];
     }
 }

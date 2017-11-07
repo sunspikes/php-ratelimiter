@@ -211,11 +211,8 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
      */
     private function setUsedCapacity($tokens)
     {
-        $countItem = new CacheCount($tokens, $this->cacheTtl);
-        $this->cache->setItem($this->getTokenCacheKey(), $countItem);
-
-        $timeItem = new CacheTime($this->timeProvider->now(), $this->cacheTtl);
-        $this->cache->setItem($this->getTimeCacheKey(), $timeItem);
+        $this->cache->setItem($this->getTokenCacheKey(), new CacheCount($tokens, $this->cacheTtl));
+        $this->cache->setItem($this->getTimeCacheKey(), new CacheTime($this->timeProvider->now(), $this->cacheTtl));
     }
 
     /**

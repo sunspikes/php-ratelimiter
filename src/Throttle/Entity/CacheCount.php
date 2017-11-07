@@ -2,14 +2,15 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
+use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
 use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
-class CacheCount implements ThrottlerItemInterface
+class CacheCount extends AbstractCacheItem implements ThrottlerItemInterface
 {
     /** @var int $count */
     private $count;
 
-    /** @var int $ttl */
+    /** @var int|null $ttl */
     private $ttl;
 
     /**
@@ -23,30 +24,6 @@ class CacheCount implements ThrottlerItemInterface
     }
 
     /**
-     * @param array $array
-     *
-     * @return ThrottlerItemInterface
-     */
-    public static function createFromArray(array $array): ThrottlerItemInterface
-    {
-        return new static(
-            $array['count'],
-            $array['ttl']
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'count' => $this->count,
-            'ttl' => $this->ttl,
-        ];
-    }
-
-    /**
      * @return int
      */
     public function getCount(): int
@@ -55,10 +32,30 @@ class CacheCount implements ThrottlerItemInterface
     }
 
     /**
-     * @return int|null
+     * @inheritdoc
      */
     public function getTtl()
     {
         return $this->ttl;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function fromArray(array $array)
+    {
+        $this->count = $array['count'];
+        $this->ttl = $array['ttl'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function toArray(): array
+    {
+        return [
+            'count' => $this->count,
+            'ttl' => $this->ttl,
+        ];
     }
 }

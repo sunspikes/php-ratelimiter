@@ -2,14 +2,15 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
+use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
 use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
-class CacheTime implements ThrottlerItemInterface
+class CacheTime extends AbstractCacheItem implements ThrottlerItemInterface
 {
     /** @var float $limit */
     private $time;
 
-    /** @var int $ttl */
+    /** @var int|null $ttl */
     private $ttl;
 
     /**
@@ -23,30 +24,6 @@ class CacheTime implements ThrottlerItemInterface
     }
 
     /**
-     * @param array $array
-     *
-     * @return ThrottlerItemInterface
-     */
-    public static function createFromArray(array $array): ThrottlerItemInterface
-    {
-        return new static(
-            $array['time'],
-            $array['ttl']
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'time' => $this->time,
-            'ttl' => $this->ttl,
-        ];
-    }
-
-    /**
      * @return float
      */
     public function getTime(): float
@@ -55,10 +32,30 @@ class CacheTime implements ThrottlerItemInterface
     }
 
     /**
-     * @return float|null
+     * @inheritdoc
      */
     public function getTtl()
     {
         return $this->ttl;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function fromArray(array $array)
+    {
+        $this->time = $array['time'];
+        $this->ttl = $array['ttl'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function toArray(): array
+    {
+        return [
+            'time' => $this->time,
+            'ttl' => $this->ttl,
+        ];
     }
 }

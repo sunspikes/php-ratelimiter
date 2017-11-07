@@ -44,7 +44,6 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
             $throttle->hit();
         }
 
-
         $this->assertFalse($throttle->check());
     }
 

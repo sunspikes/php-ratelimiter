@@ -2,15 +2,8 @@
 
 namespace Sunspikes\Ratelimit\Cache;
 
-interface ThrottlerItemInterface extends \JsonSerializable
+interface ThrottlerItemInterface extends \Serializable
 {
-    /**
-     * @param array $array
-     *
-     * @return ThrottlerItemInterface
-     */
-    public static function createFromArray(array $array): ThrottlerItemInterface;
-
     /**
      * @return int|null
      */
