@@ -188,11 +188,11 @@ the request is delayed until the internal throttler has capacity again.
 $settings = new RetrialQueueSettings(new LeakyBucketSettings(120, 60000, 120));
 ```
 
-## Author
+## Authors
 
 Krishnaprasad MG [@sunspikes]
 
-@Feijs
+Mike Feijs [@Feijs]
 
 ## Contributing
 
