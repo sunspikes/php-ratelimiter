@@ -3,8 +3,6 @@
 namespace Sunspikes\Tests\Ratelimit\Functional;
 
 use Mockery as M;
-use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
-use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;

@@ -3,13 +3,13 @@
 namespace Sunspikes\Tests\Ratelimit\Cache;
 
 use Cache\Adapter\Common\CacheItem;
-use Cache\Adapter\Common\Exception\CachePoolException;
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Sunspikes\Ratelimit\Cache\ThrottlerCache;
 use Sunspikes\Ratelimit\Throttle\Entity\CacheCount;
 
-class ThrottlerCacheTest extends \PHPUnit_Framework_TestCase
+class ThrottlerCacheTest extends TestCase
 {
     public function testGetItemFound()
     {

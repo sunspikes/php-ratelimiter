@@ -4,6 +4,7 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Factory;
 
 use Mockery as M;
 use Mockery\MockInterface;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
@@ -12,7 +13,7 @@ use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface;
 
-class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
+class ThrottlerFactoryTest extends TestCase
 {
     /**
      * @var ThrottlerCacheInterface|MockInterface
@@ -41,18 +42,22 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
     public function testInvalidSettings()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
         $this->factory->make($this->getData(), new ElasticWindowSettings());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testUnknownSettings()
     {
         $settings = M::mock(ThrottleSettingsInterface::class);
         $settings->shouldReceive('isValid')->andReturn(true);
 
-        $this->setExpectedException(\InvalidArgumentException::class);
         $this->factory->make($this->getData(), $settings);
     }
 

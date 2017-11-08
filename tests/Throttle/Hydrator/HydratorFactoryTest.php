@@ -2,9 +2,10 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Hydrator;
 
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 
-class HydratorFactoryTest extends \PHPUnit_Framework_TestCase
+class HydratorFactoryTest extends TestCase
 {
     private $hydratorFactory;
 

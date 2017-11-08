@@ -3,10 +3,11 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
-class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
+class LeakyBucketSettingsTest extends TestCase
 {
     public function testMergeWithEmpty()
     {
@@ -30,9 +31,11 @@ class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(null, $mergedSettings->getCacheTtl());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testInvalidMerge()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
         (new LeakyBucketSettings())->merge(M::mock(ThrottleSettingsInterface::class));
     }
 

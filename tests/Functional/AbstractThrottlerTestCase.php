@@ -3,11 +3,12 @@
 namespace Sunspikes\Tests\Ratelimit\Functional;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Cache\ThrottlerCache;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 
-abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractThrottlerTestCase extends TestCase
 {
     /**
      * @var Ratelimiter
@@ -15,11 +16,16 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
     protected $ratelimiter;
 
     /**
+     * @var array
+     */
+    protected $cache = [];
+
+    /**
      * @inheritdoc
      */
     protected function setUp()
     {
-        $pool = new ArrayCachePool();
+        $pool = new ArrayCachePool(null, $this->cache);
         $cache = new ThrottlerCache($pool);
 
         $this->ratelimiter = $this->createRatelimiter($cache);

@@ -2,9 +2,10 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 
-class DataTest extends \PHPUnit_Framework_TestCase
+class DataTest extends TestCase
 {
     /**
      * @var Data

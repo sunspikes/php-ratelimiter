@@ -26,7 +26,7 @@ by including `sunspikes/php-ratelimiter` in your project composer.json require:
 
 ### Without Composer
 
-You can also download it from [Github] (https://github.com/sunspikes/php-ratelimiter), 
+You can also download it from [Github](https://github.com/sunspikes/php-ratelimiter), 
 but no autoloader is provided so you'll need to register it with your own PSR-4 
 compatible autoloader.
 

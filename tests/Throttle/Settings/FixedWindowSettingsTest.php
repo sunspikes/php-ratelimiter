@@ -2,7 +2,6 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
-use Mockery as M;
 use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 
 class FixedWindowSettingsTest extends AbstractWindowSettingsTest

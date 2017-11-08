@@ -14,12 +14,12 @@
     },
     "require-dev": {
         "mockery/mockery": "^0.9.4",
-        "phpunit/phpunit": "^4.7.6",
+        "phpunit/phpunit": "^6.4",
         "cache/cache": "^0.4",
         "scrutinizer/ocular": "^1.1"
     },
     "suggest": {
-        "cache/cache": "Rate limiter needs one of PSR-6 compatible cache adapters"
+        "cache/cache": "Rate limiter needs one of the PSR-6 compatible cache adapters"
     },
     "autoload": {
         "psr-4": {
