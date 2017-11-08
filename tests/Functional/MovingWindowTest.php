@@ -37,7 +37,8 @@ class MovingWindowTest extends AbstractThrottlerTestCase
 
     public function testWindowMoves()
     {
-        $throttle = $this->ratelimiter->get('window-moves');
+        $key = $this->getRateLimiterKey('window-moves');
+        $throttle = $this->ratelimiter->get($key);
 
         $timeValues = [];
 

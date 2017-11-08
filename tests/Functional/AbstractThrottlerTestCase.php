@@ -3,6 +3,7 @@
 namespace Sunspikes\Tests\Ratelimit\Functional;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
+use Cache\Adapter\Redis\RedisCachePool;
 use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Cache\ThrottlerCache;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
@@ -16,24 +17,37 @@ abstract class AbstractThrottlerTestCase extends TestCase
     protected $ratelimiter;
 
     /**
-     * @var array
-     */
-    protected $cache = [];
-
-    /**
      * @inheritdoc
      */
     protected function setUp()
     {
-        $pool = new ArrayCachePool(null, $this->cache);
+        $pool = $this->getCachePool();
         $cache = new ThrottlerCache($pool);
 
         $this->ratelimiter = $this->createRatelimiter($cache);
     }
 
+    /**
+     * Get the cache pool adapter to use
+     *
+     * @return ArrayCachePool|RedisCachePool
+     */
+    private function getCachePool()
+    {
+        if (class_exists(\Redis::class)) {
+            $redis = new \Redis();
+            if (true === $redis->connect('localhost')) {
+                return new RedisCachePool($redis);
+            }
+        }
+
+        return new ArrayCachePool();
+    }
+
     public function testThrottlePreLimit()
     {
-        $throttle = $this->ratelimiter->get('pre-limit-test');
+        $key = $this->getRateLimiterKey('pre-limit-test');
+        $throttle = $this->ratelimiter->get($key);
 
         for ($i = 0; ++$i < $this->getMaxAttempts();) {
             $throttle->hit();
@@ -44,7 +58,8 @@ abstract class AbstractThrottlerTestCase extends TestCase
 
     public function testThrottlePostLimit()
     {
-        $throttle = $this->ratelimiter->get('post-limit-test');
+        $key = $this->getRateLimiterKey('post-limit-test');
+        $throttle = $this->ratelimiter->get($key);
 
         for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
             $throttle->hit();
@@ -55,7 +70,8 @@ abstract class AbstractThrottlerTestCase extends TestCase
 
     public function testThrottleAccess()
     {
-        $throttle = $this->ratelimiter->get('access-test');
+        $key = $this->getRateLimiterKey('access-test');
+        $throttle = $this->ratelimiter->get($key);
 
         for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
             $throttle->access();
@@ -66,7 +82,8 @@ abstract class AbstractThrottlerTestCase extends TestCase
 
     public function testThrottleCount()
     {
-        $throttle = $this->ratelimiter->get('count-test');
+        $key = $this->getRateLimiterKey('count-test');
+        $throttle = $this->ratelimiter->get($key);
 
         for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
             $throttle->access();
@@ -77,11 +94,23 @@ abstract class AbstractThrottlerTestCase extends TestCase
 
     public function testClear()
     {
-        $throttle = $this->ratelimiter->get('clear-test');
+        $key = $this->getRateLimiterKey('clear-test');
+        $throttle = $this->ratelimiter->get($key);
         $throttle->hit();
         $throttle->clear();
 
         self::assertEquals(0, $throttle->count());
+    }
+
+    /**
+     * Get an unique key based on throttling mode
+     *
+     * @param string $key
+     * @return string
+     */
+    protected function getRateLimiterKey(string $key): string
+    {
+        return $key .'-'. sha1(static::class . mt_rand());
     }
 
     /**

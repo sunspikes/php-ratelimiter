@@ -88,10 +88,6 @@ class ThrottlerCache implements ThrottlerCacheInterface
     {
         try {
             $cacheItem = $this->cacheItemPool->getItem($key);
-
-            if ($cacheItem->isHit()) {
-                $this->cacheItemPool->deleteItem($key);
-            }
         } catch (PsrCacheException $e) {
             throw new CacheAdapterException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
