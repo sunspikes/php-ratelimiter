@@ -28,7 +28,7 @@ namespace Sunspikes\Ratelimit\Throttle\Entity;
 use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
 use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
-class CacheTime extends AbstractCacheItem implements ThrottlerItemInterface
+class CacheTime extends AbstractCacheItem
 {
     /** @var float $limit */
     private $time;

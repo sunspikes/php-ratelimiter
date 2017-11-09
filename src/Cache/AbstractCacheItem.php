@@ -25,7 +25,7 @@
 
 namespace Sunspikes\Ratelimit\Cache;
 
-abstract class AbstractCacheItem
+abstract class AbstractCacheItem implements ThrottlerItemInterface
 {
     /**
      * @param string $serialized

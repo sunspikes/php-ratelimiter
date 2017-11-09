@@ -29,7 +29,7 @@ namespace Sunspikes\Ratelimit\Throttle\Entity;
 use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
 
-class CacheHitMapping extends AbstractCacheItem implements ThrottlerItemInterface
+class CacheHitMapping extends AbstractCacheItem
 {
     /** @var array $hitMapping */
     private $hitMapping;

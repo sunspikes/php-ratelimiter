@@ -29,7 +29,7 @@ namespace Sunspikes\Ratelimit\Throttle\Entity;
 use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
 use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
-class CacheCount extends AbstractCacheItem implements ThrottlerItemInterface
+class CacheCount extends AbstractCacheItem
 {
     /** @var int $count */
     private $count;
