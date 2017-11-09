@@ -1,15 +1,18 @@
 language: php
 
+services:
+  - redis-server
+
 php:
-  - 5.5
-  - 5.6
   - 7.0
+  - 7.1
 
 before_script:
+  - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer self-update
   - composer install --prefer-source --dev
 
 script:
-  - phpunit --colors --verbose --coverage-clover build/logs/clover.xml
+  - php vendor/bin/phpunit --colors --verbose --coverage-clover build/logs/clover.xml -c phpunit.xml
 
-after_script: if [ $(phpenv version-name) = "5.6" ]; then php vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml; fi
+after_script: if [ $(phpenv version-name) = "7.1" ]; then php vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml; fi

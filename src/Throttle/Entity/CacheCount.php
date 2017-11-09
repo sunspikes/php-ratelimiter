@@ -23,56 +23,63 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Adapter;
 
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+namespace Sunspikes\Ratelimit\Throttle\Entity;
 
-interface CacheAdapterInterface
+use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
+use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
+
+class CacheCount extends AbstractCacheItem
 {
-    /**
-     * Get value from cache
-     *
-     * @param string $key
-     *
-     * @return mixed
-     * 
-     * @throws ItemNotFoundException
-     */
-    public function get($key);
+    /** @var int $count */
+    private $count;
+
+    /** @var int|null $ttl */
+    private $ttl;
 
     /**
-     * Set value in cache
-     *
-     * @param string $key
-     * @param mixed $value
+     * @param int $count
      * @param int $ttl
-     *
-     * @return mixed
      */
-    public function set($key, $value, $ttl = null);
+    public function __construct(int $count, int $ttl = null)
+    {
+        $this->count = $count;
+        $this->ttl = $ttl;
+    }
 
     /**
-     * Delete value from cache
-     *
-     * @param string $key
-     *
-     * @return mixed
+     * @return int
      */
-    public function delete($key);
+    public function getCount(): int
+    {
+        return $this->count;
+    }
 
     /**
-     * Check if keyed value exists in cache
-     *
-     * @param string $key
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function has($key);
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
 
     /**
-     * Clear cache
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function clear();
+    protected function fromArray(array $array)
+    {
+        $this->count = $array['count'];
+        $this->ttl = $array['ttl'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function toArray(): array
+    {
+        return [
+            'count' => $this->count,
+            'ttl' => $this->ttl,
+        ];
+    }
 }

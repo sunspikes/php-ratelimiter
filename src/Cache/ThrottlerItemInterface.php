@@ -23,13 +23,13 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Exception;
 
-use Psr\Cache\CacheException as PsrCacheException;
+namespace Sunspikes\Ratelimit\Cache;
 
-/**
- * The base cache exception
- */
-class CacheException extends \RuntimeException implements PsrCacheException
+interface ThrottlerItemInterface extends \Serializable
 {
+    /**
+     * @return int|null
+     */
+    public function getTtl();
 }

@@ -23,67 +23,63 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Adapter;
 
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+namespace Sunspikes\Ratelimit\Throttle\Entity;
 
-/**
- * Adapter for the cache library Desarrolla2\Cache
- */
-class DesarrollaCacheAdapter implements CacheAdapterInterface
+use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
+use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
+
+class CacheHitMapping extends AbstractCacheItem
 {
-    /* @var \Desarrolla2\Cache\CacheInterface $cache */
-    protected $cache;
+    /** @var array $hitMapping */
+    private $hitMapping;
+
+    /** @var int|null $ttl */
+    private $ttl;
 
     /**
-     * @param \Desarrolla2\Cache\CacheInterface $cache
+     * @param array $hitMapping
+     * @param int $ttl
      */
-    public function __construct($cache)
+    public function __construct(array $hitMapping, int $ttl = null)
     {
-        $this->cache = $cache;
+        $this->hitMapping = $hitMapping;
+        $this->ttl = $ttl;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHitMapping(): array
+    {
+        return $this->hitMapping;
     }
 
     /**
      * @inheritdoc
      */
-    public function get($key)
+    public function getTtl()
     {
-        if ($this->cache->has($key)) {
-            return $this->cache->get($key);
-        }
-
-        throw new ItemNotFoundException('Cannot find the item in cache');
+        return $this->ttl;
     }
 
     /**
      * @inheritdoc
      */
-    public function set($key, $value, $ttl = null)
+    protected function fromArray(array $array)
     {
-        $this->cache->set($key, $value, $ttl);
+        $this->hitMapping = $array['hitMapping'];
+        $this->ttl = $array['ttl'];
     }
 
     /**
      * @inheritdoc
      */
-    public function delete($key)
+    protected function toArray(): array
     {
-        $this->cache->delete($key);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function has($key)
-    {
-        return $this->cache->has($key);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function clear()
-    {
-        $this->cache->clearCache();
+        return [
+            'hitMapping' => $this->hitMapping,
+            'ttl' => $this->ttl,
+        ];
     }
 }

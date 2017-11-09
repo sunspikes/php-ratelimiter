@@ -3,6 +3,7 @@
 namespace Sunspikes\Tests\Ratelimit;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
@@ -12,7 +13,7 @@ use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
-class RatelimiterTest extends \PHPUnit_Framework_TestCase
+class RatelimiterTest extends TestCase
 {
     /**
      * @var ThrottleSettingsInterface|M\MockInterface
@@ -50,9 +51,11 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testGetWithInvalidData()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
         $this->ratelimiter->get('');
     }
 

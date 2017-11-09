@@ -3,10 +3,11 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
-class ElasticWindowSettingsTest extends \PHPUnit_Framework_TestCase
+class ElasticWindowSettingsTest extends TestCase
 {
     public function testMergeWithEmpty()
     {
@@ -26,9 +27,11 @@ class ElasticWindowSettingsTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(700, $mergedSettings->getTime());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testInvalidMerge()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
         (new ElasticWindowSettings())->merge(M::mock(ThrottleSettingsInterface::class));
     }
 

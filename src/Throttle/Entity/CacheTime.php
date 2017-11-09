@@ -23,13 +23,62 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Exception;
+namespace Sunspikes\Ratelimit\Throttle\Entity;
 
-use Psr\Cache\CacheException as PsrCacheException;
+use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
+use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
-/**
- * The base cache exception
- */
-class CacheException extends \RuntimeException implements PsrCacheException
+class CacheTime extends AbstractCacheItem
 {
+    /** @var float $limit */
+    private $time;
+
+    /** @var int|null $ttl */
+    private $ttl;
+
+    /**
+     * @param float $time
+     * @param int $ttl
+     */
+    public function __construct(float $time, int $ttl = null)
+    {
+        $this->time = $time;
+        $this->ttl = $ttl;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTime(): float
+    {
+        return $this->time;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function fromArray(array $array)
+    {
+        $this->time = $array['time'];
+        $this->ttl = $array['ttl'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function toArray(): array
+    {
+        return [
+            'time' => $this->time,
+            'ttl' => $this->ttl,
+        ];
+    }
 }

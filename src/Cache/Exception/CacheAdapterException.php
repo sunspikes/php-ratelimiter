@@ -26,8 +26,8 @@
 namespace Sunspikes\Ratelimit\Cache\Exception;
 
 /**
- * Invalid driver configuration
+ * Cache driver not found
  */
-class InvalidConfigException extends CacheException
+class CacheAdapterException extends CacheException
 {
 }

@@ -25,12 +25,13 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
+use Sunspikes\Ratelimit\Throttle\Entity\CacheCount;
 
 class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
 {
-    /* @var CacheAdapterInterface */
+    /* @var ThrottlerCacheInterface */
     protected $cache;
     /* @var string */
     protected $key;
@@ -42,12 +43,12 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     protected $counter;
 
     /**
-     * @param CacheAdapterInterface $cache
+     * @param ThrottlerCacheInterface $cache
      * @param string $key
      * @param int $limit
      * @param int $ttl
      */
-    public function __construct(CacheAdapterInterface $cache, $key, $limit, $ttl)
+    public function __construct(ThrottlerCacheInterface $cache, $key, $limit, $ttl)
     {
         $this->cache = $cache;
         $this->key = $key;
@@ -73,8 +74,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     public function hit()
     {
         $this->counter = $this->count() + 1;
-
-        $this->cache->set($this->key, $this->counter, $this->ttl);
+        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
 
         return $this;
     }
@@ -85,8 +85,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     public function clear()
     {
         $this->counter = 0;
-
-        $this->cache->set($this->key, $this->counter, $this->ttl);
+        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
 
         return $this;
     }
@@ -101,7 +100,9 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
         }
 
         try {
-            $this->counter = $this->cache->get($this->key);
+            /** @var CacheCount $item */
+            $item = $this->cache->getItem($this->key);
+            $this->counter = $item->getCount();
         } catch (ItemNotFoundException $e) {
             $this->counter = 0;
         }

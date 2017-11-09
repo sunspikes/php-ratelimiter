@@ -23,14 +23,41 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Cache\Factory;
+namespace Sunspikes\Ratelimit\Cache;
 
-interface FactoryInterface
+use Sunspikes\Ratelimit\Cache\Exception\CacheAdapterException;
+use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
+
+interface ThrottlerCacheInterface
 {
     /**
-     * Create a cache driver adapter
+     * @param string $key
      *
-     * @return mixed
+     * @return ThrottlerItemInterface
+     * @throws CacheAdapterException
+     * @throws ItemNotFoundException
      */
-    public function make();
+    public function getItem(string $key): ThrottlerItemInterface;
+
+    /**
+     * @param string                 $key
+     * @param ThrottlerItemInterface $item
+     * @return bool
+     * @throws CacheAdapterException
+     */
+    public function setItem(string $key, ThrottlerItemInterface $item): bool;
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     * @throws CacheAdapterException
+     */
+    public function hasItem(string $key): bool;
+
+    /**
+     * @param string $key
+     * @throws CacheAdapterException
+     */
+    public function removeItem(string $key);
 }

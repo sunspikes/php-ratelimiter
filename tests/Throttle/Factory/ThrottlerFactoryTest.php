@@ -4,7 +4,8 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Factory;
 
 use Mockery as M;
 use Mockery\MockInterface;
-use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
+use PHPUnit\Framework\TestCase;
+use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
@@ -12,12 +13,12 @@ use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface;
 
-class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
+class ThrottlerFactoryTest extends TestCase
 {
     /**
-     * @var CacheAdapterInterface|MockInterface
+     * @var ThrottlerCacheInterface|MockInterface
      */
-    protected $cacheAdapter;
+    protected $throttlerCache;
 
     /**
      * @var FactoryInterface
@@ -29,8 +30,8 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
-        $this->factory = new ThrottlerFactory($this->cacheAdapter);
+        $this->throttlerCache = M::mock(ThrottlerCacheInterface::class);
+        $this->factory = new ThrottlerFactory($this->throttlerCache);
     }
 
     public function testMakeElasticWindow()
@@ -41,18 +42,22 @@ class ThrottlerFactoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
     public function testInvalidSettings()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
         $this->factory->make($this->getData(), new ElasticWindowSettings());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testUnknownSettings()
     {
         $settings = M::mock(ThrottleSettingsInterface::class);
         $settings->shouldReceive('isValid')->andReturn(true);
 
-        $this->setExpectedException(\InvalidArgumentException::class);
         $this->factory->make($this->getData(), $settings);
     }
 
