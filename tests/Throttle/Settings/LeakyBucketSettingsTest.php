@@ -9,36 +9,6 @@ use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
 class LeakyBucketSettingsTest extends TestCase
 {
-    public function testMergeWithEmpty()
-    {
-        $settings = new LeakyBucketSettings(120, 60, 30, 3600);
-        $mergedSettings = $settings->merge(new LeakyBucketSettings());
-
-        self::assertEquals(120, $mergedSettings->getTokenLimit());
-        self::assertEquals(60, $mergedSettings->getTimeLimit());
-        self::assertEquals(30, $mergedSettings->getThreshold());
-        self::assertEquals(3600, $mergedSettings->getCacheTtl());
-    }
-
-    public function testMergeWithNonEmpty()
-    {
-        $settings = new LeakyBucketSettings(null, 60, 30, null);
-        $mergedSettings = $settings->merge(new LeakyBucketSettings(120, null, 40, null));
-
-        self::assertEquals(120, $mergedSettings->getTokenLimit());
-        self::assertEquals(60, $mergedSettings->getTimeLimit());
-        self::assertEquals(40, $mergedSettings->getThreshold());
-        self::assertEquals(null, $mergedSettings->getCacheTtl());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidMerge()
-    {
-        (new LeakyBucketSettings())->merge(M::mock(ThrottleSettingsInterface::class));
-    }
-
     /**
      * @dataProvider inputProvider
      */

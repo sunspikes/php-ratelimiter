@@ -70,12 +70,12 @@ interface ThrottlerInterface
      *
      * @return int
      */
-    public function getTime();
+    public function getTimeLimit();
 
     /**
      * Get throttle limit
      *
      * @return int
      */
-    public function getLimit();
+    public function getHitLimit();
 }

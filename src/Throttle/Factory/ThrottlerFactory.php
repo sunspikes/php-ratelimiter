@@ -63,15 +63,15 @@ class ThrottlerFactory implements FactoryInterface
      * @param ThrottleSettingsInterface $settings
      *
      * @return ElasticWindowThrottler
+     * @throws \InvalidArgumentException
      */
     protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
     {
         if ($settings instanceof ElasticWindowSettings) {
             return new ElasticWindowThrottler(
-                $this->throttlerCache,
                 $data->getKey(),
-                $settings->getLimit(),
-                $settings->getTime()
+                $this->throttlerCache,
+                $settings
             );
         }
 

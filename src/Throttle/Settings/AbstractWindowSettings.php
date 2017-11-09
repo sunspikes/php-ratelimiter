@@ -27,29 +27,21 @@ namespace Sunspikes\Ratelimit\Throttle\Settings;
 
 abstract class AbstractWindowSettings implements ThrottleSettingsInterface
 {
-    /**
-     * @var int|null
-     */
-    private $hitLimit;
+    use CacheTtlAwareSettingsTrait, TimeLimitAwareSettingsTrait;
 
     /**
      * @var int|null
      */
-    private $timeLimit;
+    protected $hitLimit;
 
     /**
-     * @var int|null
+     * @param int|null $hitLimit
+     * @param int|null $timeLimit
+     * @param int|null $cacheTtl
      */
-    private $cacheTtl;
-
-    /**
-     * @param int|null $tokenLimit
-     * @param int|null $timeLimit  In seconds
-     * @param int|null $cacheTtl   In seconds
-     */
-    public function __construct($tokenLimit = null, $timeLimit = null, $cacheTtl = null)
+    public function __construct($hitLimit = null, $timeLimit = null, $cacheTtl = null)
     {
-        $this->hitLimit = $tokenLimit;
+        $this->hitLimit = $hitLimit;
         $this->timeLimit = $timeLimit;
         $this->cacheTtl = $cacheTtl;
     }
@@ -57,30 +49,9 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
     /**
      * @inheritdoc
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    public function isValid(): bool
     {
-        if (!$settings instanceof static) {
-            throw new \InvalidArgumentException(
-                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
-            );
-        }
-
-        return new static(
-            null === $settings->getHitLimit() ? $this->hitLimit : $settings->getHitLimit(),
-            null === $settings->getTimeLimit() ? $this->timeLimit : $settings->getTimeLimit(),
-            null === $settings->getCacheTtl() ? $this->cacheTtl : $settings->getCacheTtl()
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isValid()
-    {
-        return
-            null !== $this->hitLimit &&
-            null !== $this->timeLimit &&
-            0 !== $this->timeLimit;
+        return null !== $this->hitLimit && $this->isValidTimeLimit();
     }
 
     /**
@@ -89,21 +60,5 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
     public function getHitLimit()
     {
         return $this->hitLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getTimeLimit()
-    {
-        return $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCacheTtl()
-    {
-        return $this->cacheTtl;
     }
 }

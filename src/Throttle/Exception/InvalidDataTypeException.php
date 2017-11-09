@@ -25,9 +25,6 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Exception;
 
-/**
- * Invalid data type exception
- */
-class InvalidDataTypeException extends \Exception
+class InvalidDataTypeException extends ThrottleException
 {
 }

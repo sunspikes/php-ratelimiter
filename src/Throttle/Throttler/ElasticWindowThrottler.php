@@ -28,44 +28,27 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\CacheCount;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 
-class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
+final class ElasticWindowThrottler extends AbstractWindowThrottler
 {
-    /* @var ThrottlerCacheInterface */
-    protected $cache;
     /* @var string */
-    protected $key;
+    private $key;
+
     /* @var int */
-    protected $limit;
-    /* @var int */
-    protected $ttl;
-    /* @var int */
-    protected $counter;
+    private $counter;
 
     /**
+     * ElasticWindowThrottler constructor.
+     *
+     * @param string                  $key
      * @param ThrottlerCacheInterface $cache
-     * @param string $key
-     * @param int $limit
-     * @param int $ttl
+     * @param ElasticWindowSettings   $settings
      */
-    public function __construct(ThrottlerCacheInterface $cache, $key, $limit, $ttl)
+    public function __construct(string $key, ThrottlerCacheInterface $cache, ElasticWindowSettings $settings)
     {
-        $this->cache = $cache;
+        parent::__construct($cache, $settings);
         $this->key = $key;
-        $this->limit = $limit;
-        $this->ttl = $ttl;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function access()
-    {
-        $status = $this->check();
-
-        $this->hit();
-
-        return $status;
     }
 
     /**
@@ -74,7 +57,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     public function hit()
     {
         $this->counter = $this->count() + 1;
-        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
+        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->settings->getTimeLimit()));
 
         return $this;
     }
@@ -85,7 +68,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     public function clear()
     {
         $this->counter = 0;
-        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
+        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->settings->getTimeLimit()));
 
         return $this;
     }
@@ -113,36 +96,12 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function check()
-    {
-        return ($this->count() < $this->limit);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTime()
-    {
-        return $this->ttl;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getRetryTimeout()
     {
         if ($this->check()) {
             return 0;
         }
 
-        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->ttl;
+        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->timeLimit;
     }
 }

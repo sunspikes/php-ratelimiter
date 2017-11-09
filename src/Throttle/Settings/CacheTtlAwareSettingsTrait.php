@@ -25,42 +25,18 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class RetrialQueueSettings implements ThrottleSettingsInterface
+trait CacheTtlAwareSettingsTrait
 {
     /**
-     * @var ThrottleSettingsInterface
+     * @var int|null
      */
-    private $internalThrottlerSettings;
+    protected $cacheTtl;
 
     /**
-     * @param ThrottleSettingsInterface $internalThrottlerSettings
-     */
-    public function __construct(ThrottleSettingsInterface $internalThrottlerSettings)
-    {
-        $this->internalThrottlerSettings = $internalThrottlerSettings;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isValid(): bool
-    {
-        return $this->internalThrottlerSettings->isValid();
-    }
-
-    /**
-     * @return ThrottleSettingsInterface
-     */
-    public function getInternalThrottlerSettings(): ThrottleSettingsInterface
-    {
-        return $this->internalThrottlerSettings;
-    }
-
-    /**
-     * @inheritdoc
+     * @return int|null
      */
     public function getCacheTtl()
     {
-        $this->internalThrottlerSettings->getCacheTtl();
+        return $this->cacheTtl;
     }
 }

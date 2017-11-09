@@ -27,7 +27,7 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-final class RetrialQueueThrottler implements ThrottlerInterface
+final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
 {
     /**
      * @var ThrottlerInterface
@@ -40,10 +40,10 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     private $timeProvider;
 
     /**
-     * @param RetriableThrottlerInterface $internalThrottler
-     * @param TimeAdapterInterface        $timeProvider
+     * @param ThrottlerInterface   $internalThrottler
+     * @param TimeAdapterInterface $timeProvider
      */
-    public function __construct(RetriableThrottlerInterface $internalThrottler, TimeAdapterInterface $timeProvider)
+    public function __construct(ThrottlerInterface $internalThrottler, TimeAdapterInterface $timeProvider)
     {
         $this->internalThrottler = $internalThrottler;
         $this->timeProvider = $timeProvider;
@@ -99,16 +99,16 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     /**
      * @inheritdoc
      */
-    public function getTime()
+    public function getTimeLimit()
     {
-        return $this->internalThrottler->getTime();
+        return $this->internalThrottler->getTimeLimit();
     }
 
     /**
      * @inheritdoc
      */
-    public function getLimit()
+    public function getHitLimit()
     {
-        return $this->internalThrottler->getLimit();
+        return $this->internalThrottler->getHitLimit();
     }
 }

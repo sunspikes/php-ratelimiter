@@ -77,6 +77,7 @@ class RateLimiter implements RateLimiterInterface
             throw new \InvalidArgumentException('Invalid data, please check the data.');
         }
 
+        $settings = $settings ?? $this->defaultSettings;
         $object = $this->hydratorFactory->make($data)->hydrate($data);
 
         if (!isset($this->throttlers[$object->getKey()])) {
@@ -87,22 +88,13 @@ class RateLimiter implements RateLimiterInterface
     }
 
     /**
-     * @param Data                           $object
-     * @param ThrottleSettingsInterface|null $settings
+     * @param Data                      $object
+     * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
      */
-    private function createThrottler(Data $object, ThrottleSettingsInterface $settings = null)
+    private function createThrottler(Data $object, ThrottleSettingsInterface $settings)
     {
-        if (null === $settings) {
-            $settings = $this->defaultSettings;
-        } else {
-            try {
-                $settings = $this->defaultSettings->merge($settings);
-            } catch (\InvalidArgumentException $exception) {
-            }
-        }
-
         return $this->throttlerFactory->make($object, $settings);
     }
 }

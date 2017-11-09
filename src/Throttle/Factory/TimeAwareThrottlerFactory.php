@@ -81,35 +81,28 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
     {
         if ($settings instanceof LeakyBucketSettings) {
             return new LeakyBucketThrottler(
-                $this->throttlerCache,
-                $this->timeAdapter,
                 $data->getKey(),
-                $settings->getTokenLimit(),
-                $settings->getTimeLimit(),
-                $settings->getThreshold(),
-                $settings->getCacheTtl()
+                $this->throttlerCache,
+                $settings,
+                $this->timeAdapter
             );
         }
 
         if ($settings instanceof MovingWindowSettings) {
             return new MovingWindowThrottler(
-                $this->throttlerCache,
-                $this->timeAdapter,
                 $data->getKey(),
-                $settings->getHitLimit(),
-                $settings->getTimeLimit(),
-                $settings->getCacheTtl()
+                $this->throttlerCache,
+                $settings,
+                $this->timeAdapter
             );
         }
 
         if ($settings instanceof FixedWindowSettings) {
             return new FixedWindowThrottler(
-                $this->throttlerCache,
-                $this->timeAdapter,
                 $data->getKey(),
-                $settings->getHitLimit(),
-                $settings->getTimeLimit(),
-                $settings->getCacheTtl()
+                $this->throttlerCache,
+                $settings,
+                $this->timeAdapter
             );
         }
 
