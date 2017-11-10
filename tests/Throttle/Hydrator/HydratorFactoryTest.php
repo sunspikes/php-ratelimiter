@@ -4,9 +4,12 @@ namespace Sunspikes\Tests\Ratelimit\Throttle\Hydrator;
 
 use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
+use Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator;
+use Sunspikes\Ratelimit\Throttle\Hydrator\StringHydrator;
 
 class HydratorFactoryTest extends TestCase
 {
+    /** @var HydratorFactory */
     private $hydratorFactory;
 
     public function setUp()
@@ -20,14 +23,14 @@ class HydratorFactoryTest extends TestCase
     {
         $hydrator = $this->hydratorFactory->make([]);
 
-        $this->assertInstanceOf('\Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator', $hydrator);
+        $this->assertInstanceOf(ArrayHydrator::class, $hydrator);
     }
 
     public function testStringHydrator()
     {
         $hydrator = $this->hydratorFactory->make('test');
 
-        $this->assertInstanceOf('\Sunspikes\Ratelimit\Throttle\Hydrator\StringHydrator', $hydrator);
+        $this->assertInstanceOf(StringHydrator::class, $hydrator);
     }
 
     /**
@@ -35,6 +38,6 @@ class HydratorFactoryTest extends TestCase
      */
     public function testUnsupportedHydrator()
     {
-        $hydrator = $this->hydratorFactory->make(1);
+        $this->hydratorFactory->make(1);
     }
 }

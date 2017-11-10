@@ -35,7 +35,7 @@ interface ThrottlerInterface
      *
      * @return bool
      */
-    public function access();
+    public function access(): bool;
 
     /**
      * Register a hit for the resource
@@ -56,26 +56,26 @@ interface ThrottlerInterface
      *
      * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
      * Check the throttle status
      *
      * @return bool
      */
-    public function check();
+    public function check(): bool;
 
     /**
      * Get time window
      *
      * @return int
      */
-    public function getTimeLimit();
+    public function getTimeLimit(): int;
 
     /**
      * Get throttle limit
      *
      * @return int
      */
-    public function getHitLimit();
+    public function getHitLimit(): int;
 }

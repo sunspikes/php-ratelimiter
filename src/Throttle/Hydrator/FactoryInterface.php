@@ -27,11 +27,6 @@ namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
 use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
 
-/**
- * This is the hydrator factory class.
- *
- * @author Graham Campbell <graham@alt-three.com>
- */
 interface FactoryInterface
 {
     /**
@@ -42,5 +37,5 @@ interface FactoryInterface
      * @return DataHydratorInterface
      * @throws InvalidDataTypeException
      */
-    public function make($data);
+    public function make($data): DataHydratorInterface;
 }

@@ -43,7 +43,7 @@ class ThrottlerFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
     public function testInvalidSettings()
     {
@@ -51,7 +51,7 @@ class ThrottlerFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
     public function testUnknownSettings()
     {

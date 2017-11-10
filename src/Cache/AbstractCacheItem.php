@@ -29,6 +29,7 @@ abstract class AbstractCacheItem implements ThrottlerItemInterface
 {
     /**
      * @param string $serialized
+     *
      * @return ThrottlerItemInterface
      */
     public function unserialize($serialized)

@@ -42,6 +42,7 @@ interface ThrottlerCacheInterface
     /**
      * @param string                 $key
      * @param ThrottlerItemInterface $item
+     *
      * @return bool
      * @throws CacheAdapterException
      */
@@ -57,6 +58,7 @@ interface ThrottlerCacheInterface
 
     /**
      * @param string $key
+     *
      * @throws CacheAdapterException
      */
     public function removeItem(string $key);

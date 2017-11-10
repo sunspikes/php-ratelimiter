@@ -28,7 +28,7 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Settings\AbstractWindowSettings;
 
-abstract class AbstractWindowThrottler implements ThrottlerInterface, \Countable
+abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \Countable
 {
     /**
      * @var ThrottlerCacheInterface
@@ -46,7 +46,7 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface, \Countable
      * @param ThrottlerCacheInterface $cache
      * @param AbstractWindowSettings  $settings
      *
-     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottleSettingsException
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
     public function __construct(ThrottlerCacheInterface $cache, AbstractWindowSettings $settings)
     {
@@ -57,7 +57,7 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function access()
+    public function access(): bool
     {
         $status = $this->check();
         $this->hit();
@@ -68,7 +68,7 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function check()
+    public function check(): bool
     {
         return $this->count() < $this->settings->getHitLimit();
     }
@@ -76,7 +76,7 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function getTimeLimit()
+    public function getTimeLimit(): int
     {
         return $this->settings->getTimeLimit();
     }
@@ -84,7 +84,7 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function getHitLimit()
+    public function getHitLimit(): int
     {
         return $this->settings->getHitLimit();
     }
@@ -97,5 +97,5 @@ abstract class AbstractWindowThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    abstract public function count();
+    abstract public function count(): int;
 }

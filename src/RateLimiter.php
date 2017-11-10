@@ -26,6 +26,7 @@
 namespace Sunspikes\Ratelimit;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
@@ -71,10 +72,10 @@ class RateLimiter implements RateLimiterInterface
     /**
      * @inheritdoc
      */
-    public function get($data, ThrottleSettingsInterface $settings = null)
+    public function get($data, ThrottleSettingsInterface $settings = null): ThrottlerInterface
     {
         if (empty($data)) {
-            throw new \InvalidArgumentException('Invalid data, please check the data.');
+            throw new InvalidDataTypeException('Invalid data, please check the data.');
         }
 
         $settings = $settings ?? $this->defaultSettings;
@@ -92,8 +93,9 @@ class RateLimiter implements RateLimiterInterface
      * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
-    private function createThrottler(Data $object, ThrottleSettingsInterface $settings)
+    private function createThrottler(Data $object, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         return $this->throttlerFactory->make($object, $settings);
     }

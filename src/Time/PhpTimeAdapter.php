@@ -30,17 +30,17 @@ final class PhpTimeAdapter implements TimeAdapterInterface
     /**
      * @return float
      */
-    public function now()
+    public function now(): float
     {
         list($usec, $sec) = explode(" ", microtime());
 
-        return ((float) $usec + (float) $sec);
+        return ((float)$usec + (float)$sec);
     }
 
     /**
      * @param int $microseconds
      */
-    public function usleep($microseconds)
+    public function usleep(int $microseconds)
     {
         usleep($microseconds);
     }

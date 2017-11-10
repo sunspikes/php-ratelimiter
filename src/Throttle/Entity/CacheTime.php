@@ -26,7 +26,6 @@
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
 use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
-use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
 class CacheTime extends AbstractCacheItem
 {
@@ -38,7 +37,7 @@ class CacheTime extends AbstractCacheItem
 
     /**
      * @param float $time
-     * @param int $ttl
+     * @param int   $ttl
      */
     public function __construct(float $time, int $ttl = null)
     {
@@ -78,7 +77,7 @@ class CacheTime extends AbstractCacheItem
     {
         return [
             'time' => $this->time,
-            'ttl' => $this->ttl,
+            'ttl'  => $this->ttl,
         ];
     }
 }

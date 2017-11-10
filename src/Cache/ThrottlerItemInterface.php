@@ -23,7 +23,6 @@
  * SOFTWARE.
  */
 
-
 namespace Sunspikes\Ratelimit\Cache;
 
 interface ThrottlerItemInterface extends \Serializable

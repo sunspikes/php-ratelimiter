@@ -39,7 +39,7 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
      * @param int|null $timeLimit
      * @param int|null $cacheTtl
      */
-    public function __construct($hitLimit = null, $timeLimit = null, $cacheTtl = null)
+    public function __construct(int $hitLimit = null, int $timeLimit = null, int $cacheTtl = null)
     {
         $this->hitLimit = $hitLimit;
         $this->timeLimit = $timeLimit;

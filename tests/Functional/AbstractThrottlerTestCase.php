@@ -106,11 +106,12 @@ abstract class AbstractThrottlerTestCase extends TestCase
      * Get an unique key based on throttling mode
      *
      * @param string $key
+     *
      * @return string
      */
     protected function getRateLimiterKey(string $key): string
     {
-        return $key .'-'. sha1(static::class . mt_rand());
+        return $key.'-'.sha1(static::class.mt_rand());
     }
 
     /**

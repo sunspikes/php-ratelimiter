@@ -41,7 +41,7 @@ class RatelimiterTest extends TestCase
     protected function setUp()
     {
         $this->throttlerFactory = M::mock(ThrottlerFactoryInterface::class);
-        $this->hydratorFactory =  M::mock(HydratorFactoryInterface::class);
+        $this->hydratorFactory = M::mock(HydratorFactoryInterface::class);
         $this->defaultSettings = M::mock(ThrottleSettingsInterface::class);
 
         $this->ratelimiter = new RateLimiter(
@@ -52,7 +52,7 @@ class RatelimiterTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException
      */
     public function testGetWithInvalidData()
     {

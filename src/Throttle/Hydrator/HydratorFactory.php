@@ -35,7 +35,7 @@ class HydratorFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function make($data)
+    public function make($data): DataHydratorInterface
     {
         if (is_string($data)) {
             return new StringHydrator();

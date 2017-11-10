@@ -27,7 +27,6 @@
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
 use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
-use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
 class CacheCount extends AbstractCacheItem
 {
@@ -79,7 +78,7 @@ class CacheCount extends AbstractCacheItem
     {
         return [
             'count' => $this->count,
-            'ttl' => $this->ttl,
+            'ttl'   => $this->ttl,
         ];
     }
 }

@@ -40,7 +40,7 @@ final class Data
     /**
      * @param string $data
      */
-    public function __construct($data)
+    public function __construct(string $data)
     {
         $this->data = $data;
     }
@@ -50,7 +50,7 @@ final class Data
      *
      * @return string
      */
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }
@@ -60,9 +60,9 @@ final class Data
      *
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
-        if (is_null($this->key)) {
+        if (null === $this->key) {
             $this->key = sha1($this->data);
         }
 

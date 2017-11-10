@@ -51,13 +51,17 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
     /**
      * MovingWindowThrottler constructor.
      *
-     * @param string                  $key
+     * @param string $key
      * @param ThrottlerCacheInterface $cache
-     * @param MovingWindowSettings    $settings
-     * @param TimeAdapterInterface    $timeAdapter
+     * @param MovingWindowSettings $settings
+     * @param TimeAdapterInterface $timeAdapter
      */
-    public function __construct(string $key, ThrottlerCacheInterface $cache, MovingWindowSettings $settings, TimeAdapterInterface $timeAdapter)
-    {
+    public function __construct(
+        string $key,
+        ThrottlerCacheInterface $cache,
+        MovingWindowSettings $settings,
+        TimeAdapterInterface $timeAdapter
+    ) {
         parent::__construct($cache, $settings);
         $this->key = $key;
         $this->timeProvider = $timeAdapter;
@@ -68,7 +72,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
      */
     public function hit()
     {
-        $timestamp = (int) ceil($this->timeProvider->now());
+        $timestamp = (int)ceil($this->timeProvider->now());
         $this->updateHitCount();
 
         if (!isset($this->hitCountMapping[$timestamp])) {
@@ -85,17 +89,17 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         $this->updateHitCount();
 
-        return (int) array_sum($this->hitCountMapping);
+        return (int)array_sum($this->hitCountMapping);
     }
 
     /**
      * @inheritdoc
      */
-    public function getRetryTimeout()
+    public function getRetryTimeout(): int
     {
         if ($this->settings->getHitLimit() > $totalHitCount = $this->count()) {
             return 0;
@@ -106,9 +110,9 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
         foreach ($this->hitCountMapping as $timestamp => $hitCount) {
             if ($this->settings->getHitLimit() > $totalHitCount -= $hitCount) {
                 return self::SECOND_TO_MILLISECOND_MULTIPLIER * max(
-                    0,
-                    $this->settings->getTimeLimit() - ((int) ceil($this->timeProvider->now()) - $timestamp)
-                );
+                        0,
+                        $this->settings->getTimeLimit() - ((int)ceil($this->timeProvider->now()) - $timestamp)
+                    );
             }
         }
 
@@ -133,14 +137,18 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
                 $item = $this->cache->getItem($this->key);
                 $this->hitCountMapping = $item->getHitMapping();
             }
-        } catch (ItemNotFoundException $exception) {}
+        } catch (ItemNotFoundException $exception) {
+        }
 
-        $startTime = (int) ceil($this->timeProvider->now()) - $this->settings->getTimeLimit();
+        $startTime = (int)ceil($this->timeProvider->now()) - $this->settings->getTimeLimit();
 
         // Clear all entries older than the window front-edge
-        $relevantTimestamps = array_filter(array_keys($this->hitCountMapping), function ($key) use ($startTime) {
-            return $startTime <= $key;
-        });
+        $relevantTimestamps = array_filter(
+            array_keys($this->hitCountMapping),
+            function ($key) use ($startTime) {
+                return $startTime <= $key;
+            }
+        );
 
         $this->hitCountMapping = array_intersect_key($this->hitCountMapping, array_flip($relevantTimestamps));
     }

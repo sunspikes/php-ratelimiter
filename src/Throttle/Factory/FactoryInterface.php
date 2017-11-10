@@ -26,6 +26,7 @@
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
@@ -38,7 +39,7 @@ interface FactoryInterface
      * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
-     * @throws \InvalidArgumentException
+     * @throws InvalidThrottlerSettingsException
      */
-    public function make(Data $data, ThrottleSettingsInterface $settings);
+    public function make(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface;
 }

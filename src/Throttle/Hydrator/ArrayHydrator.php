@@ -32,7 +32,7 @@ class ArrayHydrator implements DataHydratorInterface
     /**
      * @inheritdoc
      */
-    public function hydrate($data)
+    public function hydrate($data): Data
     {
         $string = implode('', $data);
 

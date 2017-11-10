@@ -32,7 +32,7 @@ class StringHydrator implements DataHydratorInterface
     /**
      * @inheritdoc
      */
-    public function hydrate($data)
+    public function hydrate($data): Data
     {
         return new Data($data);
     }

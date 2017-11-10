@@ -48,7 +48,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
 
     /**
      * @param ThrottlerCacheInterface $throttlerCache
-     * @param TimeAdapterInterface  $timeAdapter
+     * @param TimeAdapterInterface    $timeAdapter
      */
     public function __construct(ThrottlerCacheInterface $throttlerCache, TimeAdapterInterface $timeAdapter)
     {
@@ -59,7 +59,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
     /**
      * @inheritdoc
      */
-    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
+    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         if ($settings instanceof RetrialQueueSettings) {
             return new RetrialQueueThrottler(
@@ -76,8 +76,9 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
      * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
-    private function createNestableController(Data $data, ThrottleSettingsInterface $settings)
+    private function createNestableController(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         if ($settings instanceof LeakyBucketSettings) {
             return new LeakyBucketThrottler(

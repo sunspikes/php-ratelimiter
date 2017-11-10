@@ -27,9 +27,11 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException;
 use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
 class ThrottlerFactory implements FactoryInterface
 {
@@ -49,10 +51,10 @@ class ThrottlerFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function make(Data $data, ThrottleSettingsInterface $settings)
+    public function make(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         if (!$settings->isValid()) {
-            throw new \InvalidArgumentException('Provided throttler settings not valid');
+            throw new InvalidThrottlerSettingsException('Provided throttler settings not valid');
         }
 
         return $this->createThrottler($data, $settings);
@@ -62,10 +64,10 @@ class ThrottlerFactory implements FactoryInterface
      * @param Data                      $data
      * @param ThrottleSettingsInterface $settings
      *
-     * @return ElasticWindowThrottler
-     * @throws \InvalidArgumentException
+     * @return ThrottlerInterface
+     * @throws InvalidThrottlerSettingsException
      */
-    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
+    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         if ($settings instanceof ElasticWindowSettings) {
             return new ElasticWindowThrottler(
@@ -75,7 +77,7 @@ class ThrottlerFactory implements FactoryInterface
             );
         }
 
-        throw new \InvalidArgumentException(
+        throw new InvalidThrottlerSettingsException(
             sprintf('Unable to create throttler for %s settings', get_class($settings))
         );
     }

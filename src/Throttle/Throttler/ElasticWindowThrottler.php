@@ -54,7 +54,7 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     /**
      * @inheritdoc
      */
-    public function hit()
+    public function hit(): ThrottlerInterface
     {
         $this->counter = $this->count() + 1;
         $this->cache->setItem($this->key, new CacheCount($this->counter, $this->settings->getTimeLimit()));
@@ -76,9 +76,9 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
-        if (!is_null($this->counter)) {
+        if (null !== $this->counter) {
             return $this->counter;
         }
 
@@ -96,12 +96,12 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     /**
      * @inheritdoc
      */
-    public function getRetryTimeout()
+    public function getRetryTimeout(): int
     {
         if ($this->check()) {
             return 0;
         }
 
-        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->timeLimit;
+        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->settings->getTimeLimit();
     }
 }

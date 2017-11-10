@@ -32,5 +32,5 @@ interface RetriableThrottlerInterface extends ThrottlerInterface
      *
      * @return int
      */
-    public function getRetryTimeout();
+    public function getRetryTimeout(): int;
 }

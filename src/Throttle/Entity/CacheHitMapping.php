@@ -26,7 +26,6 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
-use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
 
 class CacheHitMapping extends AbstractCacheItem
@@ -39,7 +38,7 @@ class CacheHitMapping extends AbstractCacheItem
 
     /**
      * @param array $hitMapping
-     * @param int $ttl
+     * @param int   $ttl
      */
     public function __construct(array $hitMapping, int $ttl = null)
     {
@@ -79,7 +78,7 @@ class CacheHitMapping extends AbstractCacheItem
     {
         return [
             'hitMapping' => $this->hitMapping,
-            'ttl' => $this->ttl,
+            'ttl'        => $this->ttl,
         ];
     }
 }

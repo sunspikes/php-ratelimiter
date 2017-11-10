@@ -30,7 +30,7 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
 {
     /**
-     * @var ThrottlerInterface
+     * @var RetriableThrottlerInterface
      */
     private $internalThrottler;
 
@@ -40,10 +40,10 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     private $timeProvider;
 
     /**
-     * @param ThrottlerInterface   $internalThrottler
-     * @param TimeAdapterInterface $timeProvider
+     * @param RetriableThrottlerInterface $internalThrottler
+     * @param TimeAdapterInterface        $timeProvider
      */
-    public function __construct(ThrottlerInterface $internalThrottler, TimeAdapterInterface $timeProvider)
+    public function __construct(RetriableThrottlerInterface $internalThrottler, TimeAdapterInterface $timeProvider)
     {
         $this->internalThrottler = $internalThrottler;
         $this->timeProvider = $timeProvider;
@@ -52,7 +52,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function access()
+    public function access(): bool
     {
         $status = $this->check();
         $this->hit();
@@ -83,7 +83,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         return $this->internalThrottler->count();
     }
@@ -91,7 +91,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function check()
+    public function check(): bool
     {
         return $this->internalThrottler->check();
     }
@@ -99,7 +99,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function getTimeLimit()
+    public function getTimeLimit(): int
     {
         return $this->internalThrottler->getTimeLimit();
     }
@@ -107,7 +107,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function getHitLimit()
+    public function getHitLimit(): int
     {
         return $this->internalThrottler->getHitLimit();
     }
