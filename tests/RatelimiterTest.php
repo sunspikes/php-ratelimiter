@@ -71,35 +71,6 @@ class RatelimiterTest extends TestCase
         self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key'));
     }
 
-    public function testGetWithMergableSettings()
-    {
-        $object = $this->getHydratedObject('key');
-
-        $this->defaultSettings->shouldReceive('merge')->once()->andReturn(M::mock(ThrottleSettingsInterface::class));
-
-        $this->throttlerFactory
-            ->shouldReceive('make')
-            ->with($object, M::type(ThrottleSettingsInterface::class))
-            ->andReturn(M::mock(ThrottlerInterface::class));
-
-        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', new ElasticWindowSettings()));
-    }
-
-    public function testGetWithUnmergableSettings()
-    {
-        $object = $this->getHydratedObject('key');
-
-        $newSettings = M::mock(ThrottleSettingsInterface::class);
-        $this->defaultSettings->shouldReceive('merge')->once()->andReturn($newSettings);
-
-        $this->throttlerFactory
-            ->shouldReceive('make')
-            ->with($object, $newSettings)
-            ->andReturn(M::mock(ThrottlerInterface::class));
-
-        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', $newSettings));
-    }
-
     public function testGetThrottlerCaching()
     {
         $object1 = $this->getHydratedObject('key1');
