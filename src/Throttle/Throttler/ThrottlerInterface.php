@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -31,51 +31,51 @@ interface ThrottlerInterface
     const MILLISECOND_TO_MICROSECOND_MULTIPLIER = 1000;
 
     /**
-     * Access the resource and return status
+     * Access the resource and return status.
      *
      * @return bool
      */
-    public function access();
+    public function access(): bool;
 
     /**
-     * Register a hit for the resource
+     * Register a hit for the resource.
      *
      * @return mixed
      */
     public function hit();
 
     /**
-     * Clear the hit counter
+     * Clear the hit counter.
      *
      * @return mixed
      */
     public function clear();
 
     /**
-     * Get the hit count
+     * Get the hit count.
      *
      * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
-     * Check the throttle status
+     * Check the throttle status.
      *
      * @return bool
      */
-    public function check();
+    public function check(): bool;
 
     /**
-     * Get time window
+     * Get time window.
      *
      * @return int
      */
-    public function getTime();
+    public function getTimeLimit(): int;
 
     /**
-     * Get throttle limit
+     * Get throttle limit.
      *
      * @return int
      */
-    public function getLimit();
+    public function getHitLimit(): int;
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -27,122 +27,102 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
+use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\CacheCount;
+use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
+use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
+final class ElasticWindowThrottler extends AbstractWindowThrottler
 {
-    /* @var ThrottlerCacheInterface */
-    protected $cache;
     /* @var string */
-    protected $key;
+    private $key;
+
     /* @var int */
-    protected $limit;
-    /* @var int */
-    protected $ttl;
-    /* @var int */
-    protected $counter;
+    private $counter;
+
+    /** @var int $lastTtl */
+    protected $lastTtl;
 
     /**
+     * ElasticWindowThrottler constructor.
+     *
+     * @param string                  $key
      * @param ThrottlerCacheInterface $cache
-     * @param string $key
-     * @param int $limit
-     * @param int $ttl
+     * @param ElasticWindowSettings   $settings
+     * @param TimeAdapterInterface    $timeAdapter
      */
-    public function __construct(ThrottlerCacheInterface $cache, $key, $limit, $ttl)
-    {
-        $this->cache = $cache;
+    public function __construct(
+        string $key,
+        ThrottlerCacheInterface $cache,
+        ElasticWindowSettings $settings,
+        TimeAdapterInterface $timeAdapter
+    ) {
+        parent::__construct($cache, $settings, $timeAdapter);
         $this->key = $key;
-        $this->limit = $limit;
-        $this->ttl = $ttl;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function access()
-    {
-        $status = $this->check();
-
-        $this->hit();
-
-        return $status;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hit()
+    public function hit(): ThrottlerInterface
     {
         $this->counter = $this->count() + 1;
-        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
+        $this->cache->setItem($this->key, $this->makeCacheCount($this->counter));
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
         $this->counter = 0;
-        $this->cache->setItem($this->key, new CacheCount($this->counter, $this->ttl));
+        $this->cache->setItem($this->key, $this->makeCacheCount($this->counter));
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
-        if (!is_null($this->counter)) {
-            return $this->counter;
-        }
-
         try {
             /** @var CacheCount $item */
             $item = $this->cache->getItem($this->key);
             $this->counter = $item->getCount();
+            $this->lastTtl = $item->getTtl();
         } catch (ItemNotFoundException $e) {
             $this->counter = 0;
+            $this->lastTtl = null;
         }
 
         return $this->counter;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function check()
-    {
-        return ($this->count() < $this->limit);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTime()
-    {
-        return $this->ttl;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRetryTimeout()
+    public function getRetryTimeout(): int
     {
         if ($this->check()) {
             return 0;
         }
 
-        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->ttl;
+        return self::SECOND_TO_MILLISECOND_MULTIPLIER * $this->settings->getTimeLimit();
+    }
+
+    /**
+     * @param int $count
+     *
+     * @return ThrottlerItemInterface
+     */
+    private function makeCacheCount(int $count): ThrottlerItemInterface
+    {
+        return new CacheCount(
+            $count,
+            $this->lastTtl ?? $this->timeProvider->now() + $this->settings->getTimeLimit()
+        );
     }
 }

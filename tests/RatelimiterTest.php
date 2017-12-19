@@ -9,7 +9,6 @@ use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
 use Sunspikes\Ratelimit\Throttle\Hydrator\DataHydratorInterface;
 use Sunspikes\Ratelimit\Throttle\Hydrator\FactoryInterface as HydratorFactoryInterface;
-use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
@@ -36,12 +35,12 @@ class RatelimiterTest extends TestCase
     private $ratelimiter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
         $this->throttlerFactory = M::mock(ThrottlerFactoryInterface::class);
-        $this->hydratorFactory =  M::mock(HydratorFactoryInterface::class);
+        $this->hydratorFactory = M::mock(HydratorFactoryInterface::class);
         $this->defaultSettings = M::mock(ThrottleSettingsInterface::class);
 
         $this->ratelimiter = new RateLimiter(
@@ -52,7 +51,7 @@ class RatelimiterTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException
      */
     public function testGetWithInvalidData()
     {
@@ -69,35 +68,6 @@ class RatelimiterTest extends TestCase
             ->andReturn(M::mock(ThrottlerInterface::class));
 
         self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key'));
-    }
-
-    public function testGetWithMergableSettings()
-    {
-        $object = $this->getHydratedObject('key');
-
-        $this->defaultSettings->shouldReceive('merge')->once()->andReturn(M::mock(ThrottleSettingsInterface::class));
-
-        $this->throttlerFactory
-            ->shouldReceive('make')
-            ->with($object, M::type(ThrottleSettingsInterface::class))
-            ->andReturn(M::mock(ThrottlerInterface::class));
-
-        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', new ElasticWindowSettings()));
-    }
-
-    public function testGetWithUnmergableSettings()
-    {
-        $object = $this->getHydratedObject('key');
-
-        $newSettings = M::mock(ThrottleSettingsInterface::class);
-        $this->defaultSettings->shouldReceive('merge')->once()->andReturn($newSettings);
-
-        $this->throttlerFactory
-            ->shouldReceive('make')
-            ->with($object, $newSettings)
-            ->andReturn(M::mock(ThrottlerInterface::class));
-
-        self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', $newSettings));
     }
 
     public function testGetThrottlerCaching()

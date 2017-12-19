@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -26,9 +26,10 @@
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
+use Sunspikes\Ratelimit\Throttle\Settings\AbstractWindowSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-abstract class AbstractWindowThrottler
+abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \Countable
 {
     /**
      * @var ThrottlerCacheInterface
@@ -36,24 +37,9 @@ abstract class AbstractWindowThrottler
     protected $cache;
 
     /**
-     * @var int|null
+     * @var AbstractWindowSettings
      */
-    protected $cacheTtl;
-
-    /**
-     * @var int
-     */
-    protected $hitLimit;
-
-    /**
-     * @var string
-     */
-    protected $key;
-
-    /**
-     * @var int
-     */
-    protected $timeLimit;
+    protected $settings;
 
     /**
      * @var TimeAdapterInterface
@@ -61,33 +47,23 @@ abstract class AbstractWindowThrottler
     protected $timeProvider;
 
     /**
+     * AbstractWindowThrottler constructor.
+     *
      * @param ThrottlerCacheInterface $cache
-     * @param TimeAdapterInterface  $timeAdapter
-     * @param string                $key         Cache key prefix
-     * @param int                   $hitLimit    Maximum number of hits
-     * @param int                   $timeLimit   Length of window
-     * @param int|null              $cacheTtl    Cache ttl time (default: null => CacheAdapter ttl)
+     * @param AbstractWindowSettings  $settings
+     * @param TimeAdapterInterface    $timeAdapter
      */
-    public function __construct(
-        ThrottlerCacheInterface $cache,
-        TimeAdapterInterface $timeAdapter,
-        $key,
-        $hitLimit,
-        $timeLimit,
-        $cacheTtl = null
-    ) {
+    public function __construct(ThrottlerCacheInterface $cache, AbstractWindowSettings $settings, TimeAdapterInterface $timeAdapter)
+    {
         $this->cache = $cache;
+        $this->settings = $settings;
         $this->timeProvider = $timeAdapter;
-        $this->key = $key;
-        $this->hitLimit = $hitLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function access()
+    public function access(): bool
     {
         $status = $this->check();
         $this->hit();
@@ -95,38 +71,37 @@ abstract class AbstractWindowThrottler
         return $status;
     }
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function check()
+    public function check(): bool
     {
-        return $this->count() < $this->hitLimit;
+        return $this->count() < $this->settings->getHitLimit();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getTime()
+    public function getTimeLimit(): int
     {
-        return $this->timeLimit;
+        return $this->settings->getTimeLimit();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getLimit()
+    public function getHitLimit(): int
     {
-        return $this->hitLimit;
+        return $this->settings->getHitLimit();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     abstract public function hit();
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    abstract public function count();
+    abstract public function count(): int;
 }

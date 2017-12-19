@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -25,14 +25,16 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
+use Sunspikes\Ratelimit\Throttle\Entity\Data;
+
 interface DataHydratorInterface
 {
     /**
-     * Hydrate a data object with the given data
+     * Hydrate a data object with the given data.
      *
      * @param mixed $data
      *
-     * @return \Sunspikes\Ratelimit\Throttle\Entity\Data
+     * @return Data
      */
-    public function hydrate($data);
+    public function hydrate($data): Data;
 }

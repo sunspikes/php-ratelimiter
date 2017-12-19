@@ -23,40 +23,35 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Settings;
+namespace Sunspikes\Ratelimit\Time;
 
-abstract class AbstractWindowSettings extends AbstractSettings implements ThrottleSettingsInterface
+final class TestTimeAdapter implements TimeAdapterInterface
 {
     /**
-     * @var int|null
+     * @var float
      */
-    protected $hitLimit;
+    private $time = 0;
 
     /**
-     * @param int|null $hitLimit
-     * @param int|null $timeLimit
-     * @param int|null $cacheTtl
+     * @param float $now
      */
-    public function __construct(int $hitLimit = null, int $timeLimit = null, int $cacheTtl = null)
+    public function setNow(float $now)
     {
-        $this->hitLimit = $hitLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
+        $this->time = $now;
     }
 
     /**
-     * {@inheritdoc}
+     * @return float
      */
-    public function isValid(): bool
+    public function now(): float
     {
-        return null !== $this->hitLimit && $this->isValidTimeLimit();
+        return $this->time;
     }
 
     /**
-     * @return int|null
+     * @param int $microseconds
      */
-    public function getHitLimit()
+    public function usleep(int $microseconds)
     {
-        return $this->hitLimit;
     }
 }

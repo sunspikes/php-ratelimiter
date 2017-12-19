@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -31,14 +31,12 @@ use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 interface RateLimiterInterface
 {
     /**
-     * Return a throttler for given data and settings
+     * Return a throttler for given data.
      *
      * @param mixed                          $data
-     * @param ThrottleSettingsInterface|null $throttlerSettings
+     * @param ThrottleSettingsInterface|null $settings
      *
      * @return ThrottlerInterface
-     *
-     * @throws \InvalidArgumentException
      */
-    public function get($data, ThrottleSettingsInterface $throttlerSettings = null);
+    public function get($data, ThrottleSettingsInterface $settings = null): ThrottlerInterface;
 }

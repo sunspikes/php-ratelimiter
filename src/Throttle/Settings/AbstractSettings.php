@@ -25,38 +25,39 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-abstract class AbstractWindowSettings extends AbstractSettings implements ThrottleSettingsInterface
+abstract class AbstractSettings
 {
     /**
      * @var int|null
      */
-    protected $hitLimit;
+    protected $cacheTtl;
 
     /**
-     * @param int|null $hitLimit
-     * @param int|null $timeLimit
-     * @param int|null $cacheTtl
+     * @var int|null
      */
-    public function __construct(int $hitLimit = null, int $timeLimit = null, int $cacheTtl = null)
-    {
-        $this->hitLimit = $hitLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
-    }
+    protected $timeLimit;
 
     /**
-     * {@inheritdoc}
+     * @return int|null
      */
-    public function isValid(): bool
+    public function getCacheTtl()
     {
-        return null !== $this->hitLimit && $this->isValidTimeLimit();
+        return $this->cacheTtl;
     }
 
     /**
      * @return int|null
      */
-    public function getHitLimit()
+    public function getTimeLimit()
     {
-        return $this->hitLimit;
+        return $this->timeLimit;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isValidTimeLimit(): bool
+    {
+        return null !== $this->timeLimit && 0 !== $this->timeLimit;
     }
 }

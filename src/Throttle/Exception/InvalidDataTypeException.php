@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -25,9 +25,6 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Exception;
 
-/**
- * Invalid data type exception
- */
-class InvalidDataTypeException extends \Exception
+class InvalidDataTypeException extends ThrottleException
 {
 }

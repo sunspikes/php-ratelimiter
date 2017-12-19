@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -27,10 +27,10 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-final class RetrialQueueThrottler implements ThrottlerInterface
+final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
 {
     /**
-     * @var ThrottlerInterface
+     * @var RetriableThrottlerInterface
      */
     private $internalThrottler;
 
@@ -50,9 +50,9 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function access()
+    public function access(): bool
     {
         $status = $this->check();
         $this->hit();
@@ -61,7 +61,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hit()
     {
@@ -73,7 +73,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -81,34 +81,34 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->internalThrottler->count();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function check()
+    public function check(): bool
     {
         return $this->internalThrottler->check();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getTime()
+    public function getTimeLimit(): int
     {
-        return $this->internalThrottler->getTime();
+        return $this->internalThrottler->getTimeLimit();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getLimit()
+    public function getHitLimit(): int
     {
-        return $this->internalThrottler->getLimit();
+        return $this->internalThrottler->getHitLimit();
     }
 }

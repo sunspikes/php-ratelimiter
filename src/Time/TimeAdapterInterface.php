@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -30,10 +30,10 @@ interface TimeAdapterInterface
     /**
      * @return float
      */
-    public function now();
+    public function now(): float;
 
     /**
      * @param int $microseconds
      */
-    public function usleep($microseconds);
+    public function usleep(int $microseconds);
 }

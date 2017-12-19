@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -40,29 +40,29 @@ final class Data
     /**
      * @param string $data
      */
-    public function __construct($data)
+    public function __construct(string $data)
     {
         $this->data = $data;
     }
 
     /**
-     * Get data
+     * Get data.
      *
      * @return string
      */
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }
 
     /**
-     * Get key
+     * Get key.
      *
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
-        if (is_null($this->key)) {
+        if (null === $this->key) {
             $this->key = sha1($this->data);
         }
 

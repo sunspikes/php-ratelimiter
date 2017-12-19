@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -27,9 +27,20 @@ namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException;
 use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
+use Sunspikes\Ratelimit\Throttle\Settings\RetrialQueueSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\FixedWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\LeakyBucketThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\MovingWindowThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\RetrialQueueThrottler;
+use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
+use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class ThrottlerFactory implements FactoryInterface
 {
@@ -39,43 +50,94 @@ class ThrottlerFactory implements FactoryInterface
     protected $throttlerCache;
 
     /**
-     * @param ThrottlerCacheInterface $throttlerCache
+     * @var TimeAdapterInterface
      */
-    public function __construct(ThrottlerCacheInterface $throttlerCache)
+    private $timeAdapter;
+
+    /**
+     * @param ThrottlerCacheInterface $throttlerCache
+     * @param TimeAdapterInterface    $timeAdapter
+     */
+    public function __construct(ThrottlerCacheInterface $throttlerCache, TimeAdapterInterface $timeAdapter)
     {
         $this->throttlerCache = $throttlerCache;
+        $this->timeAdapter = $timeAdapter;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function make(Data $data, ThrottleSettingsInterface $settings)
+    public function make(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         if (!$settings->isValid()) {
-            throw new \InvalidArgumentException('Provided throttler settings not valid');
+            throw new InvalidThrottlerSettingsException('Provided throttler settings not valid');
         }
 
         return $this->createThrottler($data, $settings);
     }
 
     /**
-     * @param Data                      $data
-     * @param ThrottleSettingsInterface $settings
-     *
-     * @return ElasticWindowThrottler
+     * {@inheritdoc}
      */
-    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
+    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
-        if ($settings instanceof ElasticWindowSettings) {
-            return new ElasticWindowThrottler(
-                $this->throttlerCache,
-                $data->getKey(),
-                $settings->getLimit(),
-                $settings->getTime()
+        if ($settings instanceof RetrialQueueSettings) {
+            return new RetrialQueueThrottler(
+                $this->createNestableController($data, $settings->getInternalThrottlerSettings()),
+                $this->timeAdapter
             );
         }
 
-        throw new \InvalidArgumentException(
+        return $this->createNestableController($data, $settings);
+    }
+
+    /**
+     * @param Data                      $data
+     * @param ThrottleSettingsInterface $settings
+     *
+     * @return ThrottlerInterface
+     *
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
+     */
+    private function createNestableController(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
+    {
+        if ($settings instanceof LeakyBucketSettings) {
+            return new LeakyBucketThrottler(
+                $data->getKey(),
+                $this->throttlerCache,
+                $settings,
+                $this->timeAdapter
+            );
+        }
+
+        if ($settings instanceof MovingWindowSettings) {
+            return new MovingWindowThrottler(
+                $data->getKey(),
+                $this->throttlerCache,
+                $settings,
+                $this->timeAdapter
+            );
+        }
+
+        if ($settings instanceof FixedWindowSettings) {
+            return new FixedWindowThrottler(
+                $data->getKey(),
+                $this->throttlerCache,
+                $settings,
+                $this->timeAdapter
+            );
+        }
+
+        if ($settings instanceof ElasticWindowSettings) {
+            return new ElasticWindowThrottler(
+                $data->getKey(),
+                $this->throttlerCache,
+                $settings,
+                $this->timeAdapter
+            );
+        }
+
+        throw new InvalidThrottlerSettingsException(
             sprintf('Unable to create throttler for %s settings', get_class($settings))
         );
     }

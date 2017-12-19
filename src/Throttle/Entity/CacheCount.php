@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -23,11 +23,9 @@
  * SOFTWARE.
  */
 
-
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
 use Sunspikes\Ratelimit\Cache\AbstractCacheItem;
-use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 
 class CacheCount extends AbstractCacheItem
 {
@@ -56,7 +54,7 @@ class CacheCount extends AbstractCacheItem
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTtl()
     {
@@ -64,7 +62,7 @@ class CacheCount extends AbstractCacheItem
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function fromArray(array $array)
     {
@@ -73,7 +71,7 @@ class CacheCount extends AbstractCacheItem
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function toArray(): array
     {

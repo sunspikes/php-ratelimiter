@@ -7,7 +7,7 @@ use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 class FixedWindowSettingsTest extends AbstractWindowSettingsTest
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getSettings($hitLimit = null, $timeLimit = null, $cacheTtl = null)
     {

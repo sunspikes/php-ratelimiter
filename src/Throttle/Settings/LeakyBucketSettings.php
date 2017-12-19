@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -25,7 +25,7 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class LeakyBucketSettings implements ThrottleSettingsInterface
+final class LeakyBucketSettings extends AbstractSettings implements ThrottleSettingsInterface
 {
     /**
      * @var int|null
@@ -35,17 +35,7 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
     /**
      * @var int|null
      */
-    private $timeLimit;
-
-    /**
-     * @var int|null
-     */
     private $threshold;
-
-    /**
-     * @var int|null
-     */
-    private $cacheTtl;
 
     /**
      * @param int|null $tokenLimit
@@ -53,42 +43,24 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
      * @param int|null $threshold
      * @param int|null $cacheTtl   In seconds
      */
-    public function __construct($tokenLimit = null, $timeLimit = null, $threshold = null, $cacheTtl = null)
-    {
+    public function __construct(
+        int $tokenLimit = null,
+        int $timeLimit = null,
+        int $threshold = null,
+        int $cacheTtl = null
+    ) {
         $this->tokenLimit = $tokenLimit;
         $this->timeLimit = $timeLimit;
-        $this->threshold = $threshold;
+        $this->threshold = $threshold ?? 0;
         $this->cacheTtl = $cacheTtl;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    public function isValid(): bool
     {
-        if (!$settings instanceof self) {
-            throw new \InvalidArgumentException(
-                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
-            );
-        }
-
-        return new self(
-            null === $settings->getTokenLimit() ? $this->tokenLimit : $settings->getTokenLimit(),
-            null === $settings->getTimeLimit() ? $this->timeLimit : $settings->getTimeLimit(),
-            null === $settings->getThreshold() ? $this->threshold : $settings->getThreshold(),
-            null === $settings->getCacheTtl() ? $this->cacheTtl : $settings->getCacheTtl()
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isValid()
-    {
-        return
-            null !== $this->tokenLimit &&
-            null !== $this->timeLimit &&
-            0 !== $this->timeLimit;
+        return null !== $this->tokenLimit && $this->isValidTimeLimit();
     }
 
     /**
@@ -102,24 +74,8 @@ final class LeakyBucketSettings implements ThrottleSettingsInterface
     /**
      * @return int|null
      */
-    public function getTimeLimit()
-    {
-        return $this->timeLimit;
-    }
-
-    /**
-     * @return int|null
-     */
     public function getThreshold()
     {
         return $this->threshold;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCacheTtl()
-    {
-        return $this->cacheTtl;
     }
 }

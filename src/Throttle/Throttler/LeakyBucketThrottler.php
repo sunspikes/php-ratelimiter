@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -29,22 +29,13 @@ use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\Throttle\Entity\CacheCount;
 use Sunspikes\Ratelimit\Throttle\Entity\CacheTime;
+use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-final class LeakyBucketThrottler implements RetriableThrottlerInterface
+final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Countable
 {
     const CACHE_KEY_TIME = '-time';
     const CACHE_KEY_TOKEN = '-tokens';
-
-    /**
-     * @var ThrottlerCacheInterface
-     */
-    private $cache;
-
-    /**
-     * @var int|null
-     */
-    private $cacheTtl;
 
     /**
      * @var string
@@ -52,9 +43,14 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
     private $key;
 
     /**
-     * @var int
+     * @var ThrottlerCacheInterface
      */
-    private $threshold;
+    private $cache;
+
+    /**
+     * @var LeakyBucketSettings
+     */
+    private $settings;
 
     /**
      * @var TimeAdapterInterface
@@ -62,54 +58,37 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
     private $timeProvider;
 
     /**
-     * @var int
-     */
-    private $timeLimit;
-
-    /**
-     * @var int
-     */
-    private $tokenlimit;
-
-    /**
+     * LeakyBucketThrottler constructor.
+     *
+     * @param string                  $key
      * @param ThrottlerCacheInterface $cache
+     * @param LeakyBucketSettings     $settings
      * @param TimeAdapterInterface    $timeAdapter
-     * @param string                  $key        Cache key prefix
-     * @param int                     $tokenLimit Bucket capacity
-     * @param int                     $timeLimit  Refill time in milliseconds
-     * @param int|null                $threshold  Capacity threshold on which to start throttling (default: 0)
-     * @param int|null                $cacheTtl   Cache ttl time (default: null => CacheAdapter ttl)
      */
     public function __construct(
+        string $key,
         ThrottlerCacheInterface $cache,
-        TimeAdapterInterface $timeAdapter,
-        $key,
-        $tokenLimit,
-        $timeLimit,
-        $threshold = null,
-        $cacheTtl = null
+        LeakyBucketSettings $settings,
+        TimeAdapterInterface $timeAdapter
     ) {
-        $this->cache = $cache;
-        $this->timeProvider = $timeAdapter;
         $this->key = $key;
-        $this->tokenlimit = $tokenLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
-        $this->threshold = null !== $threshold ? $threshold : 0;
+        $this->cache = $cache;
+        $this->settings = $settings;
+        $this->timeProvider = $timeAdapter;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function access()
+    public function access(): bool
     {
         return 0 === $this->hit();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function hit()
+    public function hit(): bool
     {
         $tokenCount = $this->count();
 
@@ -123,7 +102,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -131,16 +110,18 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         try {
             /** @var CacheTime $timeItem */
             $timeItem = $this->cache->getItem($this->getTimeCacheKey());
-            $timeSinceLastRequest = self::SECOND_TO_MILLISECOND_MULTIPLIER * ($this->timeProvider->now() - $timeItem->getTime());
+            $timeSinceLastRequest = self::SECOND_TO_MILLISECOND_MULTIPLIER * (
+                    $this->timeProvider->now() - $timeItem->getTime()
+                );
 
-            if ($timeSinceLastRequest > $this->timeLimit) {
+            if ($timeSinceLastRequest > $this->settings->getTimeLimit()) {
                 return 0;
             }
 
@@ -152,44 +133,52 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
             return 0;
         }
 
-        // Return the `used` token count, minus the amount of tokens which have been `refilled` since the previous request
-        return  (int) max(0, ceil($countItem->getCount() - ($this->tokenlimit * $timeSinceLastRequest / ($this->timeLimit))));
+        // Return the `used` token count, minus the amount of tokens
+        // which have been `refilled` since the previous request
+        return (int) max(
+            0,
+            ceil(
+                $countItem->getCount() - (
+                    $this->settings->getTokenLimit() * $timeSinceLastRequest / $this->settings->getTimeLimit()
+                )
+            )
+        );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function check()
+    public function check(): bool
     {
         return 0 === $this->getWaitTime($this->count());
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getTime()
+    public function getTimeLimit(): int
     {
-        return $this->timeLimit;
+        return $this->settings->getTimeLimit();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getLimit()
+    public function getHitLimit(): int
     {
-        return $this->tokenlimit;
+        return $this->settings->getTokenLimit();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getRetryTimeout()
+    public function getRetryTimeout(): int
     {
-        if ($this->threshold > $this->count() + 1) {
+        if ($this->settings->getThreshold() > $this->count() + 1) {
             return 0;
         }
 
-        return (int) ceil($this->timeLimit / $this->tokenlimit);
+        return (int) ceil($this->settings->getTimeLimit() / $this->settings->getTokenLimit());
     }
 
     /**
@@ -197,13 +186,18 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
      *
      * @return int
      */
-    private function getWaitTime($tokenCount)
+    private function getWaitTime($tokenCount): int
     {
-        if ($this->threshold > $tokenCount) {
+        if ($this->settings->getThreshold() > $tokenCount) {
             return 0;
         }
 
-        return (int) ceil($this->timeLimit / max(1, ($this->tokenlimit - $this->threshold)));
+        return (int) ceil(
+            $this->settings->getTimeLimit() / max(
+                1,
+                $this->settings->getTokenLimit() - $this->settings->getThreshold()
+            )
+        );
     }
 
     /**
@@ -211,14 +205,20 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
      */
     private function setUsedCapacity($tokens)
     {
-        $this->cache->setItem($this->getTokenCacheKey(), new CacheCount($tokens, $this->cacheTtl));
-        $this->cache->setItem($this->getTimeCacheKey(), new CacheTime($this->timeProvider->now(), $this->cacheTtl));
+        $this->cache->setItem(
+            $this->getTokenCacheKey(),
+            new CacheCount($tokens, $this->settings->getCacheTtl())
+        );
+        $this->cache->setItem(
+            $this->getTimeCacheKey(),
+            new CacheTime($this->timeProvider->now(), $this->settings->getCacheTtl())
+        );
     }
 
     /**
      * @return string
      */
-    private function getTokenCacheKey()
+    private function getTokenCacheKey(): string
     {
         return $this->key.self::CACHE_KEY_TOKEN;
     }
@@ -226,7 +226,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
     /**
      * @return string
      */
-    private function getTimeCacheKey()
+    private function getTimeCacheKey(): string
     {
         return $this->key.self::CACHE_KEY_TIME;
     }

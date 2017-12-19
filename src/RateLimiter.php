@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -26,6 +26,7 @@
 namespace Sunspikes\Ratelimit;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
@@ -69,17 +70,21 @@ class RateLimiter implements RateLimiterInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException
      */
-    public function get($data, ThrottleSettingsInterface $settings = null)
+    public function get($data, ThrottleSettingsInterface $settings = null): ThrottlerInterface
     {
         if (empty($data)) {
-            throw new \InvalidArgumentException('Invalid data, please check the data.');
+            throw new InvalidDataTypeException('Invalid data, please check the data.');
         }
 
         $object = $this->hydratorFactory->make($data)->hydrate($data);
 
-        if (!isset($this->throttlers[$object->getKey()])) {
+        if (null !== $settings || !isset($this->throttlers[$object->getKey()])) {
+            $settings = $settings ?? $this->defaultSettings;
             $this->throttlers[$object->getKey()] = $this->createThrottler($object, $settings);
         }
 
@@ -87,22 +92,15 @@ class RateLimiter implements RateLimiterInterface
     }
 
     /**
-     * @param Data                           $object
-     * @param ThrottleSettingsInterface|null $settings
+     * @param Data                      $object
+     * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
+     *
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
-    private function createThrottler(Data $object, ThrottleSettingsInterface $settings = null)
+    private function createThrottler(Data $object, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
-        if (null === $settings) {
-            $settings = $this->defaultSettings;
-        } else {
-            try {
-                $settings = $this->defaultSettings->merge($settings);
-            } catch (\InvalidArgumentException $exception) {
-            }
-        }
-
         return $this->throttlerFactory->make($object, $settings);
     }
 }

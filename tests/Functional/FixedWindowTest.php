@@ -5,7 +5,7 @@ namespace Sunspikes\Tests\Ratelimit\Functional;
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\RateLimiter;
-use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
+use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\FixedWindowSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
@@ -25,7 +25,7 @@ class FixedWindowTest extends AbstractThrottlerTestCase
     private $timeAdapter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -39,7 +39,7 @@ class FixedWindowTest extends AbstractThrottlerTestCase
     {
         $throttle = $this->ratelimiter->get('window-is-fixed');
 
-        for ($i = -1; $i < $this->getMaxAttempts(); $i++) {
+        for ($i = -1; $i < $this->getMaxAttempts(); ++$i) {
             $throttle->hit();
         }
 
@@ -50,12 +50,12 @@ class FixedWindowTest extends AbstractThrottlerTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {
         return new RateLimiter(
-            new TimeAwareThrottlerFactory($throttlerCache, $this->timeAdapter),
+            new ThrottlerFactory($throttlerCache, $this->timeAdapter),
             new HydratorFactory(),
             new FixedWindowSettings($this->getMaxAttempts(), self::TIME_LIMIT)
         );

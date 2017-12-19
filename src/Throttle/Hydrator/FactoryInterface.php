@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -27,20 +27,16 @@ namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
 use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
 
-/**
- * This is the hydrator factory class.
- *
- * @author Graham Campbell <graham@alt-three.com>
- */
 interface FactoryInterface
 {
     /**
-     * Create a hydrator
+     * Create a hydrator.
      *
      * @param mixed $data
      *
      * @return DataHydratorInterface
+     *
      * @throws InvalidDataTypeException
      */
-    public function make($data);
+    public function make($data): DataHydratorInterface;
 }

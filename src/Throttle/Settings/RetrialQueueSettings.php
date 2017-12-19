@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -41,23 +41,9 @@ final class RetrialQueueSettings implements ThrottleSettingsInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function merge(ThrottleSettingsInterface $settings)
-    {
-        if (!$settings instanceof self) {
-            throw new \InvalidArgumentException(
-                sprintf('Unable to merge %s into %s', get_class($settings), get_class($this))
-            );
-        }
-
-        return new self($this->internalThrottlerSettings->merge($settings->getInternalThrottlerSettings()));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->internalThrottlerSettings->isValid();
     }
@@ -65,8 +51,16 @@ final class RetrialQueueSettings implements ThrottleSettingsInterface
     /**
      * @return ThrottleSettingsInterface
      */
-    public function getInternalThrottlerSettings()
+    public function getInternalThrottlerSettings(): ThrottleSettingsInterface
     {
         return $this->internalThrottlerSettings;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheTtl()
+    {
+        $this->internalThrottlerSettings->getCacheTtl();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -30,17 +30,17 @@ final class PhpTimeAdapter implements TimeAdapterInterface
     /**
      * @return float
      */
-    public function now()
+    public function now(): float
     {
-        list($usec, $sec) = explode(" ", microtime());
+        list($usec, $sec) = explode(' ', microtime());
 
-        return ((float) $usec + (float) $sec);
+        return (float) $usec + (float) $sec;
     }
 
     /**
      * @param int $microseconds
      */
-    public function usleep($microseconds)
+    public function usleep(int $microseconds)
     {
         usleep($microseconds);
     }

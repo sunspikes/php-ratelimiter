@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -28,9 +28,9 @@ namespace Sunspikes\Ratelimit\Throttle\Throttler;
 interface RetriableThrottlerInterface extends ThrottlerInterface
 {
     /**
-     * Return the number of milliseconds to wait before a valid request can be made
+     * Return the number of milliseconds to wait before a valid request can be made.
      *
      * @return int
      */
-    public function getRetryTimeout();
+    public function getRetryTimeout(): int;
 }

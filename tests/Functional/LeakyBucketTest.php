@@ -5,7 +5,7 @@ namespace Sunspikes\Tests\Ratelimit\Functional;
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
 use Sunspikes\Ratelimit\RateLimiter;
-use Sunspikes\Ratelimit\Throttle\Factory\TimeAwareThrottlerFactory;
+use Sunspikes\Ratelimit\Throttle\Factory\ThrottlerFactory;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
@@ -22,7 +22,7 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
     private $timeAdapter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -43,12 +43,12 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {
         return new RateLimiter(
-            new TimeAwareThrottlerFactory($throttlerCache, $this->timeAdapter),
+            new ThrottlerFactory($throttlerCache, $this->timeAdapter),
             new HydratorFactory(),
             new LeakyBucketSettings(self::TOKEN_LIMIT, self::TIME_LIMIT, $this->getMaxAttempts())
         );

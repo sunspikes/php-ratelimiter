@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -28,14 +28,12 @@ namespace Sunspikes\Ratelimit\Throttle\Settings;
 interface ThrottleSettingsInterface
 {
     /**
-     * @param ThrottleSettingsInterface $settings
-     *
-     * @return ThrottleSettingsInterface
-     */
-    public function merge(ThrottleSettingsInterface $settings);
-
-    /**
      * @return bool
      */
-    public function isValid();
+    public function isValid(): bool;
+
+    /**
+     * @return int|null
+     */
+    public function getCacheTtl();
 }

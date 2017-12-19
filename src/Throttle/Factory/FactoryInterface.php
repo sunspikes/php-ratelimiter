@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -26,19 +26,21 @@
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
 interface FactoryInterface
 {
     /**
-     * Create the throttler
+     * Create the throttler.
      *
      * @param Data                      $data
      * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
-     * @throws \InvalidArgumentException
+     *
+     * @throws InvalidThrottlerSettingsException
      */
-    public function make(Data $data, ThrottleSettingsInterface $settings);
+    public function make(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface;
 }

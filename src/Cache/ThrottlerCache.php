@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -48,7 +48,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getItem(string $key): ThrottlerItemInterface
     {
@@ -70,7 +70,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hasItem(string $key): bool
     {
@@ -82,7 +82,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setItem(string $key, ThrottlerItemInterface $item): bool
     {
@@ -93,19 +93,19 @@ class ThrottlerCache implements ThrottlerCacheInterface
         }
 
         $cacheItem->set(serialize($item));
-        $cacheItem->expiresAfter($item->getTtl());
+        $cacheItem->expiresAt($item->getTtl());
 
         return $this->cacheItemPool->save($cacheItem);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function removeItem(string $key)
     {
         try {
             $this->cacheItemPool->deleteItem($key);
-        }  catch (PsrCacheException $e) {
+        } catch (PsrCacheException $e) {
             throw new CacheAdapterException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
