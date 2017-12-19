@@ -22,7 +22,7 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
     private $timeAdapter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -45,7 +45,7 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {

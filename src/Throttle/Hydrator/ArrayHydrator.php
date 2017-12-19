@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -30,7 +30,7 @@ use Sunspikes\Ratelimit\Throttle\Entity\Data;
 class ArrayHydrator implements DataHydratorInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hydrate($data): Data
     {

@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -37,7 +37,7 @@ final class TestTimeAdapter implements TimeAdapterInterface
      */
     public function setNow(float $now)
     {
-        $this->time =  $now;
+        $this->time = $now;
     }
 
     /**

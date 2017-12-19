@@ -26,7 +26,7 @@ class ThrottlerFactoryTest extends TestCase
     protected $factory;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {

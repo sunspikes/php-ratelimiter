@@ -17,7 +17,7 @@ abstract class AbstractThrottlerTestCase extends TestCase
     protected $ratelimiter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -28,7 +28,7 @@ abstract class AbstractThrottlerTestCase extends TestCase
     }
 
     /**
-     * Get the cache pool adapter to use
+     * Get the cache pool adapter to use.
      *
      * @return ArrayCachePool|RedisCachePool
      */
@@ -61,7 +61,7 @@ abstract class AbstractThrottlerTestCase extends TestCase
         $key = $this->getRateLimiterKey('post-limit-test');
         $throttle = $this->ratelimiter->get($key);
 
-        for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
+        for ($i = 0; $i < $this->getMaxAttempts(); ++$i) {
             $throttle->hit();
         }
 
@@ -73,7 +73,7 @@ abstract class AbstractThrottlerTestCase extends TestCase
         $key = $this->getRateLimiterKey('access-test');
         $throttle = $this->ratelimiter->get($key);
 
-        for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
+        for ($i = 0; $i < $this->getMaxAttempts(); ++$i) {
             $throttle->access();
         }
 
@@ -85,7 +85,7 @@ abstract class AbstractThrottlerTestCase extends TestCase
         $key = $this->getRateLimiterKey('count-test');
         $throttle = $this->ratelimiter->get($key);
 
-        for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
+        for ($i = 0; $i < $this->getMaxAttempts(); ++$i) {
             $throttle->access();
         }
 
@@ -103,7 +103,7 @@ abstract class AbstractThrottlerTestCase extends TestCase
     }
 
     /**
-     * Get an unique key based on throttling mode
+     * Get an unique key based on throttling mode.
      *
      * @param string $key
      *

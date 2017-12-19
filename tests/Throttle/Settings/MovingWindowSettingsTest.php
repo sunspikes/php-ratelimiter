@@ -7,7 +7,7 @@ use Sunspikes\Ratelimit\Throttle\Settings\MovingWindowSettings;
 class MovingWindowSettingsTest extends AbstractWindowSettingsTest
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getSettings($hitLimit = null, $timeLimit = null, $cacheTtl = null)
     {

@@ -25,7 +25,7 @@ class FixedWindowTest extends AbstractThrottlerTestCase
     private $timeAdapter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -39,7 +39,7 @@ class FixedWindowTest extends AbstractThrottlerTestCase
     {
         $throttle = $this->ratelimiter->get('window-is-fixed');
 
-        for ($i = -1; $i < $this->getMaxAttempts(); $i++) {
+        for ($i = -1; $i < $this->getMaxAttempts(); ++$i) {
             $throttle->hit();
         }
 
@@ -50,7 +50,7 @@ class FixedWindowTest extends AbstractThrottlerTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {

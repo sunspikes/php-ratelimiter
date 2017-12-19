@@ -29,7 +29,7 @@ class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
     private $timeAdapter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {

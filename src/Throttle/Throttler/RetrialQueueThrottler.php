@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -50,7 +50,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function access(): bool
     {
@@ -61,7 +61,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hit()
     {
@@ -73,7 +73,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -81,7 +81,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function count(): int
     {
@@ -89,7 +89,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function check(): bool
     {
@@ -97,7 +97,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTimeLimit(): int
     {
@@ -105,7 +105,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface, \Countable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getHitLimit(): int
     {

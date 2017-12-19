@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -48,7 +48,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getItem(string $key): ThrottlerItemInterface
     {
@@ -70,7 +70,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hasItem(string $key): bool
     {
@@ -82,7 +82,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setItem(string $key, ThrottlerItemInterface $item): bool
     {
@@ -99,7 +99,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function removeItem(string $key)
     {

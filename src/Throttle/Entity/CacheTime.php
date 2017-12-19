@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -54,7 +54,7 @@ class CacheTime extends AbstractCacheItem
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTtl()
     {
@@ -62,7 +62,7 @@ class CacheTime extends AbstractCacheItem
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function fromArray(array $array)
     {
@@ -71,13 +71,13 @@ class CacheTime extends AbstractCacheItem
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function toArray(): array
     {
         return [
             'time' => $this->time,
-            'ttl'  => $this->ttl,
+            'ttl' => $this->ttl,
         ];
     }
 }

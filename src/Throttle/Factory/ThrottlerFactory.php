@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -42,7 +42,6 @@ use Sunspikes\Ratelimit\Throttle\Throttler\RetrialQueueThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-
 class ThrottlerFactory implements FactoryInterface
 {
     /**
@@ -66,7 +65,7 @@ class ThrottlerFactory implements FactoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function make(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
@@ -78,7 +77,7 @@ class ThrottlerFactory implements FactoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createThrottler(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
@@ -97,6 +96,7 @@ class ThrottlerFactory implements FactoryInterface
      * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
+     *
      * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
     private function createNestableController(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface

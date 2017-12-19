@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -37,7 +37,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
     private $key;
 
     /**
-     * [Timestamp => recorded hits]
+     * [Timestamp => recorded hits].
      *
      * @var array
      */
@@ -46,10 +46,10 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
     /**
      * MovingWindowThrottler constructor.
      *
-     * @param string $key
+     * @param string                  $key
      * @param ThrottlerCacheInterface $cache
-     * @param MovingWindowSettings $settings
-     * @param TimeAdapterInterface $timeAdapter
+     * @param MovingWindowSettings    $settings
+     * @param TimeAdapterInterface    $timeAdapter
      */
     public function __construct(
         string $key,
@@ -62,11 +62,11 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hit()
     {
-        $timestamp = (int)ceil($this->timeProvider->now());
+        $timestamp = (int) ceil($this->timeProvider->now());
         $this->updateHitCount();
 
         if (!isset($this->hitCountMapping[$timestamp])) {
@@ -74,24 +74,24 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
         }
 
         //Adds 1 recorded hit to the mapping entry for the current timestamp
-        $this->hitCountMapping[$timestamp]++;
+        ++$this->hitCountMapping[$timestamp];
         $this->cache->setItem($this->key, new CacheHitMapping($this->hitCountMapping, $this->settings->getCacheTtl()));
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function count(): int
     {
         $this->updateHitCount();
 
-        return (int)array_sum($this->hitCountMapping);
+        return (int) array_sum($this->hitCountMapping);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getRetryTimeout(): int
     {
@@ -105,7 +105,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
             if ($this->settings->getHitLimit() > $totalHitCount -= $hitCount) {
                 return self::SECOND_TO_MILLISECOND_MULTIPLIER * max(
                         0,
-                        $this->settings->getTimeLimit() - ((int)ceil($this->timeProvider->now()) - $timestamp)
+                        $this->settings->getTimeLimit() - ((int) ceil($this->timeProvider->now()) - $timestamp)
                     );
             }
         }
@@ -114,7 +114,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -134,7 +134,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
         } catch (ItemNotFoundException $exception) {
         }
 
-        $startTime = (int)ceil($this->timeProvider->now()) - $this->settings->getTimeLimit();
+        $startTime = (int) ceil($this->timeProvider->now()) - $this->settings->getTimeLimit();
 
         // Clear all entries older than the window front-edge
         $relevantTimestamps = array_filter(

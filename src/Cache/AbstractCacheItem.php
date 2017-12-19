@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -47,14 +47,14 @@ abstract class AbstractCacheItem implements ThrottlerItemInterface
     }
 
     /**
-     * Wake up call to build the cache item object from array representation
+     * Wake up call to build the cache item object from array representation.
      *
      * @param array $array
      */
     abstract protected function fromArray(array $array);
 
     /**
-     * Get the array representation of the object
+     * Get the array representation of the object.
      *
      * @return array
      */

@@ -22,7 +22,7 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
     private $timeAdapter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -43,7 +43,7 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {

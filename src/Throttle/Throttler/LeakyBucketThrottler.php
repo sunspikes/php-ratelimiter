@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -78,7 +78,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function access(): bool
     {
@@ -86,7 +86,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hit(): bool
     {
@@ -102,7 +102,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -110,7 +110,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function count(): int
     {
@@ -135,7 +135,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
 
         // Return the `used` token count, minus the amount of tokens
         // which have been `refilled` since the previous request
-        return (int)max(
+        return (int) max(
             0,
             ceil(
                 $countItem->getCount() - (
@@ -146,7 +146,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function check(): bool
     {
@@ -154,7 +154,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTimeLimit(): int
     {
@@ -162,7 +162,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getHitLimit(): int
     {
@@ -170,7 +170,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getRetryTimeout(): int
     {
@@ -178,7 +178,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
             return 0;
         }
 
-        return (int)ceil($this->settings->getTimeLimit() / $this->settings->getTokenLimit());
+        return (int) ceil($this->settings->getTimeLimit() / $this->settings->getTokenLimit());
     }
 
     /**
@@ -192,7 +192,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface, \Counta
             return 0;
         }
 
-        return (int)ceil(
+        return (int) ceil(
             $this->settings->getTimeLimit() / max(
                 1,
                 $this->settings->getTokenLimit() - $this->settings->getThreshold()

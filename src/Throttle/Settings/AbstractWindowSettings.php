@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -45,7 +45,7 @@ abstract class AbstractWindowSettings extends AbstractSettings implements Thrott
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isValid(): bool
     {

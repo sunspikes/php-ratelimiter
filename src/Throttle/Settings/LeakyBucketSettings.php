@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -39,9 +39,9 @@ final class LeakyBucketSettings extends AbstractSettings implements ThrottleSett
 
     /**
      * @param int|null $tokenLimit
-     * @param int|null $timeLimit In milliseconds
+     * @param int|null $timeLimit  In milliseconds
      * @param int|null $threshold
-     * @param int|null $cacheTtl  In seconds
+     * @param int|null $cacheTtl   In seconds
      */
     public function __construct(
         int $tokenLimit = null,
@@ -56,7 +56,7 @@ final class LeakyBucketSettings extends AbstractSettings implements ThrottleSett
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isValid(): bool
     {

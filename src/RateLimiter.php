@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -70,7 +70,8 @@ class RateLimiter implements RateLimiterInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException
      */
@@ -95,6 +96,7 @@ class RateLimiter implements RateLimiterInterface
      * @param ThrottleSettingsInterface $settings
      *
      * @return ThrottlerInterface
+     *
      * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
     private function createThrottler(Data $object, ThrottleSettingsInterface $settings): ThrottlerInterface

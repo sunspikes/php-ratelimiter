@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -26,7 +26,6 @@
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
-use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 use Sunspikes\Ratelimit\Throttle\Settings\AbstractWindowSettings;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
@@ -62,7 +61,7 @@ abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function access(): bool
     {
@@ -73,7 +72,7 @@ abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function check(): bool
     {
@@ -81,7 +80,7 @@ abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTimeLimit(): int
     {
@@ -89,7 +88,7 @@ abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getHitLimit(): int
     {
@@ -97,12 +96,12 @@ abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     abstract public function hit();
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     abstract public function count(): int;
 }

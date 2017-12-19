@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -46,7 +46,7 @@ final class Data
     }
 
     /**
-     * Get data
+     * Get data.
      *
      * @return string
      */
@@ -56,7 +56,7 @@ final class Data
     }
 
     /**
-     * Get key
+     * Get key.
      *
      * @return string
      */

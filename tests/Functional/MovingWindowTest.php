@@ -25,7 +25,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
     private $timeAdapter;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -42,7 +42,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
 
         $timeValues = [];
 
-        for ($i = 0; $i < $this->getMaxAttempts(); $i++) {
+        for ($i = 0; $i < $this->getMaxAttempts(); ++$i) {
             $timeValues[] = $this->startTime + $i;
             $timeValues[] = $this->startTime + $i;
         }
@@ -52,7 +52,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
 
         $this->timeAdapter->shouldReceive('now')->andReturnValues($timeValues);
 
-        for ($i = 0; $i < $this->getMaxAttempts() + 1; $i++) {
+        for ($i = 0; $i < $this->getMaxAttempts() + 1; ++$i) {
             $throttle->hit();
         }
 
@@ -61,7 +61,7 @@ class MovingWindowTest extends AbstractThrottlerTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {

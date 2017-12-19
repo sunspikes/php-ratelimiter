@@ -11,7 +11,7 @@ use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 class ElasticWindowTest extends AbstractThrottlerTestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createRatelimiter(ThrottlerCacheInterface $throttlerCache)
     {

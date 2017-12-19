@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -34,6 +34,7 @@ interface ThrottlerCacheInterface
      * @param string $key
      *
      * @return ThrottlerItemInterface
+     *
      * @throws CacheAdapterException
      * @throws ItemNotFoundException
      */
@@ -44,6 +45,7 @@ interface ThrottlerCacheInterface
      * @param ThrottlerItemInterface $item
      *
      * @return bool
+     *
      * @throws CacheAdapterException
      */
     public function setItem(string $key, ThrottlerItemInterface $item): bool;
@@ -52,6 +54,7 @@ interface ThrottlerCacheInterface
      * @param string $key
      *
      * @return bool
+     *
      * @throws CacheAdapterException
      */
     public function hasItem(string $key): bool;

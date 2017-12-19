@@ -1,6 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
+ * The MIT License (MIT).
  *
  * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
  *
@@ -46,10 +46,10 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     /**
      * ElasticWindowThrottler constructor.
      *
-     * @param string $key
+     * @param string                  $key
      * @param ThrottlerCacheInterface $cache
-     * @param ElasticWindowSettings $settings
-     * @param TimeAdapterInterface $timeAdapter
+     * @param ElasticWindowSettings   $settings
+     * @param TimeAdapterInterface    $timeAdapter
      */
     public function __construct(
         string $key,
@@ -62,7 +62,7 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hit(): ThrottlerInterface
     {
@@ -73,7 +73,7 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -84,7 +84,7 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function count(): int
     {
@@ -102,7 +102,7 @@ final class ElasticWindowThrottler extends AbstractWindowThrottler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getRetryTimeout(): int
     {
