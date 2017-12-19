@@ -23,28 +23,35 @@
  * SOFTWARE.
  */
 
-namespace Sunspikes\Ratelimit\Throttle\Settings;
+namespace Sunspikes\Ratelimit\Time;
 
-trait TimeLimitAwareSettingsTrait
+final class TestTimeAdapter implements TimeAdapterInterface
 {
     /**
-     * @var int|null
+     * @var float
      */
-    protected $timeLimit;
+    private $time = 0;
 
     /**
-     * @return int|null
+     * @param float $now
      */
-    public function getTimeLimit()
+    public function setNow(float $now)
     {
-        return $this->timeLimit;
+        $this->time =  $now;
     }
 
     /**
-     * @return bool
+     * @return float
      */
-    protected function isValidTimeLimit(): bool
+    public function now(): float
     {
-        return null !== $this->timeLimit && 0 !== $this->timeLimit;
+        return $this->time;
+    }
+
+    /**
+     * @param int $microseconds
+     */
+    public function usleep(int $microseconds)
+    {
     }
 }

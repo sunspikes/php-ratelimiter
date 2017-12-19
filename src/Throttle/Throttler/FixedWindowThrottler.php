@@ -48,11 +48,6 @@ final class FixedWindowThrottler extends AbstractWindowThrottler
     private $hitCount;
 
     /**
-     * @var TimeAdapterInterface
-     */
-    private $timeProvider;
-
-    /**
      * FixedWindowThrottler constructor.
      *
      * @param string                  $key
@@ -66,9 +61,8 @@ final class FixedWindowThrottler extends AbstractWindowThrottler
         FixedWindowSettings $settings,
         TimeAdapterInterface $timeAdapter
     ) {
-        parent::__construct($cache, $settings);
+        parent::__construct($cache, $settings, $timeAdapter);
         $this->key = $key;
-        $this->timeProvider = $timeAdapter;
     }
 
     /**

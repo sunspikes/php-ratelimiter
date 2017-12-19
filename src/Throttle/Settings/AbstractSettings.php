@@ -25,7 +25,7 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-trait CacheTtlAwareSettingsTrait
+abstract class AbstractSettings
 {
     /**
      * @var int|null
@@ -33,10 +33,31 @@ trait CacheTtlAwareSettingsTrait
     protected $cacheTtl;
 
     /**
+     * @var int|null
+     */
+    protected $timeLimit;
+
+    /**
      * @return int|null
      */
     public function getCacheTtl()
     {
         return $this->cacheTtl;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTimeLimit()
+    {
+        return $this->timeLimit;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isValidTimeLimit(): bool
+    {
+        return null !== $this->timeLimit && 0 !== $this->timeLimit;
     }
 }

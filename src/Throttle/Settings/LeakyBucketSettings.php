@@ -25,10 +25,8 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-final class LeakyBucketSettings implements ThrottleSettingsInterface
+final class LeakyBucketSettings extends AbstractSettings implements ThrottleSettingsInterface
 {
-    use CacheTtlAwareSettingsTrait, TimeLimitAwareSettingsTrait;
-
     /**
      * @var int|null
      */

@@ -25,10 +25,8 @@
 
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
-abstract class AbstractWindowSettings implements ThrottleSettingsInterface
+abstract class AbstractWindowSettings extends AbstractSettings implements ThrottleSettingsInterface
 {
-    use CacheTtlAwareSettingsTrait, TimeLimitAwareSettingsTrait;
-
     /**
      * @var int|null
      */

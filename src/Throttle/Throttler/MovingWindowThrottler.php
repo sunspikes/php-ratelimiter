@@ -44,11 +44,6 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
     private $hitCountMapping = [];
 
     /**
-     * @var TimeAdapterInterface
-     */
-    private $timeProvider;
-
-    /**
      * MovingWindowThrottler constructor.
      *
      * @param string $key
@@ -62,9 +57,8 @@ final class MovingWindowThrottler extends AbstractWindowThrottler
         MovingWindowSettings $settings,
         TimeAdapterInterface $timeAdapter
     ) {
-        parent::__construct($cache, $settings);
+        parent::__construct($cache, $settings, $timeAdapter);
         $this->key = $key;
-        $this->timeProvider = $timeAdapter;
     }
 
     /**

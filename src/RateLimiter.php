@@ -71,8 +71,10 @@ class RateLimiter implements RateLimiterInterface
 
     /**
      * @inheritdoc
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
+     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException
      */
-    public function get($data): ThrottlerInterface
+    public function get($data, ThrottleSettingsInterface $settings = null): ThrottlerInterface
     {
         if (empty($data)) {
             throw new InvalidDataTypeException('Invalid data, please check the data.');
@@ -80,8 +82,9 @@ class RateLimiter implements RateLimiterInterface
 
         $object = $this->hydratorFactory->make($data)->hydrate($data);
 
-        if (!isset($this->throttlers[$object->getKey()])) {
-            $this->throttlers[$object->getKey()] = $this->createThrottler($object, $this->defaultSettings);
+        if (null !== $settings || !isset($this->throttlers[$object->getKey()])) {
+            $settings = $settings ?? $this->defaultSettings;
+            $this->throttlers[$object->getKey()] = $this->createThrottler($object, $settings);
         }
 
         return $this->throttlers[$object->getKey()];

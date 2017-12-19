@@ -93,7 +93,7 @@ class ThrottlerCache implements ThrottlerCacheInterface
         }
 
         $cacheItem->set(serialize($item));
-        $cacheItem->expiresAfter($item->getTtl());
+        $cacheItem->expiresAt($item->getTtl());
 
         return $this->cacheItemPool->save($cacheItem);
     }

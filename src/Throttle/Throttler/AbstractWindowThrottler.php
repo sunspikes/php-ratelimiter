@@ -26,7 +26,9 @@
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 use Sunspikes\Ratelimit\Cache\ThrottlerCacheInterface;
+use Sunspikes\Ratelimit\Cache\ThrottlerItemInterface;
 use Sunspikes\Ratelimit\Throttle\Settings\AbstractWindowSettings;
+use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \Countable
 {
@@ -41,17 +43,22 @@ abstract class AbstractWindowThrottler implements RetriableThrottlerInterface, \
     protected $settings;
 
     /**
+     * @var TimeAdapterInterface
+     */
+    protected $timeProvider;
+
+    /**
      * AbstractWindowThrottler constructor.
      *
      * @param ThrottlerCacheInterface $cache
      * @param AbstractWindowSettings  $settings
-     *
-     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
+     * @param TimeAdapterInterface    $timeAdapter
      */
-    public function __construct(ThrottlerCacheInterface $cache, AbstractWindowSettings $settings)
+    public function __construct(ThrottlerCacheInterface $cache, AbstractWindowSettings $settings, TimeAdapterInterface $timeAdapter)
     {
         $this->cache = $cache;
         $this->settings = $settings;
+        $this->timeProvider = $timeAdapter;
     }
 
     /**

@@ -34,11 +34,9 @@ interface RateLimiterInterface
      * Return a throttler for given data
      *
      * @param mixed                          $data
+     * @param ThrottleSettingsInterface|null $settings
      *
      * @return ThrottlerInterface
-     *
-     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException
-     * @throws \Sunspikes\Ratelimit\Throttle\Exception\InvalidThrottlerSettingsException
      */
-    public function get($data): ThrottlerInterface;
+    public function get($data, ThrottleSettingsInterface $settings = null): ThrottlerInterface;
 }
