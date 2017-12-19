@@ -36,8 +36,11 @@ abstract class AbstractThrottlerTestCase extends TestCase
     {
         if (class_exists(\Redis::class)) {
             $redis = new \Redis();
-            if (true === $redis->connect('localhost')) {
-                return new RedisCachePool($redis);
+            try {
+                if (true === $redis->connect('localhost')) {
+                    return new RedisCachePool($redis);
+                }
+            } catch (\Exception $e) {
             }
         }
 

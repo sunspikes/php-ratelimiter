@@ -12,9 +12,15 @@ use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface;
+use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class ThrottlerFactoryTest extends TestCase
 {
+    /**
+     * @var TimeAdapterInterface|MockInterface
+     */
+    protected $timeAdapter;
+
     /**
      * @var ThrottlerCacheInterface|MockInterface
      */
@@ -30,8 +36,9 @@ class ThrottlerFactoryTest extends TestCase
      */
     protected function setUp()
     {
+        $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->throttlerCache = M::mock(ThrottlerCacheInterface::class);
-        $this->factory = new ThrottlerFactory($this->throttlerCache);
+        $this->factory = new ThrottlerFactory($this->throttlerCache, $this->timeAdapter);
     }
 
     public function testMakeElasticWindow()
