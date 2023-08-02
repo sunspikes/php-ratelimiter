@@ -56,7 +56,7 @@ interface ThrottlerInterface
      *
      * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
      * Check the throttle status

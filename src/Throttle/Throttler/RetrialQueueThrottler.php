@@ -83,7 +83,7 @@ final class RetrialQueueThrottler implements ThrottlerInterface
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         return $this->internalThrottler->count();
     }

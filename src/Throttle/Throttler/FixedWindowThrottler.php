@@ -59,7 +59,7 @@ final class FixedWindowThrottler extends AbstractWindowThrottler implements Retr
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         try {
             if (($this->timeProvider->now() - $this->cache->get($this->getTimeCacheKey())) > $this->timeLimit) {

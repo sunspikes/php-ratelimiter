@@ -58,7 +58,7 @@ final class MovingWindowThrottler extends AbstractWindowThrottler implements Ret
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         $this->updateHitCount();
 
