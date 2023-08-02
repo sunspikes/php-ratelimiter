@@ -131,7 +131,7 @@ final class LeakyBucketThrottler implements RetriableThrottlerInterface
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         try {
             $cachedTime = $this->cache->get($this->getTimeCacheKey());

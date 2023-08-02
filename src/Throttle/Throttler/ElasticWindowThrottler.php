@@ -94,7 +94,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         if (!is_null($this->counter)) {
             return $this->counter;
