@@ -128,5 +128,5 @@ abstract class AbstractWindowThrottler
     /**
      * @inheritdoc
      */
-    abstract public function count();
+    abstract public function count(): int;
 }
