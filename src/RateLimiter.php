@@ -92,7 +92,7 @@ class RateLimiter implements RateLimiterInterface
      *
      * @return ThrottlerInterface
      */
-    private function createThrottler(Data $object, ThrottleSettingsInterface $settings = null)
+    private function createThrottler(Data $object, ?ThrottleSettingsInterface $settings = null)
     {
         if (null === $settings) {
             $settings = $this->defaultSettings;

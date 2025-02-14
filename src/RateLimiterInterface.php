@@ -40,5 +40,5 @@ interface RateLimiterInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function get($data, ThrottleSettingsInterface $throttlerSettings = null);
+    public function get($data, ?ThrottleSettingsInterface $throttlerSettings = null);
 }
