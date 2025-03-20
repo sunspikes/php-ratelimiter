@@ -71,7 +71,7 @@ class RateLimiter implements RateLimiterInterface
     /**
      * @inheritdoc
      */
-    public function get($data, ThrottleSettingsInterface $settings = null)
+    public function get($data, ?ThrottleSettingsInterface $settings = null)
     {
         if (empty($data)) {
             throw new \InvalidArgumentException('Invalid data, please check the data.');
