@@ -2,12 +2,13 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Hydrator;
 
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator;
 
-class ArrayHydratorTest extends \PHPUnit_Framework_TestCase
+class ArrayHydratorTest extends TestCase
 {
-    public function testHydrate()
+    public function testHydrate(): void
     {
         $arrayHydrator = new ArrayHydrator();
         $data = $arrayHydrator->hydrate([]);

@@ -23,7 +23,11 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Hydrator;
+
+use Sunspikes\Ratelimit\Throttle\Entity\Data;
 
 interface DataHydratorInterface
 {
@@ -32,7 +36,7 @@ interface DataHydratorInterface
      *
      * @param mixed $data
      *
-     * @return \Sunspikes\Ratelimit\Throttle\Entity\Data
+     * @return Data
      */
-    public function hydrate($data);
+    public function hydrate(mixed $data): Data;
 }

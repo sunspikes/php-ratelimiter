@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
@@ -42,24 +44,20 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 class TimeAwareThrottlerFactory extends ThrottlerFactory
 {
     /**
-     * @var TimeAdapterInterface
-     */
-    private $timeAdapter;
-
-    /**
      * @param CacheAdapterInterface $cacheAdapter
      * @param TimeAdapterInterface  $timeAdapter
      */
-    public function __construct(CacheAdapterInterface $cacheAdapter, TimeAdapterInterface $timeAdapter)
-    {
+    public function __construct(
+        CacheAdapterInterface $cacheAdapter,
+        private TimeAdapterInterface $timeAdapter
+    ) {
         parent::__construct($cacheAdapter);
-        $this->timeAdapter = $timeAdapter;
     }
 
     /**
      * @inheritdoc
      */
-    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings)
+    protected function createThrottler(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         if ($settings instanceof RetrialQueueSettings) {
             return new RetrialQueueThrottler(
@@ -77,7 +75,7 @@ class TimeAwareThrottlerFactory extends ThrottlerFactory
      *
      * @return ThrottlerInterface
      */
-    private function createNestableController(Data $data, ThrottleSettingsInterface $settings)
+    private function createNestableController(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface
     {
         if ($settings instanceof LeakyBucketSettings) {
             return new LeakyBucketThrottler(

@@ -1,27 +1,6 @@
 <?php
-/**
- * The MIT License (MIT)
- *
- * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+
+declare(strict_types=1);
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
@@ -29,30 +8,13 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 final class RetrialQueueThrottler implements ThrottlerInterface
 {
-    /**
-     * @var ThrottlerInterface
-     */
-    private $internalThrottler;
-
-    /**
-     * @var TimeAdapterInterface
-     */
-    private $timeProvider;
-
-    /**
-     * @param RetriableThrottlerInterface $internalThrottler
-     * @param TimeAdapterInterface        $timeProvider
-     */
-    public function __construct(RetriableThrottlerInterface $internalThrottler, TimeAdapterInterface $timeProvider)
-    {
-        $this->internalThrottler = $internalThrottler;
-        $this->timeProvider = $timeProvider;
+    public function __construct(
+        private RetriableThrottlerInterface $internalThrottler,
+        private TimeAdapterInterface $timeProvider
+    ) {
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function access()
+    public function access(): bool
     {
         $status = $this->check();
         $this->hit();
@@ -60,54 +22,36 @@ final class RetrialQueueThrottler implements ThrottlerInterface
         return $status;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hit()
+    public function hit(): mixed
     {
         if (0 !== $waitTime = $this->internalThrottler->getRetryTimeout()) {
-            $this->timeProvider->usleep(self::MILLISECOND_TO_MICROSECOND_MULTIPLIER * $waitTime);
+            $this->timeProvider->usleep(self::MILLISECOND_TO_MICROSECOND_MULTIPLIER * (int) $waitTime);
         }
 
         return $this->internalThrottler->hit();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function clear()
+    public function clear(): void
     {
         $this->internalThrottler->clear();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function count(): int
     {
         return $this->internalThrottler->count();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function check()
+    public function check(): bool
     {
         return $this->internalThrottler->check();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getTime()
+    public function getTime(): int
     {
         return $this->internalThrottler->getTime();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->internalThrottler->getLimit();
     }

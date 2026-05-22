@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Factory;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
@@ -40,5 +42,5 @@ interface FactoryInterface
      * @return ThrottlerInterface
      * @throws \InvalidArgumentException
      */
-    public function make(Data $data, ThrottleSettingsInterface $settings);
+    public function make(Data $data, ThrottleSettingsInterface $settings): ThrottlerInterface;
 }

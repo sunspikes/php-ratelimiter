@@ -3,12 +3,13 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Settings\AbstractWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
-abstract class AbstractWindowSettingsTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractWindowSettingsTest extends TestCase
 {
-    public function testMergeWithEmpty()
+    public function testMergeWithEmpty(): void
     {
         $mergedSettings = $this->getSettings(120, 60, 3600)->merge($this->getSettings());
 
@@ -17,7 +18,7 @@ abstract class AbstractWindowSettingsTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(3600, $mergedSettings->getCacheTtl());
     }
 
-    public function testMergeWithNonEmpty()
+    public function testMergeWithNonEmpty(): void
     {
         $mergedSettings = $this->getSettings(null, 60, null)->merge($this->getSettings(120, null, null));
 
@@ -26,24 +27,21 @@ abstract class AbstractWindowSettingsTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(null, $mergedSettings->getCacheTtl());
     }
 
-    public function testInvalidMerge()
+    public function testInvalidMerge(): void
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->getSettings()->merge(M::mock(ThrottleSettingsInterface::class));
     }
 
     /**
      * @dataProvider inputProvider
      */
-    public function testIsValid($tokenLimit, $timeLimit, $result)
+    public function testIsValid(?int $tokenLimit, ?int $timeLimit, bool $result): void
     {
         self::assertEquals($result, $this->getSettings($tokenLimit, $timeLimit)->isValid());
     }
 
-    /**
-     * @return array
-     */
-    public function inputProvider()
+    public static function inputProvider(): array
     {
         return [
             [null, null, false],
@@ -54,12 +52,5 @@ abstract class AbstractWindowSettingsTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @param int|null $hitLimit
-     * @param int|null $timeLimit
-     * @param int|null $cacheTtl
-     *
-     * @return AbstractWindowSettings
-     */
-    abstract protected function getSettings($hitLimit = null, $timeLimit = null, $cacheTtl = null);
+    abstract protected function getSettings(?int $hitLimit = null, ?int $timeLimit = null, ?int $cacheTtl = null): AbstractWindowSettings;
 }

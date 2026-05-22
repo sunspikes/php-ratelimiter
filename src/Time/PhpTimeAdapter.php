@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Time;
 
 final class PhpTimeAdapter implements TimeAdapterInterface
@@ -30,17 +32,15 @@ final class PhpTimeAdapter implements TimeAdapterInterface
     /**
      * @return float
      */
-    public function now()
+    public function now(): float
     {
-        list($usec, $sec) = explode(" ", microtime());
-
-        return ((float) $usec + (float) $sec);
+        return microtime(true);
     }
 
     /**
      * @param int $microseconds
      */
-    public function usleep($microseconds)
+    public function usleep(int $microseconds): void
     {
         usleep($microseconds);
     }

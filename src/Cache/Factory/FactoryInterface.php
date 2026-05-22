@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Cache\Factory;
 
 interface FactoryInterface
@@ -30,7 +32,7 @@ interface FactoryInterface
     /**
      * Create a cache driver adapter
      *
-     * @return mixed
+     * @return \Desarrolla2\Cache\CacheInterface
      */
-    public function make();
+    public function make(): \Desarrolla2\Cache\CacheInterface;
 }

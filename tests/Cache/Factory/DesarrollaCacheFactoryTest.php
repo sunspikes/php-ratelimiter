@@ -2,47 +2,50 @@
 
 namespace Sunspikes\Tests\Ratelimit\Cache\Factory;
 
-use Desarrolla2\Cache\Cache;
+use Desarrolla2\Cache\CacheInterface;
+use PHPUnit\Framework\TestCase;
+use Sunspikes\Ratelimit\Cache\Exception\InvalidConfigException;
 use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 
-class DesarrollaCacheFactoryTest extends \PHPUnit_Framework_TestCase
+class DesarrollaCacheFactoryTest extends TestCase
 {
-    public function testMake()
+    public function testMake(): void
     {
         $factory = new DesarrollaCacheFactory();
         $cache = $factory->make();
 
-        $this->assertInstanceOf(Cache::class, $cache);
+        $this->assertInstanceOf(CacheInterface::class, $cache);
     }
 
     /**
      * @dataProvider configProvider
-     *
-     * @param array $config
      */
-    public function testCreateDrivers(array $config, $driverClass)
+    public function testCreateDrivers(array $config, ?string $driverClass): void
     {
         if (null !== $driverClass && !class_exists($driverClass)) {
-            $this->markTestSkipped($driverClass.' is not available on this system');
+            $this->markTestSkipped($driverClass . ' is not available on this system');
         }
 
         $factory = new DesarrollaCacheFactory(null, $config);
-        $this->assertInstanceOf(Cache::class, $factory->make());
+        $this->assertInstanceOf(CacheInterface::class, $factory->make());
     }
 
-    /**
-     * @return array
-     */
-    public function configProvider()
+    public function testMysqlRequiresConfig(): void
+    {
+        $this->expectException(InvalidConfigException::class);
+        $factory = new DesarrollaCacheFactory(null, ['driver' => 'mysql', 'mysql' => []]);
+        $factory->make();
+    }
+
+    public static function configProvider(): array
     {
         return [
             [['driver' => 'file'], null],
             [['driver' => 'apc'], null],
             [['driver' => 'memory'], null],
-            [['driver' => 'mongo'], \MongoClient::class],
+            [['driver' => 'mongo'], \MongoDB\Client::class],
             [['driver' => 'redis'], \Predis\Client::class],
-            [['driver' => 'mysql', 'mysql' => []], \mysqli::class],
-            [['driver' => 'memcache'], \Memcache::class],
+            [['driver' => 'memcache'], \Memcached::class],
         ];
     }
 }

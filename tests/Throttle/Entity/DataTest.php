@@ -2,26 +2,24 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 
-class DataTest extends \PHPUnit_Framework_TestCase
+class DataTest extends TestCase
 {
-    /**
-     * @var Data
-     */
-    private $data;
+    private Data $data;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->data = new Data('test');
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->assertEquals('test', $this->data->getData());
     }
 
-    public function testGetKey()
+    public function testGetKey(): void
     {
         $this->assertEquals(sha1('test'), $this->data->getKey());
     }

@@ -3,41 +3,24 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\RetriableThrottlerInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\RetrialQueueThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
-class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
+class RetrialQueueThrottlerTest extends TestCase
 {
     const HIT_LIMIT = 8;
     const TIME_LIMIT = 24;
 
-    /**
-     * @var CacheAdapterInterface|\Mockery\MockInterface
-     */
-    private $cacheAdapter;
+    private CacheAdapterInterface|M\MockInterface $cacheAdapter;
+    private RetriableThrottlerInterface|M\MockInterface $internalThrottler;
+    private TimeAdapterInterface|M\MockInterface $timeAdapter;
+    private RetrialQueueThrottler $throttler;
 
-    /**
-     * @var ThrottlerInterface|\Mockery\MockInterface
-     */
-    private $internalThrottler;
-
-    /**
-     * @var TimeAdapterInterface|\Mockery\MockInterface
-     */
-    private $timeAdapter;
-
-    /**
-     * @var ThrottlerInterface
-     */
-    private $throttler;
-
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
@@ -49,7 +32,7 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->throttler = new RetrialQueueThrottler($this->internalThrottler, $this->timeAdapter);
     }
 
-    public function testAccess()
+    public function testAccess(): void
     {
         $this->internalThrottler->shouldReceive('check')->andReturn(true);
         $this->internalThrottler->shouldReceive('getRetryTimeout')->andReturn(0);
@@ -60,7 +43,7 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->throttler->access());
     }
 
-    public function testHitBelowThreshold()
+    public function testHitBelowThreshold(): void
     {
         $this->internalThrottler->shouldReceive('getRetryTimeout')->andReturn(0);
         $this->internalThrottler->shouldReceive('hit')->once()->andReturnSelf();
@@ -70,7 +53,7 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->internalThrottler, $this->throttler->hit());
     }
 
-    public function testHitOnThreshold()
+    public function testHitOnThreshold(): void
     {
         $this->internalThrottler->shouldReceive('getRetryTimeout')
             ->andReturn(ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER);
@@ -81,21 +64,23 @@ class RetrialQueueThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->internalThrottler, $this->throttler->hit());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $this->internalThrottler->shouldReceive('clear')->once();
 
         $this->throttler->clear();
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $this->internalThrottler->shouldReceive('count')->andReturn(1);
 
         self::assertEquals(1, $this->throttler->count());
     }
 
-    public function testCheck()
+    public function testCheck(): void
     {
         $this->internalThrottler->shouldReceive('check')->andReturn(true);
 

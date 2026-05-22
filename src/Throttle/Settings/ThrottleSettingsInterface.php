@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
 interface ThrottleSettingsInterface
@@ -32,10 +34,10 @@ interface ThrottleSettingsInterface
      *
      * @return ThrottleSettingsInterface
      */
-    public function merge(ThrottleSettingsInterface $settings);
+    public function merge(ThrottleSettingsInterface $settings): ThrottleSettingsInterface;
 
     /**
      * @return bool
      */
-    public function isValid();
+    public function isValid(): bool;
 }

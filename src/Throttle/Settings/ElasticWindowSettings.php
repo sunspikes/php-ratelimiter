@@ -23,34 +23,26 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
 final class ElasticWindowSettings implements ThrottleSettingsInterface
 {
     /**
-     * @var int|null
-     */
-    private $limit;
-
-    /**
-     * @var int|null
-     */
-    private $time;
-
-    /**
      * @param int|null $limit
      * @param int|null $time
      */
-    public function __construct($limit = null, $time = null)
-    {
-        $this->limit = $limit;
-        $this->time = $time;
+    public function __construct(
+        private ?int $limit = null,
+        private ?int $time = null
+    ) {
     }
 
     /**
      * @inheritdoc
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    public function merge(ThrottleSettingsInterface $settings): ThrottleSettingsInterface
     {
         if (!$settings instanceof self) {
             throw new \InvalidArgumentException(
@@ -67,7 +59,7 @@ final class ElasticWindowSettings implements ThrottleSettingsInterface
     /**
      * @inheritdoc
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return null !== $this->limit && null !== $this->time;
     }
@@ -75,7 +67,7 @@ final class ElasticWindowSettings implements ThrottleSettingsInterface
     /**
      * @return int|null
      */
-    public function getLimit()
+    public function getLimit(): ?int
     {
         return $this->limit;
     }
@@ -83,7 +75,7 @@ final class ElasticWindowSettings implements ThrottleSettingsInterface
     /**
      * @return int|null
      */
-    public function getTime()
+    public function getTime(): ?int
     {
         return $this->time;
     }

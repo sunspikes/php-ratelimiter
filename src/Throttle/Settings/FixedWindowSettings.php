@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
 final class FixedWindowSettings extends AbstractWindowSettings

@@ -23,35 +23,34 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Cache\Factory;
 
-use Desarrolla2\Cache\Adapter\Apcu;
-use Desarrolla2\Cache\Adapter\File;
-use Desarrolla2\Cache\Adapter\Memcache;
-use Desarrolla2\Cache\Adapter\Memory;
-use Desarrolla2\Cache\Adapter\Mongo;
-use Desarrolla2\Cache\Adapter\Mysqli;
-use Desarrolla2\Cache\Adapter\NotCache;
-use Desarrolla2\Cache\Adapter\Predis;
-use Desarrolla2\Cache\Cache;
+use Desarrolla2\Cache\Apcu;
+use Desarrolla2\Cache\CacheInterface;
+use Desarrolla2\Cache\File;
+use Desarrolla2\Cache\Memcached;
+use Desarrolla2\Cache\Memory;
+use Desarrolla2\Cache\MongoDB;
+use Desarrolla2\Cache\Mysqli;
+use Desarrolla2\Cache\NotCache;
+use Desarrolla2\Cache\Predis;
 use Sunspikes\Ratelimit\Cache\Exception\DriverNotFoundException;
 use Sunspikes\Ratelimit\Cache\Exception\InvalidConfigException;
 
 class DesarrollaCacheFactory implements FactoryInterface
 {
-    /* @const DEFAULT_TTL */
-    const DEFAULT_TTL = 3600;
-    /* @const DEFAULT_LIMIT */
-    const DEFAULT_LIMIT = 1000;
+    public const DEFAULT_TTL = 3600;
+    public const DEFAULT_LIMIT = 1000;
 
-    /* @var array */
-    protected $config;
+    protected array $config;
 
     /**
      * @param string|null $configFile
      * @param array       $configArray
      */
-    public function __construct($configFile = null, array $configArray = [])
+    public function __construct(?string $configFile = null, array $configArray = [])
     {
         // Default config from distribution
         if (null === $configFile) {
@@ -66,40 +65,40 @@ class DesarrollaCacheFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function make()
+    public function make(): CacheInterface
     {
-        return new Cache($this->getDriver());
+        return $this->createDriver();
     }
 
     /**
      * Make the driver based on given config
      *
-     * @return null|\Desarrolla2\Cache\Adapter\AdapterInterface
+     * @return CacheInterface
      *
      * @throws DriverNotFoundException
      * @throws InvalidConfigException
      */
-    protected function getDriver()
+    protected function createDriver(): CacheInterface
     {
-        $driver = $this->config['driver'];
+        $driver = $this->config['driver'] ?? null;
 
-        if (is_null($driver)) {
+        if (null === $driver) {
             throw new InvalidConfigException('Cache driver is not defined in configuration.');
         }
 
-        $driverCreateMethod = 'create' . ucfirst($driver) . 'Driver';
+        $adapter = match (strtolower((string) $driver)) {
+            'notcache' => $this->createNotcacheDriver(),
+            'file' => $this->createFileDriver(),
+            'apc', 'apcu' => $this->createApcDriver(),
+            'memory' => $this->createMemoryDriver(),
+            'mongo', 'mongodb' => $this->createMongoDriver(),
+            'mysql', 'mysqli' => $this->createMysqlDriver(),
+            'redis' => $this->createRedisDriver(),
+            'memcache' => $this->createMemcacheDriver(),
+            default => throw new DriverNotFoundException('Cannot find the driver ' . $driver . ' for Desarrolla')
+        };
 
-        if (method_exists($this, $driverCreateMethod)) {
-            $driver = $this->{$driverCreateMethod}();
-            $driver->setOption('ttl',
-                $this->config['default_ttl']
-                    ?: static::DEFAULT_TTL
-            );
-
-            return $driver;
-        }
-
-        throw new DriverNotFoundException('Cannot find the driver ' . $driver . ' for Desarrolla');
+        return $adapter->withOption('ttl', $this->config['default_ttl'] ?? self::DEFAULT_TTL);
     }
 
     /**
@@ -107,7 +106,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return NotCache
      */
-    protected function createNotcacheDriver()
+    protected function createNotcacheDriver(): NotCache
     {
         return new NotCache();
     }
@@ -117,9 +116,9 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return File
      */
-    protected function createFileDriver()
+    protected function createFileDriver(): File
     {
-        return new File($this->config['file']['cache_dir']);
+        return new File($this->config['file']['cache_dir'] ?? sys_get_temp_dir());
     }
 
     /**
@@ -127,7 +126,7 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Apcu
      */
-    protected function createApcDriver()
+    protected function createApcDriver(): Apcu
     {
         return new Apcu();
     }
@@ -137,15 +136,9 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Memory
      */
-    protected function createMemoryDriver()
+    protected function createMemoryDriver(): Memory
     {
-        $memory = new Memory();
-        $memory->setOption('limit',
-            $this->config['memory']['limit']
-                ?: static::DEFAULT_LIMIT
-        );
-
-        return $memory;
+        return (new Memory())->withOption('limit', $this->config['memory']['limit'] ?? self::DEFAULT_LIMIT);
     }
 
     /**
@@ -153,9 +146,9 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Mongo
      */
-    protected function createMongoDriver()
+    protected function createMongoDriver(): MongoDB
     {
-        return new Mongo($this->config['mongo']['server']);
+        return new MongoDB($this->config['mongo']['server']);
     }
 
     /**
@@ -163,19 +156,19 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Mysqli
      */
-    protected function createMysqlDriver()
+    protected function createMysqlDriver(): Mysqli
     {
-        $server = null;
-
-        if (!empty($this->config['mysql'])) {
-            $server = new \mysqli(
-                $this->config['mysql']['host'],
-                $this->config['mysql']['username'],
-                $this->config['mysql']['password'],
-                $this->config['mysql']['dbname'],
-                $this->config['mysql']['port']
-            );
+        if (empty($this->config['mysql'])) {
+            throw new InvalidConfigException('MySQL configuration is required for the mysql driver.');
         }
+
+        $server = new \mysqli(
+            $this->config['mysql']['host'],
+            $this->config['mysql']['username'],
+            $this->config['mysql']['password'],
+            $this->config['mysql']['dbname'],
+            (int) $this->config['mysql']['port']
+        );
 
         return new Mysqli($server);
     }
@@ -185,28 +178,28 @@ class DesarrollaCacheFactory implements FactoryInterface
      *
      * @return Predis
      */
-    protected function createRedisDriver()
+    protected function createRedisDriver(): Predis
     {
         return new Predis();
     }
 
     /**
-     * Create MemCache driver
+     * Create Memcached driver
      *
-     * @return MemCache
+     * @return Memcached
      */
-    protected function createMemcacheDriver()
+    protected function createMemcacheDriver(): Memcached
     {
         $server = null;
 
         if (isset($this->config['memcache']['servers'])) {
-            $server = new \Memcache();
+            $server = new \Memcached();
 
             foreach ($this->config['memcache']['servers'] as $host) {
-                $server->addserver($host);
+                $server->addServer($host, 11211);
             }
         }
 
-        return new Memcache($server);
+        return new Memcached($server);
     }
 }

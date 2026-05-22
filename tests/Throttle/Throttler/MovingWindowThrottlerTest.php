@@ -2,23 +2,19 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
-use Mockery as M;
 use Sunspikes\Ratelimit\Throttle\Throttler\MovingWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
 class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
 {
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->cacheAdapter->shouldReceive('get')->with('key')->andReturn(serialize([]))->byDefault();
     }
 
-    public function testAccess()
+    public function testAccess(): void
     {
         $this->cacheAdapter->shouldReceive('get')
             ->with('key')
@@ -31,8 +27,10 @@ class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
         parent::testAccess();
     }
 
-    public function testClear()
+    public function testClear(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $this->cacheAdapter->shouldReceive('set')
             ->with('key', serialize([]), self::CACHE_TTL)
             ->once();
@@ -40,9 +38,8 @@ class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
         $this->throttler->clear();
     }
 
-    public function testCountWithLessTimePassedThanLimit()
+    public function testCountWithLessTimePassedThanLimit(): void
     {
-        //Less time has passed than the given window
         $this->mockTimePassed(self::TIME_LIMIT / 6);
 
         $this->cacheAdapter->shouldReceive('get')
@@ -55,7 +52,7 @@ class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
         $this->assertEquals(self::HIT_LIMIT / 3, $this->throttler->count());
     }
 
-    public function testGetRetryTimeoutPreLimit()
+    public function testGetRetryTimeoutPreLimit(): void
     {
         $this->mockTimePassed(self::TIME_LIMIT + 1);
 
@@ -66,7 +63,7 @@ class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
         $this->assertEquals(0, $this->throttler->getRetryTimeout());
     }
 
-    public function testGetRetryTimeoutPostLimit()
+    public function testGetRetryTimeoutPostLimit(): void
     {
         $this->mockTimePassed(1);
 
@@ -74,7 +71,7 @@ class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
             ->with('key')
             ->andReturn(serialize([
                 self::INITIAL_TIME => 1,
-                self::INITIAL_TIME + 1 => 1,    // <-- This is the timestamp which should expire before can be retried
+                self::INITIAL_TIME + 1 => 1,
                 self::INITIAL_TIME + self::TIME_LIMIT - 1 => self::HIT_LIMIT - 2
             ]));
 
@@ -84,10 +81,7 @@ class MovingWindowThrottlerTest extends AbstractWindowThrottlerTest
         );
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function createThrottler($key)
+    protected function createThrottler(string $key): MovingWindowThrottler
     {
         return new MovingWindowThrottler(
             $this->cacheAdapter,

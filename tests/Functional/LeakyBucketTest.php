@@ -1,6 +1,6 @@
 <?php
 
-namespace Sunspikes\Tests\Functional;
+namespace Sunspikes\Tests\Ratelimit\Functional;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
@@ -15,17 +15,11 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 class LeakyBucketTest extends AbstractThrottlerTestCase
 {
     const TIME_LIMIT = 27000;
-    const TOKEN_LIMIT = 30;    //30 requests per 27 seconds
+    const TOKEN_LIMIT = 30;
 
-    /**
-     * @var TimeAdapterInterface|M\MockInterface
-     */
-    private $timeAdapter;
+    private TimeAdapterInterface|M\MockInterface $timeAdapter;
 
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->timeAdapter->shouldReceive('now')->andReturn(time());
@@ -33,20 +27,17 @@ class LeakyBucketTest extends AbstractThrottlerTestCase
         parent::setUp();
     }
 
-    public function testThrottleAccess()
+    public function testThrottleAccess(): void
     {
         $expectedWaitTime = self::TIME_LIMIT / (self::TOKEN_LIMIT - $this->getMaxAttempts());
         $this->timeAdapter->shouldReceive('usleep')
-            ->with(ThrottlerInterface::SECOND_TO_MILLISECOND_MULTIPLIER * $expectedWaitTime)
+            ->with(ThrottlerInterface::MILLISECOND_TO_MICROSECOND_MULTIPLIER * $expectedWaitTime)
             ->once();
 
         parent::testThrottleAccess();
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function createRatelimiter(FactoryInterface $cacheFactory)
+    protected function createRatelimiter(FactoryInterface $cacheFactory): RateLimiter
     {
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),

@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 interface RetriableThrottlerInterface extends ThrottlerInterface
@@ -30,7 +32,7 @@ interface RetriableThrottlerInterface extends ThrottlerInterface
     /**
      * Return the number of milliseconds to wait before a valid request can be made
      *
-     * @return int
+     * @return int|float
      */
-    public function getRetryTimeout();
+    public function getRetryTimeout(): int|float;
 }

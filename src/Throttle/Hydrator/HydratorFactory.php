@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
 use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
@@ -35,16 +37,12 @@ class HydratorFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function make($data)
+    public function make(mixed $data): DataHydratorInterface
     {
-        if (is_string($data)) {
-            return new StringHydrator();
-        }
-
-        if (is_array($data)) {
-            return new ArrayHydrator();
-        }
-
-        throw new InvalidDataTypeException('Data type not supported, please check the data.');
+        return match (true) {
+            is_string($data) => new StringHydrator(),
+            is_array($data) => new ArrayHydrator(),
+            default => throw new InvalidDataTypeException('Data type not supported, please check the data.'),
+        };
     }
 }
