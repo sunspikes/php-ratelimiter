@@ -23,41 +23,28 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
 abstract class AbstractWindowSettings implements ThrottleSettingsInterface
 {
     /**
-     * @var int|null
-     */
-    private $hitLimit;
-
-    /**
-     * @var int|null
-     */
-    private $timeLimit;
-
-    /**
-     * @var int|null
-     */
-    private $cacheTtl;
-
-    /**
-     * @param int|null $tokenLimit
+     * @param int|null $hitLimit
      * @param int|null $timeLimit  In seconds
      * @param int|null $cacheTtl   In seconds
      */
-    public function __construct($tokenLimit = null, $timeLimit = null, $cacheTtl = null)
-    {
-        $this->hitLimit = $tokenLimit;
-        $this->timeLimit = $timeLimit;
-        $this->cacheTtl = $cacheTtl;
+    public function __construct(
+        private ?int $hitLimit = null,
+        private ?int $timeLimit = null,
+        private ?int $cacheTtl = null
+    ) {
     }
 
     /**
      * @inheritdoc
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    public function merge(ThrottleSettingsInterface $settings): ThrottleSettingsInterface
     {
         if (!$settings instanceof static) {
             throw new \InvalidArgumentException(
@@ -75,7 +62,7 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
     /**
      * @inheritdoc
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return
             null !== $this->hitLimit &&
@@ -86,7 +73,7 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
     /**
      * @return int|null
      */
-    public function getHitLimit()
+    public function getHitLimit(): ?int
     {
         return $this->hitLimit;
     }
@@ -94,7 +81,7 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
     /**
      * @return int|null
      */
-    public function getTimeLimit()
+    public function getTimeLimit(): ?int
     {
         return $this->timeLimit;
     }
@@ -102,7 +89,7 @@ abstract class AbstractWindowSettings implements ThrottleSettingsInterface
     /**
      * @return int|null
      */
-    public function getCacheTtl()
+    public function getCacheTtl(): ?int
     {
         return $this->cacheTtl;
     }

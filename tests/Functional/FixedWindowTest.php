@@ -1,6 +1,6 @@
 <?php
 
-namespace Sunspikes\Tests\Functional;
+namespace Sunspikes\Tests\Ratelimit\Functional;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
@@ -15,20 +15,10 @@ class FixedWindowTest extends AbstractThrottlerTestCase
 {
     const TIME_LIMIT = 4;
 
-    /**
-     * @var int
-     */
-    private $startTime;
+    private int $startTime;
+    private TimeAdapterInterface|M\MockInterface $timeAdapter;
 
-    /**
-     * @var TimeAdapterInterface|M\MockInterface
-     */
-    private $timeAdapter;
-
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->timeAdapter->shouldReceive('now')->andReturn($this->startTime = time())->byDefault();
@@ -36,7 +26,7 @@ class FixedWindowTest extends AbstractThrottlerTestCase
         parent::setUp();
     }
 
-    public function testWindowIsFixed()
+    public function testWindowIsFixed(): void
     {
         $throttle = $this->ratelimiter->get('window-is-fixed');
 
@@ -44,16 +34,12 @@ class FixedWindowTest extends AbstractThrottlerTestCase
             $throttle->hit();
         }
 
-        //override time
         $this->timeAdapter->shouldReceive('now')->andReturn($this->startTime + self::TIME_LIMIT + 1);
 
         self::assertEquals(0, $throttle->count());
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function createRatelimiter(FactoryInterface $cacheFactory)
+    protected function createRatelimiter(FactoryInterface $cacheFactory): RateLimiter
     {
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),

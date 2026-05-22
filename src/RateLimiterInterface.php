@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit;
 
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
@@ -40,5 +42,5 @@ interface RateLimiterInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function get($data, ?ThrottleSettingsInterface $throttlerSettings = null);
+    public function get(mixed $data, ?ThrottleSettingsInterface $throttlerSettings = null): ThrottlerInterface;
 }

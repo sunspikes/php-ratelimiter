@@ -3,23 +3,18 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Throttler;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Cache\Adapter\CacheAdapterInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ElasticWindowThrottler;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
-class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
+class ElasticWindowThrottlerTest extends TestCase
 {
     const TTL = 600;
 
-    /**
-     * @var ElasticWindowThrottler
-     */
-    private $throttler;
+    private ElasticWindowThrottler $throttler;
 
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $cacheAdapter = M::mock(CacheAdapterInterface::class);
 
@@ -34,33 +29,35 @@ class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->throttler = new ElasticWindowThrottler($cacheAdapter, 'key', 3, self::TTL);
     }
 
-    public function testAccess()
+    public function testAccess(): void
     {
-        $this->assertEquals(true, $this->throttler->access());
+        $this->assertTrue($this->throttler->access());
     }
 
-    public function testHit()
-    {
-        $this->assertEquals(1, count($this->throttler->hit()));
-    }
-
-    public function testClear()
-    {
-        $this->assertEquals(0, count($this->throttler->clear()));
-    }
-
-    public function testCount()
+    public function testHit(): void
     {
         $this->throttler->hit();
         $this->assertEquals(1, $this->throttler->count());
     }
 
-    public function testCheck()
+    public function testClear(): void
+    {
+        $this->throttler->clear();
+        $this->assertEquals(0, $this->throttler->count());
+    }
+
+    public function testCount(): void
+    {
+        $this->throttler->hit();
+        $this->assertEquals(1, $this->throttler->count());
+    }
+
+    public function testCheck(): void
     {
         $this->assertTrue($this->throttler->check());
     }
 
-    public function testThrottle()
+    public function testThrottle(): void
     {
         $this->throttler->hit();
         $this->throttler->hit();
@@ -68,7 +65,7 @@ class ElasticWindowThrottlerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->throttler->access());
     }
 
-    public function testGetRetryTimeout()
+    public function testGetRetryTimeout(): void
     {
         $this->assertEquals(0, $this->throttler->getRetryTimeout());
 

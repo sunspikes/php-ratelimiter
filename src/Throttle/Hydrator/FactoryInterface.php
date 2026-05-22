@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
 use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
@@ -42,5 +44,5 @@ interface FactoryInterface
      * @return DataHydratorInterface
      * @throws InvalidDataTypeException
      */
-    public function make($data);
+    public function make(mixed $data): DataHydratorInterface;
 }

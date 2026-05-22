@@ -2,16 +2,17 @@
 
 namespace Sunspikes\Tests\Ratelimit\Cache\Adapter;
 
-use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
-use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 use Desarrolla2\Cache\CacheInterface;
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
+use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
+use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
-class DesarrollaCacheAdapterTest extends \PHPUnit_Framework_TestCase
+class DesarrollaCacheAdapterTest extends TestCase
 {
-    private $adapterMock;
+    private DesarrollaCacheAdapter $adapterMock;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $cache = M::mock(CacheInterface::class);
 
@@ -47,48 +48,49 @@ class DesarrollaCacheAdapterTest extends \PHPUnit_Framework_TestCase
             ->with('delete-key')
             ->andReturnNull();
 
-        $cache->shouldReceive('clearCache')
+        $cache->shouldReceive('clear')
             ->withNoArgs()
             ->andReturnNull();
 
         $this->adapterMock = new DesarrollaCacheAdapter($cache);
     }
 
-    public function testSet()
+    public function testSet(): void
     {
-        $this->assertNull($this->adapterMock->set('key', 'value', 30));
+        $this->adapterMock->set('key', 'value', 30);
+        $this->assertEquals('value', $this->adapterMock->get('key'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->assertEquals('value', $this->adapterMock->get('key'));
     }
 
-    /**
-     * @expectedException \Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException
-     */
-    public function testGetNonExisting()
+    public function testGetNonExisting(): void
     {
+        $this->expectException(ItemNotFoundException::class);
         $this->adapterMock->get('non-existing-key');
     }
 
-    public function testHasExisting()
+    public function testHasExisting(): void
     {
         $this->assertTrue($this->adapterMock->has('has-existing-key'));
     }
 
-    public function testHasNonExisting()
+    public function testHasNonExisting(): void
     {
         $this->assertFalse($this->adapterMock->has('has-nonexisting-key'));
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
-        $this->assertNull($this->adapterMock->delete('delete-key'));
+        $this->adapterMock->delete('delete-key');
+        $this->assertTrue(true);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
-        $this->assertNull($this->adapterMock->clear());
+        $this->adapterMock->clear();
+        $this->assertTrue(true);
     }
 }

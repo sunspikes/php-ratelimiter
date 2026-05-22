@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
@@ -36,22 +38,7 @@ class RateLimiter implements RateLimiterInterface
     /**
      * @var ThrottlerInterface[]
      */
-    protected $throttlers;
-
-    /**
-     * @var ThrottlerFactoryInterface
-     */
-    protected $throttlerFactory;
-
-    /**
-     * @var HydratorFactoryInterface
-     */
-    protected $hydratorFactory;
-
-    /**
-     * @var ThrottleSettingsInterface
-     */
-    private $defaultSettings;
+    protected array $throttlers = [];
 
     /**
      * @param ThrottlerFactoryInterface $throttlerFactory
@@ -59,19 +46,16 @@ class RateLimiter implements RateLimiterInterface
      * @param ThrottleSettingsInterface $defaultSettings
      */
     public function __construct(
-        ThrottlerFactoryInterface $throttlerFactory,
-        HydratorFactoryInterface $hydratorFactory,
-        ThrottleSettingsInterface $defaultSettings
+        protected ThrottlerFactoryInterface $throttlerFactory,
+        protected HydratorFactoryInterface $hydratorFactory,
+        private ThrottleSettingsInterface $defaultSettings
     ) {
-        $this->throttlerFactory = $throttlerFactory;
-        $this->hydratorFactory = $hydratorFactory;
-        $this->defaultSettings = $defaultSettings;
     }
 
     /**
      * @inheritdoc
      */
-    public function get($data, ?ThrottleSettingsInterface $settings = null)
+    public function get(mixed $data, ?ThrottleSettingsInterface $settings = null): ThrottlerInterface
     {
         if (empty($data)) {
             throw new \InvalidArgumentException('Invalid data, please check the data.');
@@ -92,7 +76,7 @@ class RateLimiter implements RateLimiterInterface
      *
      * @return ThrottlerInterface
      */
-    private function createThrottler(Data $object, ?ThrottleSettingsInterface $settings = null)
+    private function createThrottler(Data $object, ?ThrottleSettingsInterface $settings = null): ThrottlerInterface
     {
         if (null === $settings) {
             $settings = $this->defaultSettings;

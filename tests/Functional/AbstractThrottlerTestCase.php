@@ -1,23 +1,17 @@
 <?php
 
-namespace Sunspikes\Tests\Functional;
+namespace Sunspikes\Tests\Ratelimit\Functional;
 
-use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Cache\Factory\DesarrollaCacheFactory;
 use Sunspikes\Ratelimit\Cache\Factory\FactoryInterface;
 use Sunspikes\Ratelimit\RateLimiter;
 
-abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractThrottlerTestCase extends TestCase
 {
-    /**
-     * @var Ratelimiter
-     */
-    protected $ratelimiter;
+    protected Ratelimiter $ratelimiter;
 
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $cacheFactory = new DesarrollaCacheFactory(null, [
             'driver' => 'memory',
@@ -27,7 +21,7 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
         $this->ratelimiter = $this->createRatelimiter($cacheFactory);
     }
 
-    public function testThrottlePreLimit()
+    public function testThrottlePreLimit(): void
     {
         $throttle = $this->ratelimiter->get('pre-limit-test');
 
@@ -38,7 +32,7 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
         $this->assertTrue($throttle->check());
     }
 
-    public function testThrottlePostLimit()
+    public function testThrottlePostLimit(): void
     {
         $throttle = $this->ratelimiter->get('post-limit-test');
 
@@ -49,7 +43,7 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
         $this->assertFalse($throttle->check());
     }
 
-    public function testThrottleAccess()
+    public function testThrottleAccess(): void
     {
         $throttle = $this->ratelimiter->get('access-test');
 
@@ -60,7 +54,7 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
         $this->assertFalse($throttle->access());
     }
 
-    public function testThrottleCount()
+    public function testThrottleCount(): void
     {
         $throttle = $this->ratelimiter->get('count-test');
 
@@ -71,7 +65,7 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $throttle->count());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $throttle = $this->ratelimiter->get('clear-test');
         $throttle->hit();
@@ -80,18 +74,10 @@ abstract class AbstractThrottlerTestCase extends \PHPUnit_Framework_TestCase
         self::assertEquals(0, $throttle->count());
     }
 
-    /**
-     * @return int
-     */
-    protected function getMaxAttempts()
+    protected function getMaxAttempts(): int
     {
         return 3;
     }
 
-    /**
-     * @param FactoryInterface $cacheFactory
-     *
-     * @return RateLimiter
-     */
-    abstract protected function createRatelimiter(FactoryInterface $cacheFactory);
+    abstract protected function createRatelimiter(FactoryInterface $cacheFactory): RateLimiter;
 }

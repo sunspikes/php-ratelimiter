@@ -18,20 +18,10 @@ use Sunspikes\Ratelimit\Time\TimeAdapterInterface;
 
 class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
 {
-    /**
-     * @var CacheAdapterInterface|MockInterface
-     */
-    protected $cacheAdapter;
+    protected CacheAdapterInterface|MockInterface $cacheAdapter;
+    private TimeAdapterInterface|MockInterface $timeAdapter;
 
-    /**
-     * @var TimeAdapterInterface|MockInterface
-     */
-    private $timeAdapter;
-
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->cacheAdapter = M::mock(CacheAdapterInterface::class);
@@ -39,7 +29,7 @@ class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
         $this->factory = new TimeAwareThrottlerFactory($this->cacheAdapter, $this->timeAdapter);
     }
 
-    public function testMakeLeakyBucket()
+    public function testMakeLeakyBucket(): void
     {
         self::assertInstanceOf(
             LeakyBucketThrottler::class,
@@ -47,7 +37,7 @@ class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
         );
     }
 
-    public function testMakeMovingWindow()
+    public function testMakeMovingWindow(): void
     {
         self::assertInstanceOf(
             MovingWindowThrottler::class,
@@ -55,7 +45,7 @@ class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
         );
     }
 
-    public function testMakeFixedWindow()
+    public function testMakeFixedWindow(): void
     {
         self::assertInstanceOf(
             FixedWindowThrottler::class,
@@ -63,7 +53,7 @@ class TimeAwareThrottlerFactoryTest extends ThrottlerFactoryTest
         );
     }
 
-    public function testMakeRetrialQueue()
+    public function testMakeRetrialQueue(): void
     {
         self::assertInstanceOf(
             RetrialQueueThrottler::class,

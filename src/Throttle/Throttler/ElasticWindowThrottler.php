@@ -1,27 +1,6 @@
 <?php
-/**
- * The MIT License (MIT)
- *
- * Copyright (c) 2015 Krishnaprasad MG <sunspikes@gmail.com>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+
+declare(strict_types=1);
 
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
@@ -30,35 +9,17 @@ use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
 
 class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
 {
-    /* @var CacheAdapterInterface */
-    protected $cache;
-    /* @var string */
-    protected $key;
-    /* @var int */
-    protected $limit;
-    /* @var int */
-    protected $ttl;
-    /* @var int */
-    protected $counter;
+    private ?int $counter = null;
 
-    /**
-     * @param CacheAdapterInterface $cache
-     * @param string $key
-     * @param int $limit
-     * @param int $ttl
-     */
-    public function __construct(CacheAdapterInterface $cache, $key, $limit, $ttl)
-    {
-        $this->cache = $cache;
-        $this->key = $key;
-        $this->limit = $limit;
-        $this->ttl = $ttl;
+    public function __construct(
+        protected CacheAdapterInterface $cache,
+        protected string $key,
+        protected int $limit,
+        protected int $ttl
+    ) {
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function access()
+    public function access(): bool
     {
         $status = $this->check();
 
@@ -67,10 +28,7 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
         return $status;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hit()
+    public function hit(): mixed
     {
         $this->counter = $this->count() + 1;
 
@@ -79,24 +37,16 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function clear()
+    public function clear(): void
     {
         $this->counter = 0;
 
         $this->cache->set($this->key, $this->counter, $this->ttl);
-
-        return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function count(): int
     {
-        if (!is_null($this->counter)) {
+        if (null !== $this->counter) {
             return $this->counter;
         }
 
@@ -109,34 +59,22 @@ class ElasticWindowThrottler implements RetriableThrottlerInterface, \Countable
         return $this->counter;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function check()
+    public function check(): bool
     {
         return ($this->count() < $this->limit);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getTime()
+    public function getTime(): int
     {
         return $this->ttl;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->limit;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getRetryTimeout()
+    public function getRetryTimeout(): int|float
     {
         if ($this->check()) {
             return 0;

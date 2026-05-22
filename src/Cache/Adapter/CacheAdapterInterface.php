@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Cache\Adapter;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
@@ -38,27 +40,27 @@ interface CacheAdapterInterface
      * 
      * @throws ItemNotFoundException
      */
-    public function get($key);
+    public function get(string $key): mixed;
 
     /**
      * Set value in cache
      *
      * @param string $key
      * @param mixed $value
-     * @param int $ttl
+     * @param int|null $ttl
      *
-     * @return mixed
+     * @return void
      */
-    public function set($key, $value, $ttl = null);
+    public function set(string $key, mixed $value, ?int $ttl = null): void;
 
     /**
      * Delete value from cache
      *
      * @param string $key
      *
-     * @return mixed
+     * @return void
      */
-    public function delete($key);
+    public function delete(string $key): void;
 
     /**
      * Check if keyed value exists in cache
@@ -67,12 +69,12 @@ interface CacheAdapterInterface
      *
      * @return bool
      */
-    public function has($key);
+    public function has(string $key): bool;
 
     /**
      * Clear cache
      *
      * @return void
      */
-    public function clear();
+    public function clear(): void;
 }

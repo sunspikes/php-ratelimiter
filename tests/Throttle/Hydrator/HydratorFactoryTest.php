@@ -2,38 +2,38 @@
 
 namespace Sunspikes\Tests\Ratelimit\Throttle\Hydrator;
 
+use PHPUnit\Framework\TestCase;
+use Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException;
+use Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator;
 use Sunspikes\Ratelimit\Throttle\Hydrator\HydratorFactory;
+use Sunspikes\Ratelimit\Throttle\Hydrator\StringHydrator;
 
-class HydratorFactoryTest extends \PHPUnit_Framework_TestCase
+class HydratorFactoryTest extends TestCase
 {
-    private $hydratorFactory;
+    private HydratorFactory $hydratorFactory;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
-
         $this->hydratorFactory = new HydratorFactory();
     }
 
-    public function testArrayHydrator()
+    public function testArrayHydrator(): void
     {
         $hydrator = $this->hydratorFactory->make([]);
 
-        $this->assertInstanceOf('\Sunspikes\Ratelimit\Throttle\Hydrator\ArrayHydrator', $hydrator);
+        $this->assertInstanceOf(ArrayHydrator::class, $hydrator);
     }
 
-    public function testStringHydrator()
+    public function testStringHydrator(): void
     {
         $hydrator = $this->hydratorFactory->make('test');
 
-        $this->assertInstanceOf('\Sunspikes\Ratelimit\Throttle\Hydrator\StringHydrator', $hydrator);
+        $this->assertInstanceOf(StringHydrator::class, $hydrator);
     }
 
-    /**
-     * @expectedException \Sunspikes\Ratelimit\Throttle\Exception\InvalidDataTypeException
-     */
-    public function testUnsupportedHydrator()
+    public function testUnsupportedHydrator(): void
     {
-        $hydrator = $this->hydratorFactory->make(1);
+        $this->expectException(InvalidDataTypeException::class);
+        $this->hydratorFactory->make(1);
     }
 }

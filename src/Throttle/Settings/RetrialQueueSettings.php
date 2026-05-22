@@ -23,27 +23,24 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Settings;
 
 final class RetrialQueueSettings implements ThrottleSettingsInterface
 {
     /**
-     * @var ThrottleSettingsInterface
-     */
-    private $internalThrottlerSettings;
-
-    /**
      * @param ThrottleSettingsInterface $internalThrottlerSettings
      */
-    public function __construct(ThrottleSettingsInterface $internalThrottlerSettings)
-    {
-        $this->internalThrottlerSettings = $internalThrottlerSettings;
+    public function __construct(
+        private ThrottleSettingsInterface $internalThrottlerSettings
+    ) {
     }
 
     /**
      * @inheritdoc
      */
-    public function merge(ThrottleSettingsInterface $settings)
+    public function merge(ThrottleSettingsInterface $settings): ThrottleSettingsInterface
     {
         if (!$settings instanceof self) {
             throw new \InvalidArgumentException(
@@ -57,7 +54,7 @@ final class RetrialQueueSettings implements ThrottleSettingsInterface
     /**
      * @inheritdoc
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->internalThrottlerSettings->isValid();
     }
@@ -65,7 +62,7 @@ final class RetrialQueueSettings implements ThrottleSettingsInterface
     /**
      * @return ThrottleSettingsInterface
      */
-    public function getInternalThrottlerSettings()
+    public function getInternalThrottlerSettings(): ThrottleSettingsInterface
     {
         return $this->internalThrottlerSettings;
     }

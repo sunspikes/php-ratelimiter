@@ -3,6 +3,7 @@
 namespace Sunspikes\Tests\Ratelimit;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\RateLimiter;
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
 use Sunspikes\Ratelimit\Throttle\Factory\FactoryInterface as ThrottlerFactoryInterface;
@@ -12,35 +13,17 @@ use Sunspikes\Ratelimit\Throttle\Settings\ElasticWindowSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 use Sunspikes\Ratelimit\Throttle\Throttler\ThrottlerInterface;
 
-class RatelimiterTest extends \PHPUnit_Framework_TestCase
+class RatelimiterTest extends TestCase
 {
-    /**
-     * @var ThrottleSettingsInterface|M\MockInterface
-     */
-    private $defaultSettings;
+    private ThrottleSettingsInterface|M\MockInterface $defaultSettings;
+    private ThrottlerFactoryInterface|M\MockInterface $throttlerFactory;
+    private HydratorFactoryInterface|M\MockInterface $hydratorFactory;
+    private Ratelimiter $ratelimiter;
 
-    /**
-     * @var ThrottlerFactoryInterface|M\MockInterface
-     */
-    private $throttlerFactory;
-
-    /**
-     * @var HydratorFactoryInterface|M\MockInterface
-     */
-    private $hydratorFactory;
-
-    /**
-     * @var Ratelimiter
-     */
-    private $ratelimiter;
-
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->throttlerFactory = M::mock(ThrottlerFactoryInterface::class);
-        $this->hydratorFactory =  M::mock(HydratorFactoryInterface::class);
+        $this->hydratorFactory = M::mock(HydratorFactoryInterface::class);
         $this->defaultSettings = M::mock(ThrottleSettingsInterface::class);
 
         $this->ratelimiter = new RateLimiter(
@@ -50,13 +33,13 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetWithInvalidData()
+    public function testGetWithInvalidData(): void
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->ratelimiter->get('');
     }
 
-    public function testGetWithDefaultSettings()
+    public function testGetWithDefaultSettings(): void
     {
         $object = $this->getHydratedObject('key');
 
@@ -68,7 +51,7 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
         self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key'));
     }
 
-    public function testGetWithMergableSettings()
+    public function testGetWithMergableSettings(): void
     {
         $object = $this->getHydratedObject('key');
 
@@ -82,7 +65,7 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
         self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', new ElasticWindowSettings()));
     }
 
-    public function testGetWithUnmergableSettings()
+    public function testGetWithUnmergableSettings(): void
     {
         $object = $this->getHydratedObject('key');
 
@@ -97,7 +80,7 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
         self::assertInstanceOf(ThrottlerInterface::class, $this->ratelimiter->get('key', $newSettings));
     }
 
-    public function testGetThrottlerCaching()
+    public function testGetThrottlerCaching(): void
     {
         $object1 = $this->getHydratedObject('key1');
         $object2 = $this->getHydratedObject('key2');
@@ -118,14 +101,9 @@ class RatelimiterTest extends \PHPUnit_Framework_TestCase
         self::assertNotSame($this->ratelimiter->get('key1'), $this->ratelimiter->get('key2'));
     }
 
-    /**
-     * @param string $key
-     *
-     * @return Data
-     */
-    private function getHydratedObject($key)
+    private function getHydratedObject(string $key): Data
     {
-        $object = new Data('data-'.$key);
+        $object = new Data('data-' . $key);
 
         $dataHydrator = M::mock(DataHydratorInterface::class);
         $dataHydrator->shouldReceive('hydrate')->with($key)->andReturn($object);

@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Cache\Adapter;
 
 use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
@@ -32,21 +34,17 @@ use Sunspikes\Ratelimit\Cache\Exception\ItemNotFoundException;
  */
 class DesarrollaCacheAdapter implements CacheAdapterInterface
 {
-    /* @var \Desarrolla2\Cache\CacheInterface $cache */
-    protected $cache;
-
     /**
      * @param \Desarrolla2\Cache\CacheInterface $cache
      */
-    public function __construct($cache)
+    public function __construct(protected \Desarrolla2\Cache\CacheInterface $cache)
     {
-        $this->cache = $cache;
     }
 
     /**
      * @inheritdoc
      */
-    public function get($key)
+    public function get(string $key): mixed
     {
         if ($this->cache->has($key)) {
             return $this->cache->get($key);
@@ -58,7 +56,7 @@ class DesarrollaCacheAdapter implements CacheAdapterInterface
     /**
      * @inheritdoc
      */
-    public function set($key, $value, $ttl = null)
+    public function set(string $key, mixed $value, ?int $ttl = null): void
     {
         $this->cache->set($key, $value, $ttl);
     }
@@ -66,7 +64,7 @@ class DesarrollaCacheAdapter implements CacheAdapterInterface
     /**
      * @inheritdoc
      */
-    public function delete($key)
+    public function delete(string $key): void
     {
         $this->cache->delete($key);
     }
@@ -74,7 +72,7 @@ class DesarrollaCacheAdapter implements CacheAdapterInterface
     /**
      * @inheritdoc
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return $this->cache->has($key);
     }
@@ -82,8 +80,8 @@ class DesarrollaCacheAdapter implements CacheAdapterInterface
     /**
      * @inheritdoc
      */
-    public function clear()
+    public function clear(): void
     {
-        $this->cache->clearCache();
+        $this->cache->clear();
     }
 }

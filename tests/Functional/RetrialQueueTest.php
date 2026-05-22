@@ -1,6 +1,6 @@
 <?php
 
-namespace Sunspikes\Tests\Functional;
+namespace Sunspikes\Tests\Ratelimit\Functional;
 
 use Mockery as M;
 use Sunspikes\Ratelimit\Cache\Adapter\DesarrollaCacheAdapter;
@@ -17,15 +17,9 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
 {
     const TIME_LIMIT = 24;
 
-    /**
-     * @var TimeAdapterInterface|M\MockInterface
-     */
-    private $timeAdapter;
+    private TimeAdapterInterface|M\MockInterface $timeAdapter;
 
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->timeAdapter = M::mock(TimeAdapterInterface::class);
         $this->timeAdapter->shouldReceive('now')->andReturn(time());
@@ -33,7 +27,7 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
         parent::setUp();
     }
 
-    public function testThrottleAccess()
+    public function testThrottleAccess(): void
     {
         $this->timeAdapter->shouldReceive('usleep')
             ->with(
@@ -45,10 +39,7 @@ class RetrialQueueTest extends AbstractThrottlerTestCase
         parent::testThrottleAccess();
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function createRatelimiter(FactoryInterface $cacheFactory)
+    protected function createRatelimiter(FactoryInterface $cacheFactory): RateLimiter
     {
         return new RateLimiter(
             new TimeAwareThrottlerFactory(new DesarrollaCacheAdapter($cacheFactory->make()), $this->timeAdapter),

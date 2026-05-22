@@ -3,12 +3,13 @@
 namespace Sunspikes\Tests\Ratelimit\Throttle\Settings;
 
 use Mockery as M;
+use PHPUnit\Framework\TestCase;
 use Sunspikes\Ratelimit\Throttle\Settings\LeakyBucketSettings;
 use Sunspikes\Ratelimit\Throttle\Settings\ThrottleSettingsInterface;
 
-class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
+class LeakyBucketSettingsTest extends TestCase
 {
-    public function testMergeWithEmpty()
+    public function testMergeWithEmpty(): void
     {
         $settings = new LeakyBucketSettings(120, 60, 30, 3600);
         $mergedSettings = $settings->merge(new LeakyBucketSettings());
@@ -19,7 +20,7 @@ class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(3600, $mergedSettings->getCacheTtl());
     }
 
-    public function testMergeWithNonEmpty()
+    public function testMergeWithNonEmpty(): void
     {
         $settings = new LeakyBucketSettings(null, 60, 30, null);
         $mergedSettings = $settings->merge(new LeakyBucketSettings(120, null, 40, null));
@@ -30,24 +31,21 @@ class LeakyBucketSettingsTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(null, $mergedSettings->getCacheTtl());
     }
 
-    public function testInvalidMerge()
+    public function testInvalidMerge(): void
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         (new LeakyBucketSettings())->merge(M::mock(ThrottleSettingsInterface::class));
     }
 
     /**
      * @dataProvider inputProvider
      */
-    public function testIsValid($tokenLimit, $timeLimit, $threshold, $result)
+    public function testIsValid(?int $tokenLimit, ?int $timeLimit, ?int $threshold, bool $result): void
     {
         self::assertEquals($result, (new LeakyBucketSettings($tokenLimit, $timeLimit, $threshold))->isValid());
     }
 
-    /**
-     * @return array
-     */
-    public function inputProvider()
+    public static function inputProvider(): array
     {
         return [
             [null, null, null, false],

@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Hydrator;
 
 use Sunspikes\Ratelimit\Throttle\Entity\Data;
@@ -32,9 +34,9 @@ class ArrayHydrator implements DataHydratorInterface
     /**
      * @inheritdoc
      */
-    public function hydrate($data)
+    public function hydrate(mixed $data): Data
     {
-        $string = implode('', $data);
+        $string = implode('', (array) $data);
 
         return new Data($string);
     }

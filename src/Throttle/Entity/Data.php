@@ -23,34 +23,27 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Entity;
 
 final class Data
 {
-    /**
-     * @var string
-     */
-    private $data;
-
-    /**
-     * @var string
-     */
-    private $key;
+    private ?string $key = null;
 
     /**
      * @param string $data
      */
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
+    public function __construct(
+        private string $data
+    ) {}
 
     /**
      * Get data
      *
      * @return string
      */
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }
@@ -60,9 +53,9 @@ final class Data
      *
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
-        if (is_null($this->key)) {
+        if ($this->key === null) {
             $this->key = sha1($this->data);
         }
 

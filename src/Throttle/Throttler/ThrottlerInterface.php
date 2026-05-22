@@ -23,33 +23,35 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace Sunspikes\Ratelimit\Throttle\Throttler;
 
 interface ThrottlerInterface
 {
-    const SECOND_TO_MILLISECOND_MULTIPLIER = 1000;
-    const MILLISECOND_TO_MICROSECOND_MULTIPLIER = 1000;
+    public const SECOND_TO_MILLISECOND_MULTIPLIER = 1000;
+    public const MILLISECOND_TO_MICROSECOND_MULTIPLIER = 1000;
 
     /**
      * Access the resource and return status
      *
      * @return bool
      */
-    public function access();
+    public function access(): bool;
 
     /**
      * Register a hit for the resource
      *
      * @return mixed
      */
-    public function hit();
+    public function hit(): mixed;
 
     /**
      * Clear the hit counter
      *
-     * @return mixed
+     * @return void
      */
-    public function clear();
+    public function clear(): void;
 
     /**
      * Get the hit count
@@ -63,19 +65,19 @@ interface ThrottlerInterface
      *
      * @return bool
      */
-    public function check();
+    public function check(): bool;
 
     /**
      * Get time window
      *
      * @return int
      */
-    public function getTime();
+    public function getTime(): int;
 
     /**
      * Get throttle limit
      *
      * @return int
      */
-    public function getLimit();
+    public function getLimit(): int;
 }
